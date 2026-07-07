@@ -40,7 +40,7 @@ export interface CTAType {
 }
 
 export interface BrandType {
-  icon: IconType;
+  icon: string;
   name: string;
 }
 
@@ -193,6 +193,6 @@ export const CTA: CTAType = {
 
 export const brand: BrandType = {
   name: "Pennytor",
-  icon: MdSecurity,
+  icon: "/img/Logo.jpeg",
 };
 

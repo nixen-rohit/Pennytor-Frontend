@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+
+ 
+
+@theme {
+  --color-foreground: #E85B66;
+  --color-mainground: #4E385E;
+
+ 
+}
