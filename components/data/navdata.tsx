@@ -13,8 +13,7 @@ import {
   FaHeadset,
   FaComments,
 } from "react-icons/fa";
-import { MdSecurity } from "react-icons/md";
-
+ 
 export interface NavLink {
   label: string;
   href: string;
@@ -42,6 +41,30 @@ export interface CTAType {
 export interface BrandType {
   icon: string;
   name: string;
+}
+
+export interface MegaLink {
+  label: string;
+  href: string;
+  icon?: IconType;
+  description?: string;
+  redirect?: boolean;
+}
+
+export interface MegaMenuColumn {
+  heading: string;
+  links: MegaLink[];
+}
+
+export interface MegaMenuData {
+  columns: MegaMenuColumn[];
+}
+
+export interface NavItem {
+  label: string;
+  href?: string;
+  mega?: MegaMenuData;
+  redirect?: boolean;
 }
 
 export interface PromoCardData {
@@ -82,28 +105,8 @@ export const insuranceProducts: ProductColumn[] = [
       { label: "Single Premium Plans", href: "/insurance/life/single-premium", description: "One-time payment with full life coverage" },
     ],
   },
-  {
-    heading: "Motor Insurance",
-    icon: FaCarCrash,
-    items: [
-      { label: "Car Insurance", href: "/insurance/motor/car", description: "Protect your vehicle with affordable plans" },
-      { label: "Two-Wheeler Insurance", href: "/insurance/motor/two-wheeler", description: "Quick claims and instant renewal" },
-      { label: "Third-Party Car Insurance", href: "/insurance/motor/car-third-party", description: "Legal liability cover for your car" },
-       { label: "Compare Bike Insurance", href: "/insurance/motor/compare-bike", description: "Compare bike insurance plans" },
-      { label: "Renew Car Insurance", href: "/insurance/motor/renew-car", description: "Renew your car policy online" },
-      { label: "Renew Bike Insurance", href: "/insurance/motor/renew-bike", description: "Instant bike insurance renewal" },
-    ],
-  },
-  {
-    heading: "Travel Insurance",
-    icon: FaPlaneDeparture,
-    items: [
-      { label: "Domestic Travel Insurance", href: "/insurance/travel/domestic", description: "Coverage for travel within the country" },
-       { label: "Business Travel Insurance", href: "/insurance/travel/business", description: "Comprehensive cover for business trips" },
-      { label: "Adventure Sports Cover", href: "/insurance/travel/adventure-sports", description: "Coverage for adventure activities" },
-      { label: "Compare Travel Insurance", href: "/insurance/travel/compare", description: "Compare international travel plans" },
-    ],
-  },
+  
+   
   {
     heading: "Home & Other Insurance",
     icon: FaHome,
@@ -185,7 +188,6 @@ export const promoCard: PromoCardData = {
 
 
 
-
 export const CTA: CTAType = {
   label: "Sign Up",
   href: "/login",
@@ -196,3 +198,62 @@ export const brand: BrandType = {
   icon: "/img/Logo.jpeg",
 };
 
+export const NAV: NavItem[] = [
+  {
+    label: "Services",
+    mega: {
+      columns: insuranceProducts.map((col) => ({
+        heading: col.heading,
+        links: col.items.map((item) => ({
+          label: item.label,
+          href: item.href,
+          description: item.description,
+        })),
+      })),
+    },
+  },
+  {
+    label: "Renew Your Policy",
+    mega: {
+      columns: [
+        {
+          heading: "Renewal Options",
+          links: renewPolicy.items,
+        },
+      ],
+    },
+  },
+  {
+    label: "Claim",
+    mega: {
+      columns: [
+        {
+          heading: "Claims",
+          links: claim.items,
+        },
+      ],
+    },
+  },
+  {
+    label: "Support",
+    mega: {
+      columns: [
+        {
+          heading: "Help & Support",
+          links: support.items,
+        },
+      ],
+    },
+  },
+  {
+    label: "Contact Us",
+    mega: {
+      columns: [
+        {
+          heading: "Get in Touch",
+          links: talkToExpert.items,
+        },
+      ],
+    },
+  },
+];
