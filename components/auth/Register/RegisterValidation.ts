@@ -25,6 +25,10 @@ export function validateRegisterForm(
     errors.password = "Password must be at least 6 characters";
   }
 
+  if (values.referralCode && values.referralCode.trim().length > 0 && values.referralCode.trim().length < 4) {
+    errors.referralCode = "Referral code must be at least 4 characters";
+  }
+
   if (!values.agreeToTerms) {
     errors.agreeToTerms = "You must agree to the terms and privacy policy";
   }
