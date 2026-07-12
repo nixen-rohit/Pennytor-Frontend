@@ -132,7 +132,7 @@ export default function Hero() {
 
               <h2 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-normal tracking-tight leading-[1.1] text-[#111111]">
                 Let’s Build  {" "}
-                <span className="block font-serif italic font-normal text-blue-600 sm:inline">
+                <span className="block font-serif italic font-normal text-foreground sm:inline">
                   Generational Wealth
                 </span>{" "}
                   Together
@@ -146,7 +146,7 @@ export default function Hero() {
             {/* BUTTONS CONTAINER */}
             <div className="flex flex-col sm:flex-row w-full gap-3 items-center justify-center sm:justify-start">
               {/* primary button */}
-              <button className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-linear-to-r from-blue-600 to-blue-500 text-white p-3 text-sm sm:text-base font-semibold shadow-lg shadow-blue-200/60 transition-all duration-300 hover:from-blue-700 hover:to-blue-600 hover:shadow-xl hover:shadow-blue-300/40 active:scale-[0.98] ">
+              <button className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 rounded-2xl bg-foreground  text-white p-3 text-sm sm:text-base font-semibold shadow-lg shadow-blue-200/60 transition-all duration-300 hover:from-blue-700 hover:to-blue-600 hover:shadow-xl hover:shadow-blue-300/40 active:scale-[0.98] ">
                 <span>Free consultation</span>
                 <span className=" flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-white/15 backdrop-blur-md border border-white/10 text-white transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 ">
                   <ArrowUpRight className="h-5 w-5" />
@@ -172,7 +172,7 @@ export default function Hero() {
             {statsCards.map((card) => (
               <div
                 key={card.id}
-                className="relative overflow-hidden rounded-3xl bg-linear-to-br from-blue-600 to-blue-700 p-6 text-white shadow-[0_20px_60px_rgba(37,99,235,0.25)] flex-1 min-h-[160px] flex flex-col justify-between"
+                className="relative overflow-hidden rounded-3xl bg-linear-to-br from-mainground to-foreground p-6 text-white shadow-[0_20px_60px_rgba(37,99,235,0.25)] flex-1 min-h-[160px] flex flex-col justify-between"
               >
                 <div className="absolute -bottom-10 -right-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
 

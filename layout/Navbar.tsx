@@ -10,8 +10,7 @@ import { brand, CTA, NAV } from "@/components/data/navdata";
 import { DesktopNav } from "@/components/Navbar/desktop/DesktopNav";
 import { MobileNav } from "@/components/Navbar/mobile/MobileNav";
 import { SearchOverlay } from "@/components/Navbar/shared/SearchOverlay";
-import Button from "@/components/ui/Button";
-
+ 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
