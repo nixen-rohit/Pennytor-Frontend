@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { RiSearchLine, RiMenuLine, RiArrowRightLine } from "react-icons/ri";
-import { brand, CTA, NAV } from "@/components/data/navdata";
+import { CTA, NAV } from "@/components/data/navdata";
 import { DesktopNav } from "@/components/Navbar/desktop/DesktopNav";
 import { MobileNav } from "@/components/Navbar/mobile/MobileNav";
 import { SearchOverlay } from "@/components/Navbar/shared/SearchOverlay";
@@ -64,8 +64,8 @@ export default function Navbar() {
               aria-label="Pennytor Home"
             >
               <Image
-                src={brand.icon}
-                alt={brand.name}
+                src="/logos/Logo.jpeg"
+                alt="Pennytor"
                 width={100}
                 height={100}
                 className="h-auto w-auto"

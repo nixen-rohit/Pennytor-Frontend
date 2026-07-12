@@ -2,8 +2,6 @@ import type { IconType } from "react-icons";
 import {
   FaHeartbeat,
   FaUserShield,
-  FaCarCrash,
-  FaPlaneDeparture,
   FaHome,
   FaPhoneAlt,
   FaWhatsapp,
@@ -192,11 +190,7 @@ export const CTA: CTAType = {
   label: "Sign Up",
   href: "/login",
 };
-
-export const brand: BrandType = {
-  name: "Pennytor",
-  icon: "/Logos/Logo.jpeg",
-};
+ 
 
 export const NAV: NavItem[] = [
   {
