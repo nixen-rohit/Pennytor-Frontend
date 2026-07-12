@@ -6,7 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiCloseLine, RiSearchLine, RiArrowRightLine } from "react-icons/ri";
 import { NavItem } from "@/components/data/navdata";
-import { MobileNavItem } from "@/components/Header/mobile/MobileNavItem";
+import { MobileNavItem } from "@/components/Navbar/mobile/MobileNavItem";
 
 interface MobileNavProps {
   open: boolean;

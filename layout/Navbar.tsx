@@ -7,9 +7,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { RiSearchLine, RiMenuLine, RiArrowRightLine } from "react-icons/ri";
 import { brand, CTA, NAV } from "@/components/data/navdata";
-import { DesktopNav } from "@/components/Header/desktop/DesktopNav";
-import { MobileNav } from "@/components/Header/mobile/MobileNav";
-import { SearchOverlay } from "@/components/Header/shared/SearchOverlay";
+import { DesktopNav } from "@/components/Navbar/desktop/DesktopNav";
+import { MobileNav } from "@/components/Navbar/mobile/MobileNav";
+import { SearchOverlay } from "@/components/Navbar/shared/SearchOverlay";
 import Button from "@/components/ui/Button";
 
 export default function Navbar() {

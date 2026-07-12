@@ -195,7 +195,7 @@ export const CTA: CTAType = {
 
 export const brand: BrandType = {
   name: "Pennytor",
-  icon: "/img/Logo.jpeg",
+  icon: "/Logos/Logo.jpeg",
 };
 
 export const NAV: NavItem[] = [

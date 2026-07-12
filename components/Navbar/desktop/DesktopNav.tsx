@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiArrowDownSLine, RiExternalLinkLine } from "react-icons/ri";
 import { NavItem } from "@/components/data/navdata";
-import { MegaMenuPanel } from "@/components/Header/desktop/MegaMenuPanel";
+import { MegaMenuPanel } from "@/components/Navbar/desktop/MegaMenuPanel";
 
 interface DesktopNavProps {
   navItems: NavItem[];
@@ -25,7 +25,6 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
       className={cn("items-center gap-0.5 flex-1 justify-center", className)}
     >
       {navItems.map((item, i) => {
-        
         const isServices = item.label === "Services";
         const isExpertise = item.label === "Expertise";
 
@@ -41,7 +40,6 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
               className={cn(
                 "flex items-center gap-0.5 px-3 py-2 rounded-lg",
                 "text-[15px] font-semibold  text-gray-600 hover:text-gray-500",
-                 
               )}
             >
               {item.label}
@@ -56,7 +54,6 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
               <MegaMenuPanel
                 mega={item.mega}
                 align={getAlign(i, navItems.length)}
-                
                 serviceWidth={isServices ? 810 : undefined}
                 expertiseWidth={isExpertise ? 250 : undefined}
               />

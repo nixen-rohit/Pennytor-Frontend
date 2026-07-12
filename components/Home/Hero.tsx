@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Phone,
 } from "lucide-react";
-
+import Image from "next/image";
 const statsCards = [
   {
     id: 1,
@@ -186,7 +186,9 @@ export default function Hero() {
                   {card.type === "avatars" && (
                     <div className="flex -space-x-2 md:mb-4 order-2 md:order-1 pr-10 md:pr-0">
                       {card.avatars?.map((src, index) => (
-                        <img
+                        <Image
+                        height={500}
+                        width={500}
                           key={index}
                           src={src}
                           alt="Client avatar"
