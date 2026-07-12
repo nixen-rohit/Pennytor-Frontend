@@ -5,6 +5,7 @@ import AuthBanner from "@/components/auth/Banner/AuthBanner";
 import ForgotPasswordForm from "@/components/auth/ForgotPassword/ForgotPasswordForm";
 import { validateForgotPasswordForm, hasErrors } from "@/components/auth/ForgotPassword/ForgotPasswordValidation";
 import type { ForgotPasswordFieldErrors } from "@/components/auth/ForgotPassword/ForgotPasswordTypes";
+import { AuthService } from "@/services/auth.service";
 
 export default function ForgotPasswordPage() {
   const [formLoading, setFormLoading] = useState(false);
@@ -26,18 +27,25 @@ export default function ForgotPasswordPage() {
       return;
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    setIsSuccess(false);
-    setFormLoading(false);
-    setIsSuccess(true);
+    try {
+      await AuthService.forgotPassword({ email });
+      setIsSuccess(true);
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred. Please try again.");
+    } finally {
+      setFormLoading(false);
+    }
   };
 
-  const handleResendEmail = () => {
+  const handleResendEmail = async () => {
     setFormLoading(true);
-    setTimeout(() => {
+    try {
+      await AuthService.forgotPassword({ email });
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred while resending the email.");
+    } finally {
       setFormLoading(false);
-    }, 1000);
+    }
   };
 
   return (

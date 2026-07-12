@@ -6,6 +6,7 @@ import AuthBanner from "@/components/auth/Banner/AuthBanner";
 import LoginForm from "./LoginForm";
 import { validateLoginForm, hasErrors } from "./LoginValidation";
 import type { LoginFieldErrors } from "./LoginTypes";
+import { AuthService } from "@/services/auth.service";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,17 +36,30 @@ export default function LoginPage() {
       return;
     }
 
-    const validEmail = process.env.NEXT_PUBLIC_VALID_EMAIL;
-    const validPassword = process.env.NEXT_PUBLIC_VALID_PASSWORD;
-
-    setTimeout(() => {
-      if (email === validEmail && password === validPassword) {
+    try {
+      const response = await AuthService.login({ email, password });
+      
+      // Assume the response contains the token
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem("refreshToken", response.data.refreshToken);
+        }
+        
+        // Store user data if needed
+        if (response.data.user) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+        }
+        
         router.push("/dashboard");
       } else {
-        setErrorMsg("Invalid email or password.");
+        setErrorMsg("Login failed. Please check your credentials.");
       }
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred during login.");
+    } finally {
       setFormLoading(false);
-    }, 600);
+    }
   };
 
   const handleGoogleSignIn = () => {
