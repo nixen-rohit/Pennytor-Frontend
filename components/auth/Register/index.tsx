@@ -30,6 +30,7 @@ export default function RegisterPage() {
       lastName: formData.lastName as string,
       email: formData.email as string,
       password: formData.password as string,
+      referralCode: (formData.referralCode as string) || undefined,
       agreeToTerms: formData.agreeToTerms === "on",
       subscribeNewsletter: formData.subscribeNewsletter === "on",
     };

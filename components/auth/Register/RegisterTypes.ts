@@ -3,6 +3,7 @@ export interface RegisterFormValues {
   lastName: string;
   email: string;
   password: string;
+  referralCode?: string;
   agreeToTerms: boolean;
   subscribeNewsletter: boolean;
 }
@@ -12,6 +13,7 @@ export interface RegisterFieldErrors {
   lastName?: string;
   email?: string;
   password?: string;
+  referralCode?: string;
   agreeToTerms?: string;
 }
 

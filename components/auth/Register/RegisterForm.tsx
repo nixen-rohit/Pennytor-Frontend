@@ -195,6 +195,25 @@ export default function RegisterForm({
           )}
         </div>
 
+        <div className="space-y-2">
+          <Label
+            htmlFor="referralCode"
+            className="text-sm font-medium text-zinc-700"
+          >
+            Referral code <span className="text-zinc-400 font-normal">(optional)</span>
+          </Label>
+          <Input
+            id="referralCode"
+            name="referralCode"
+            type="text"
+            placeholder="Enter referral code"
+            className="h-12 rounded-xl text-black border-zinc-200 bg-zinc-50/50 block w-full"
+          />
+          {fieldErrors.referralCode && (
+            <p className="text-xs text-red-500">{fieldErrors.referralCode}</p>
+          )}
+        </div>
+
         <div className="space-y-3">
           <div className="flex items-start gap-2">
             <input

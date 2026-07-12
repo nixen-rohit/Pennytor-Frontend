@@ -26,7 +26,7 @@ export default function WhatsAppFloatingButton() {
       href={whatsappUrl}
       target="_blank"
       aria-label="Chat on WhatsApp"
-      className="fixed bottom-6 right-6 z-50"
+      className="fixed bottom-6 right-6 z-100"
     >
       <div className="group flex items-center gap-3">
         {/* Tooltip */}
