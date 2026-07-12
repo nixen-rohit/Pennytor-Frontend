@@ -159,7 +159,7 @@ export default function Hero() {
                   <Phone className="h-5 w-5" />
                 </span>
 
-                <span>+91 9296352467</span>
+                <span>+91 {process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER}</span>
               </button>
             </div>
           </div>
