@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { RegisterFieldErrors } from "./RegisterTypes";
+import PasswordRequirements from "@/components/auth/Register/Passwordrequirements";
 
 interface RegisterFormProps {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -18,6 +19,26 @@ interface RegisterFormProps {
   onLogin: () => void;
 }
 
+function getPasswordStrength(password: string) {
+  let score = 0;
+
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  return score;
+}
+
+function getStrengthLabel(score: number) {
+  if (score <= 1) return "Weak";
+  if (score <= 3) return "Medium";
+  if (score === 4) return "Strong";
+
+  return "Very Strong";
+}
+
 export default function RegisterForm({
   onSubmit,
   formLoading,
@@ -27,6 +48,9 @@ export default function RegisterForm({
   onTogglePassword,
   onLogin,
 }: RegisterFormProps) {
+  const [password, setPassword] = React.useState("");
+  const passwordStrength = getPasswordStrength(password);
+
   return (
     <div className="w-full max-w-sm mx-auto space-y-8">
       {/* Header */}
@@ -35,7 +59,7 @@ export default function RegisterForm({
           Create your account
         </h1>
         <p className="text-sm text-zinc-500">
-          Join thousands of content creators using our platform
+          Join with thousands of investors and start earning today
         </p>
       </div>
 
@@ -116,6 +140,8 @@ export default function RegisterForm({
               type={showPassword ? "text" : "password"}
               placeholder="Create a strong password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="h-12 rounded-xl text-black border-zinc-200 bg-zinc-50/50 pr-10 block w-full"
             />
             <Button
@@ -135,6 +161,38 @@ export default function RegisterForm({
           {fieldErrors.password && (
             <p className="text-xs text-red-500">{fieldErrors.password}</p>
           )}
+
+          {/* Password Strength Bar */}
+          {password && (
+            <div className="space-y-3 pt-1">
+              <div className="space-y-1.5">
+                <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      passwordStrength <= 1
+                        ? "bg-red-500"
+                        : passwordStrength <= 2
+                          ? "bg-yellow-500"
+                          : passwordStrength <= 3
+                            ? "bg-blue-500"
+                            : "bg-green-500"
+                    }`}
+                    style={{
+                      width: `${(passwordStrength / 5) * 100}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-zinc-500">
+                  Password strength:{" "}
+                  <span className="font-medium">
+                    {getStrengthLabel(passwordStrength)}
+                  </span>
+                </p>
+              </div>
+
+              <PasswordRequirements password={password} />
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">
@@ -153,14 +211,14 @@ export default function RegisterForm({
               I agree to the{" "}
               <Link
                 href="/terms"
-                className="font-medium text-zinc-900 hover:underline"
+                className="font-medium text-foreground hover:underline"
               >
                 Terms of Service
               </Link>{" "}
               and{" "}
               <Link
                 href="/privacy"
-                className="font-medium text-zinc-900 hover:underline"
+                className="font-medium text-foreground hover:underline"
               >
                 Privacy Policy
               </Link>

@@ -77,14 +77,14 @@ export default function LoginForm({
           >
             Password
           </Label>
-          <div className="relative flex items-center">
+          <div className="relative flex items-center  ">
             <Input
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
               placeholder="Enter your Password"
               required
-              className="h-12 rounded-xl text-zinc-900  border-zinc-200 bg-zinc-50/50   pr-10 block w-full"
+              className="h-12 text-zinc-900 rounded-xl  border-zinc-200 bg-zinc-50/50   pr-10 block w-full"
             />
             <Button
               type="button"

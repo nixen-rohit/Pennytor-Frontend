@@ -1,5 +1,6 @@
 // components/header/shared/SearchOverlay.tsx
 "use client";
+import { FaArrowUp } from "react-icons/fa6";
 
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
@@ -88,21 +89,21 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
 
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {[
-                "Web Development",
-                "Mobile Apps",
-                "AI & ML",
-                "Cloud Services",
-                "UX/UI Design",
-                "DevOps",
+                "STOCKS",
+                "RD PLANS",
+                "MUTUAL FUNDS",
+                "TAX PLANNING",
+                "INSURANCE",
+                "PERSONAL LOANS",
               ].map((q) => (
                 <button
                   key={q}
                   className={cn(
                     "group rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-left transition-all",
-                    "hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm"
+                    "hover:border-zinc-200 hover:bg-white/20 hover:shadow-sm"
                   )}
                 >
-                  <span className="block text-sm font-semibold text-gray-700 group-hover:text-blue-600">
+                  <span className="block text-sm font-semibold text-gray-700 group-hover:text-foreground">
                     {q}
                   </span>
                 </button>
@@ -118,16 +119,16 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
 
             <div className="space-y-3">
               {[
-                "Try 'Best AI solutions'",
-                "Search 'UI/UX portfolio'",
-                "Find 'Cloud migration'",
+                `Try "SIP PLANS"`,
+                `Search "RD PLANS"`,
+                `Find "MUTUAL FUNDS"`,
               ].map((tip) => (
                 <button
                   key={tip}
-                  className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-blue-600"
+                  className="group flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-foreground"
                 >
-                  <span>{tip}</span>
-                  <span className="text-gray-300">↗</span>
+                   {tip} 
+                  <span className="text-gray-300 rotate-45 group-hover:text-foreground"><FaArrowUp/></span>
                 </button>
               ))}
             </div>

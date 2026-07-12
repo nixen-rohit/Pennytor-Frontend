@@ -32,6 +32,5 @@ body {
 @theme {
   --color-foreground: #E85B66;
   --color-mainground: #4E385E;
-
- 
+  --color-ring: #71717a;
 }

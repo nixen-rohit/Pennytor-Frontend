@@ -53,7 +53,7 @@ export default function LoginPage() {
   };
 
   const handleResetPassword = () => {
-    router.push("/forgot");
+    router.push("/forgot-password");
   };
 
   const handleRegister = () => {
