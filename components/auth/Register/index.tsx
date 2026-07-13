@@ -6,6 +6,7 @@ import AuthBanner from "@/components/auth/Banner/AuthBanner";
 import RegisterForm from "./RegisterForm";
 import { validateRegisterForm, hasErrors } from "./RegisterValidation";
 import type { RegisterFieldErrors } from "./RegisterTypes";
+import { AuthService } from "@/services/auth.service";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -42,9 +43,32 @@ export default function RegisterPage() {
       return;
     }
 
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 600);
+    try {
+      const response = await AuthService.register({
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        password: values.password,
+        referralCode: values.referralCode,
+      });
+
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        if (response.data.refreshToken) {
+          localStorage.setItem("refreshToken", response.data.refreshToken);
+        }
+        if (response.data.user) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+        }
+        router.push("/dashboard");
+      } else {
+        setErrorMsg("Registration failed. Please try again.");
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || "An error occurred during registration.");
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const handleLogin = () => {
