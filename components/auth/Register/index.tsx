@@ -76,20 +76,31 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="h-full flex">
-      <AuthBanner />
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <RegisterForm
-          onSubmit={handleRegister}
-          formLoading={formLoading}
-          errorMsg={errorMsg}
-          showPassword={showPassword}
-          fieldErrors={fieldErrors}
-          onTogglePassword={() => setShowPassword(!showPassword)}
-          onLogin={handleLogin}
-        />
-      </div>
+    <div className="flex h-screen">
+  {/* Left Side - Fixed */}
+  <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
+    <AuthBanner />
+  </div>
+
+  {/* Right Side - Scrollable */}
+  <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
+    <div className="flex min-h-screen items-center justify-center p-8">
+      <RegisterForm
+        onSubmit={handleRegister}
+        formLoading={formLoading}
+        errorMsg={errorMsg}
+        showPassword={showPassword}
+        fieldErrors={fieldErrors}
+        onTogglePassword={() => setShowPassword(!showPassword)}
+        onLogin={handleLogin}
+      />
     </div>
+  </div>
+</div>
+
+
+
+    
   );
 }

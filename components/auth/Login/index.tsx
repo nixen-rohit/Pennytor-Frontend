@@ -38,19 +38,19 @@ export default function LoginPage() {
 
     try {
       const response = await AuthService.login({ email, password });
-      
+
       // Assume the response contains the token
       if (response.data && response.data.accessToken) {
         localStorage.setItem("accessToken", response.data.accessToken);
         if (response.data.refreshToken) {
           localStorage.setItem("refreshToken", response.data.refreshToken);
         }
-        
+
         // Store user data if needed
         if (response.data.user) {
           localStorage.setItem("user", JSON.stringify(response.data.user));
         }
-        
+
         router.push("/dashboard");
       } else {
         setErrorMsg("Login failed. Please check your credentials.");
@@ -75,23 +75,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-full flex">
-      <AuthBanner />
+    <div className="flex h-screen">
+      {/* Left Side - Fixed */}
+      <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
+        <AuthBanner />
+      </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <LoginForm
-          onSubmit={handleSignIn}
-          formLoading={formLoading}
-          errorMsg={errorMsg}
-          showPassword={showPassword}
-          keepSignedIn={keepSignedIn}
-          fieldErrors={fieldErrors}
-          onTogglePassword={() => setShowPassword(!showPassword)}
-          onToggleKeepSignedIn={() => setKeepSignedIn(!keepSignedIn)}
-          onResetPassword={handleResetPassword}
-          onGoogleSignIn={handleGoogleSignIn}
-          onRegister={handleRegister}
-        />
+      {/* Right Side - Scrollable */}
+      <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
+        <div className="flex min-h-screen items-center justify-center p-8">
+          <LoginForm
+            onSubmit={handleSignIn}
+            formLoading={formLoading}
+            errorMsg={errorMsg}
+            showPassword={showPassword}
+            keepSignedIn={keepSignedIn}
+            fieldErrors={fieldErrors}
+            onTogglePassword={() => setShowPassword(!showPassword)}
+            onToggleKeepSignedIn={() => setKeepSignedIn(!keepSignedIn)}
+            onResetPassword={handleResetPassword}
+            onGoogleSignIn={handleGoogleSignIn}
+            onRegister={handleRegister}
+          />
+        </div>
       </div>
     </div>
   );
