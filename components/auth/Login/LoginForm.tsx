@@ -35,8 +35,7 @@ export default function LoginForm({
   onRegister,
 }: LoginFormProps) {
   return (
-    <div className="w-full max-w-sm mx-auto space-y-8 ">      
-
+    <div className="w-full max-w-sm mx-auto space-y-8 ">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-black ">
@@ -51,10 +50,7 @@ export default function LoginForm({
       {/* Form */}
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label
-            htmlFor="email"
-            className="text-sm font-medium text-zinc-700"
-          >
+          <Label htmlFor="email" className="text-sm font-medium text-zinc-700">
             Your email
           </Label>
           <Input
@@ -126,11 +122,10 @@ export default function LoginForm({
 
         {/* Error Message */}
         {errorMsg && (
-          <p className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg animate-in fade-in-50">
+          <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
             {errorMsg}
           </p>
         )}
-
         {/* Submit Button */}
         <Button
           type="submit"

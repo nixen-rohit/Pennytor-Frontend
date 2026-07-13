@@ -159,7 +159,7 @@ export default function RegisterForm({
             </Button>
           </div>
           {fieldErrors.password && (
-            <p className="text-xs text-red-500">{fieldErrors.password}</p>
+            <p className="text-sm text-red-500">{fieldErrors.password}</p>
           )}
 
           {/* Password Strength Bar */}
@@ -260,7 +260,7 @@ export default function RegisterForm({
 
         {/* Error Message */}
         {errorMsg && (
-          <p className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg animate-in fade-in-50">
+          <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
             {errorMsg}
           </p>
         )}

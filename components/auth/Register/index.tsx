@@ -7,9 +7,14 @@ import RegisterForm from "./RegisterForm";
 import { validateRegisterForm, hasErrors } from "./RegisterValidation";
 import type { RegisterFieldErrors } from "./RegisterTypes";
 import { AuthService } from "@/services/auth.service";
+import RegisteredOtpDialog from "@/components/auth/OTP/RegisteredOTP";
 
 export default function RegisterPage() {
   const router = useRouter();
+   
+
+const [open, setOpen] = useState(false);
+
 
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -22,6 +27,7 @@ export default function RegisterPage() {
     setErrorMsg("");
     setFieldErrors({});
 
+    setOpen(true);
     const formData = Object.fromEntries(
       new FormData(e.currentTarget).entries(),
     );
@@ -82,7 +88,7 @@ export default function RegisterPage() {
   <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
     <AuthBanner />
   </div>
-
+<RegisteredOtpDialog open={open} onOpenChange={setOpen} email="user@example.com" />
   {/* Right Side - Scrollable */}
   <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
     <div className="flex min-h-screen items-center justify-center p-8">
