@@ -68,9 +68,9 @@ export default function Hero() {
     <div className="lg:col-span-5 flex flex-col justify-center">
       <div className="space-y-6 sm:space-y-8">
         <div className="flex flex-col items-center text-center md:items-start md:text-left">
-          <h2 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-normal tracking-tight leading-[1.1] text-[#111111]">
+          <h2 className="text-3xl  xs:text-4xl sm:text-5xl md:text-6xl xl:text-7xl tracking-tight leading-[1.1] text-[#111111]">
             Let's Build{" "}
-            <span className="block font-serif italic font-normal text-foreground sm:inline">
+            <span className="block font-normal font-serif italic  text-foreground sm:inline">
               Generational Wealth
             </span>
           </h2>

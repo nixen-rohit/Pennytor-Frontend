@@ -1,6 +1,6 @@
-import Navbar from "@/layout/Navbar";
+import Navbar from "@/components/Navbar/Navbar";
 import WhatsAppFloatingButton from "@/components/custom/WhatsAppFloatingButton";
-
+import Footer from "@/components/Footer/index";
 
 export default function MainLayout({
   children,
@@ -9,10 +9,10 @@ export default function MainLayout({
 }>) {
   return (
     <>
-    
-    <Navbar />
-     <WhatsAppFloatingButton/>
+      <Navbar />
+      <WhatsAppFloatingButton />
       {children}
+      <Footer />
     </>
   );
 }
