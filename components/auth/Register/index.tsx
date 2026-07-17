@@ -2,60 +2,46 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import AuthBanner from "@/components/auth/Banner/AuthBanner";
 import RegisterForm from "./RegisterForm";
-import { validateRegisterForm, hasErrors } from "./RegisterValidation";
-import type { RegisterFieldErrors } from "./RegisterTypes";
+import { registerSchema, type RegisterFormValues } from "@/lib/validations";
 import { AuthService } from "@/services/auth.service";
 import RegisteredOtpDialog from "@/components/auth/OTP/RegisteredOTP";
 
 export default function RegisterPage() {
   const router = useRouter();
-   
 
-const [open, setOpen] = useState(false);
-
-
+  const [open, setOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<RegisterFieldErrors>({});
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      referralCode: "",
+      agreeToTerms: false,
+      subscribeNewsletter: false,
+    },
+  });
+
+  const handleRegister = async (data: RegisterFormValues) => {
     setFormLoading(true);
     setErrorMsg("");
-    setFieldErrors({});
-
-    setOpen(true);
-    const formData = Object.fromEntries(
-      new FormData(e.currentTarget).entries(),
-    );
-
-    const values = {
-      firstName: formData.firstName as string,
-      lastName: formData.lastName as string,
-      email: formData.email as string,
-      password: formData.password as string,
-      referralCode: (formData.referralCode as string) || undefined,
-      agreeToTerms: formData.agreeToTerms === "on",
-      subscribeNewsletter: formData.subscribeNewsletter === "on",
-    };
-
-    const errors = validateRegisterForm(values);
-    if (hasErrors(errors)) {
-      setFieldErrors(errors);
-      setFormLoading(false);
-      return;
-    }
 
     try {
       const response = await AuthService.register({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        password: values.password,
-        referralCode: values.referralCode,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+        referralCode: data.referralCode || undefined,
       });
 
       if (response.data && response.data.accessToken) {
@@ -66,7 +52,7 @@ const [open, setOpen] = useState(false);
         if (response.data.user) {
           localStorage.setItem("user", JSON.stringify(response.data.user));
         }
-        router.push("/dashboard");
+        setOpen(true);
       } else {
         setErrorMsg("Registration failed. Please try again.");
       }
@@ -82,31 +68,30 @@ const [open, setOpen] = useState(false);
   };
 
   return (
-
     <div className="flex h-screen">
-  {/* Left Side - Fixed */}
-  <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
-    <AuthBanner />
-  </div>
-<RegisteredOtpDialog open={open} onOpenChange={setOpen} email="user@example.com" />
-  {/* Right Side - Scrollable */}
-  <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
-    <div className="flex min-h-screen items-center justify-center p-8">
-      <RegisterForm
-        onSubmit={handleRegister}
-        formLoading={formLoading}
-        errorMsg={errorMsg}
-        showPassword={showPassword}
-        fieldErrors={fieldErrors}
-        onTogglePassword={() => setShowPassword(!showPassword)}
-        onLogin={handleLogin}
+      {/* Left Side - Fixed */}
+      <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
+        <AuthBanner />
+      </div>
+      <RegisteredOtpDialog
+        open={open}
+        onOpenChange={setOpen}
+        email={form.getValues("email")}
       />
+      {/* Right Side - Scrollable */}
+      <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
+        <div className="flex min-h-screen items-center justify-center p-8">
+          <RegisterForm
+            form={form}
+            onSubmit={handleRegister}
+            formLoading={formLoading}
+            errorMsg={errorMsg}
+            showPassword={showPassword}
+            onTogglePassword={() => setShowPassword(!showPassword)}
+            onLogin={handleLogin}
+          />
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
-
-
-    
   );
 }

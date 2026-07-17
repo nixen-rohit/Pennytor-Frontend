@@ -4,81 +4,93 @@ import type React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Mail, ArrowLeft, CheckCircle, Clock, Shield } from "lucide-react";
-import type { ForgotPasswordFieldErrors } from "./ForgotPasswordTypes";
+import type { UseFormReturn } from "react-hook-form";
+import type { ForgotPasswordFormValues } from "@/lib/validations";
 
 interface ForgotPasswordFormProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  form: UseFormReturn<ForgotPasswordFormValues>;
+  onSubmit: (data: ForgotPasswordFormValues) => void;
   formLoading: boolean;
   errorMsg: string;
   isSuccess: boolean;
-  email: string;
-  fieldErrors: ForgotPasswordFieldErrors;
-  onEmailChange: (value: string) => void;
   onResendEmail: () => void;
 }
 
 export default function ForgotPasswordForm({
+  form,
   onSubmit,
   formLoading,
   errorMsg,
   isSuccess,
-  email,
-  fieldErrors,
-  onEmailChange,
   onResendEmail,
 }: ForgotPasswordFormProps) {
   return (
     <div className="w-full max-w-md">
       {!isSuccess ? (
         <div className="space-y-6">
-           
-
           <div className="text-center lg:text-left">
-            <h2 className="text-3xl font-bold mb-2 text-slate-900">Forgot your password?</h2>
+            <h2 className="text-3xl font-bold mb-2 text-slate-900">
+              Forgot your password?
+            </h2>
             <p className="text-slate-400">
-              No worries! Enter your email address and we&apos;ll send you a link
-              to reset your password.
+              No worries! Enter your email address and we&apos;ll send you a
+              link to reset your password.
             </p>
           </div>
 
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-zinc-700">
-                Email address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="h-12 text-zinc-900 rounded-xl border-zinc-200 bg-zinc-50/50 block w-full pl-10"
-                  value={email}
-                  onChange={(e) => onEmailChange(e.target.value)}
-                  required
-                />
-              </div>
-              {fieldErrors.email && (
-                <p className="text-xs text-red-500">{fieldErrors.email}</p>
-              )}
-            </div>
-
-            {errorMsg && (
-              <p className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
-                {errorMsg}
-              </p>
-            )}
-
-            <Button
-              type="submit"
-              disabled={formLoading}
-              className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
             >
-              {formLoading ? "Sending reset link..." : "Send reset link"}
-            </Button>
-          </form>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-zinc-700">
+                      Email address
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="Enter your email address"
+                          className="h-12 text-zinc-900 rounded-xl border-zinc-200 bg-zinc-50/50 block w-full pl-10"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {errorMsg && (
+                <p className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+                  {errorMsg}
+                </p>
+              )}
+
+              <Button
+                type="submit"
+                disabled={formLoading}
+                className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
+              >
+                {formLoading ? "Sending reset link..." : "Send reset link"}
+              </Button>
+            </form>
+          </Form>
 
           <div className="text-center">
             <Link
@@ -108,12 +120,15 @@ export default function ForgotPasswordForm({
               Check your email
             </h2>
             <p className="text-slate-600 mb-4">
-              We&apos;ve sent a password reset link to <strong>{email}</strong>
+              We&apos;ve sent a password reset link to{" "}
+              <strong>{form.getValues("email")}</strong>
             </p>
           </div>
 
           <div className="bg-slate-50 rounded-lg p-6 text-left">
-            <h3 className="font-semibold text-slate-900 mb-4">What&apos;s next?</h3>
+            <h3 className="font-semibold text-slate-900 mb-4">
+              What&apos;s next?
+            </h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
                 <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">

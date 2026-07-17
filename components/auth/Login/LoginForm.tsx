@@ -1,19 +1,27 @@
 "use client";
 
 import React from "react";
-import { Eye, EyeOff, Loader2, Asterisk } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import type { LoginFieldErrors } from "./LoginTypes";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import type { UseFormReturn } from "react-hook-form";
+import type { LoginFormValues } from "@/lib/validations";
 
 interface LoginFormProps {
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  form: UseFormReturn<LoginFormValues>;
+  onSubmit: (data: LoginFormValues) => void;
   formLoading: boolean;
   errorMsg: string;
   showPassword: boolean;
   keepSignedIn: boolean;
-  fieldErrors: LoginFieldErrors;
   onTogglePassword: () => void;
   onToggleKeepSignedIn: () => void;
   onResetPassword: () => void;
@@ -22,12 +30,12 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({
+  form,
   onSubmit,
   formLoading,
   errorMsg,
   showPassword,
   keepSignedIn,
-  fieldErrors,
   onTogglePassword,
   onToggleKeepSignedIn,
   onResetPassword,
@@ -48,100 +56,107 @@ export default function LoginForm({
       </div>
 
       {/* Form */}
-      <form onSubmit={onSubmit} className="space-y-5">
-        <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-medium text-zinc-700">
-            Your email
-          </Label>
-          <Input
-            id="email"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+          <FormField
+            control={form.control}
             name="email"
-            type="email"
-            placeholder="name@example.com"
-            required
-            className="h-12 text-zinc-900 rounded-xl border-zinc-200 bg-zinc-50/50 block w-full"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-zinc-700">
+                  Your email
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    placeholder="name@example.com"
+                    className="h-12 text-zinc-900 rounded-xl border-zinc-200 bg-zinc-50/50 block w-full"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          {fieldErrors.email && (
-            <p className="text-xs text-red-500">{fieldErrors.email}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label
-            htmlFor="password"
-            className="text-sm font-medium text-zinc-700"
-          >
-            Password
-          </Label>
-          <div className="relative flex items-center  ">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your Password"
-              required
-              className="h-12 text-zinc-900 rounded-xl  border-zinc-200 bg-zinc-50/50   pr-10 block w-full"
-            />
-            <Button
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-zinc-700">
+                  Password
+                </FormLabel>
+                <FormControl>
+                  <div className="relative flex items-center  ">
+                    <Input
+                      {...field}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your Password"
+                      className="h-12 text-zinc-900 rounded-xl  border-zinc-200 bg-zinc-50/50   pr-10 block w-full"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={onTogglePassword}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-zinc-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-zinc-400" />
+                      )}
+                    </Button>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-between items-center text-sm">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={keepSignedIn}
+                onChange={onToggleKeepSignedIn}
+                className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <span className="text-zinc-600">Keep me signed in</span>
+            </label>
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
-              onClick={onTogglePassword}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
+              onClick={onResetPassword}
+              className="text-zinc-500 hover:text-zinc-900 hover:underline"
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4 text-zinc-400" />
-              ) : (
-                <Eye className="h-4 w-4 text-zinc-400" />
-              )}
-            </Button>
+              Forgot password
+            </button>
           </div>
-          {fieldErrors.password && (
-            <p className="text-xs text-red-500">{fieldErrors.password}</p>
-          )}
-        </div>
 
-        <div className="flex justify-between items-center text-sm">
-          <label className="flex items-center gap-2 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={keepSignedIn}
-              onChange={onToggleKeepSignedIn}
-              className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
-            />
-            <span className="text-zinc-600">Keep me signed in</span>
-          </label>
-          <button
-            type="button"
-            onClick={onResetPassword}
-            className="text-zinc-500 hover:text-zinc-900 hover:underline"
+          {/* Error Message */}
+          {errorMsg && (
+            <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
+              {errorMsg}
+            </p>
+          )}
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={formLoading}
+            className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
           >
-            Forgot password
-          </button>
-        </div>
-
-        {/* Error Message */}
-        {errorMsg && (
-          <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
-            {errorMsg}
-          </p>
-        )}
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          disabled={formLoading}
-          className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
-        >
-          {formLoading ? (
-            <span className="flex items-center gap-2 justify-center">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Signing in...
-            </span>
-          ) : (
-            "Get Started"
-          )}
-        </Button>
-      </form>
+            {formLoading ? (
+              <span className="flex items-center gap-2 justify-center">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Signing in...
+              </span>
+            ) : (
+              "Get Started"
+            )}
+          </Button>
+        </form>
+      </Form>
 
       {/* Separator */}
       <div className="relative">

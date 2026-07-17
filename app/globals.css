@@ -32,4 +32,6 @@ body {
   --color-foreground: #E85B66;
   --color-mainground: #4E385E;
   --color-ring: #71717a;
+  --color-destructive: #ef4444;
+  --color-muted-foreground: #73737a;
 }
