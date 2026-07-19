@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import RegisteredOtpForm from "./RegisteredOtpForm";
-import { validateRegisteredOtpForm, hasErrors } from "./RegisteredValidation";
+import {
+  registeredOtpSchema,
+  type RegisteredOtpFormValues,
+} from "@/lib/validations";
 import { OtpService } from "@/services/otp.service";
 import { handleApiError } from "@/services/api";
-import type { RegisteredOtpFieldErrors } from "./RegisteredTypes";
 
 interface RegisteredOtpDialogProps {
   open: boolean;
@@ -23,9 +27,12 @@ export default function RegisteredOtpDialog({
 
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<RegisteredOtpFieldErrors>({});
-  const [otpValue, setOtpValue] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
+
+  const form = useForm<RegisteredOtpFormValues>({
+    resolver: zodResolver(registeredOtpSchema),
+    defaultValues: { otp: "" },
+  });
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -34,11 +41,10 @@ export default function RegisteredOtpDialog({
   }, [resendCooldown]);
 
   const resetState = useCallback(() => {
-    setOtpValue("");
+    form.reset({ otp: "" });
     setErrorMsg("");
-    setFieldErrors({});
     setFormLoading(false);
-  }, []);
+  }, [form]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -48,21 +54,12 @@ export default function RegisteredOtpDialog({
     [onOpenChange, resetState],
   );
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (data: RegisteredOtpFormValues) => {
     setFormLoading(true);
     setErrorMsg("");
-    setFieldErrors({});
-
-    const errors = validateRegisteredOtpForm({ otp: otpValue });
-    if (hasErrors(errors)) {
-      setFieldErrors(errors);
-      setFormLoading(false);
-      return;
-    }
 
     try {
-      await OtpService.verifyOtp({ email, otp: otpValue });
+      await OtpService.verifyOtp({ email, otp: data.otp });
       handleOpenChange(false);
       router.push("/dashboard");
     } catch (err: unknown) {
@@ -89,12 +86,10 @@ export default function RegisteredOtpDialog({
     <RegisteredOtpForm
       open={open}
       onOpenChange={handleOpenChange}
+      form={form}
       onSubmit={handleSubmit}
       formLoading={formLoading}
       errorMsg={errorMsg}
-      fieldErrors={fieldErrors}
-      otpValue={otpValue}
-      onOtpChange={setOtpValue}
       email={email}
       onResend={handleResend}
       resendCooldown={resendCooldown}

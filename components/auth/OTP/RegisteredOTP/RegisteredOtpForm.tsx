@@ -16,17 +16,23 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import type { RegisteredOtpFieldErrors } from "./RegisteredTypes";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import type { UseFormReturn } from "react-hook-form";
+import type { RegisteredOtpFormValues } from "@/lib/validations";
 
 interface RegisteredOtpFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  form: UseFormReturn<RegisteredOtpFormValues>;
+  onSubmit: (data: RegisteredOtpFormValues) => void;
   formLoading: boolean;
   errorMsg: string;
-  fieldErrors: RegisteredOtpFieldErrors;
-  otpValue: string;
-  onOtpChange: (value: string) => void;
   email: string;
   onResend: () => void;
   resendCooldown: number;
@@ -35,12 +41,10 @@ interface RegisteredOtpFormProps {
 export default function RegisteredOtpForm({
   open,
   onOpenChange,
+  form,
   onSubmit,
   formLoading,
   errorMsg,
-  fieldErrors,
-  otpValue,
-  onOtpChange,
   email,
   onResend,
   resendCooldown,
@@ -71,56 +75,84 @@ export default function RegisteredOtpForm({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={onSubmit} className="space-y-6">
-          {/* OTP Input */}
-          <div className="flex justify-center">
-            <InputOTP
-              maxLength={6}
-              pattern={REGEXP_ONLY_DIGITS}
-              value={otpValue}
-              onChange={onOtpChange}
-              disabled={formLoading}
-            >
-              <InputOTPGroup className=" text-black">
-                <InputOTPSlot index={0} className="h-12 w-12  text-lg" />
-                <InputOTPSlot index={1} className="h-12 w-12  text-lg" />
-                <InputOTPSlot index={2} className="h-12 w-12  text-lg" />
-                <InputOTPSlot index={3} className="h-12 w-12  text-lg" />
-                <InputOTPSlot index={4} className="h-12 w-12  text-lg" />
-                <InputOTPSlot index={5} className="h-12 w-12  text-lg" />
-              </InputOTPGroup>
-            </InputOTP>
-          </div>
-
-          {fieldErrors.otp && (
-            <p className="text-sm text-red-500 text-center">
-              {fieldErrors.otp}
-            </p>
-          )}
-
-          {/* Error Message */}
-          {errorMsg && (
-            <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
-              {errorMsg}
-            </p>
-          )}
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={formLoading}
-            className="w-full h-12 font-medium rounded-xl text-sm bg-foreground hover:bg-foreground/80 text-white"
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
           >
-            {formLoading ? (
-              <span className="flex items-center gap-2 justify-center">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Verifying...
-              </span>
-            ) : (
-              "Verify Code"
+            {/* OTP Input */}
+            <FormField
+              control={form.control}
+              name="otp"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="flex justify-center">
+                      <InputOTP
+                        maxLength={6}
+                        pattern={REGEXP_ONLY_DIGITS}
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={formLoading}
+                      >
+                        <InputOTPGroup className=" text-black">
+                          <InputOTPSlot
+                            index={0}
+                            className="h-12 w-12  text-lg"
+                          />
+                          <InputOTPSlot
+                            index={1}
+                            className="h-12 w-12  text-lg"
+                          />
+                          <InputOTPSlot
+                            index={2}
+                            className="h-12 w-12  text-lg"
+                          />
+                          <InputOTPSlot
+                            index={3}
+                            className="h-12 w-12  text-lg"
+                          />
+                          <InputOTPSlot
+                            index={4}
+                            className="h-12 w-12  text-lg"
+                          />
+                          <InputOTPSlot
+                            index={5}
+                            className="h-12 w-12  text-lg"
+                          />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-center" />
+                </FormItem>
+              )}
+            />
+
+            {/* Error Message */}
+            {errorMsg && (
+              <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
+                {errorMsg}
+              </p>
             )}
-          </Button>
-        </form>
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={formLoading}
+              className="w-full h-12 font-medium rounded-xl text-sm bg-foreground hover:bg-foreground/80 text-white"
+            >
+              {formLoading ? (
+                <span className="flex items-center gap-2 justify-center">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying...
+                </span>
+              ) : (
+                "Verify Code"
+              )}
+            </Button>
+          </form>
+        </Form>
 
         {/* Resend */}
         <p className="text-center text-sm text-slate-500">

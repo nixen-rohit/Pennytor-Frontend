@@ -2,38 +2,65 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiExternalLinkLine } from "react-icons/ri";
-import { MegaMenuData } from "../../data/navdata";
-
+import { MegaMenuData, MegaLink } from "../../data/navdata";
 
 interface MegaMenuPanelProps {
   mega: MegaMenuData;
   align?: "left" | "right" | "center";
-  isTech?: boolean;
-  serviceWidth?: number | string; 
-  expertiseWidth?: number | string;  
+  serviceWidth?: number | string;
+  expertiseWidth?: number | string;
+}
+
+function IconItem({ link }: { link: MegaLink }) {
+  return (
+    <Link
+      href={link.href}
+      target={link.redirect ? "_blank" : undefined}
+      rel={link.redirect ? "noopener noreferrer" : undefined}
+      className="group/link flex items-start gap-3 rounded-xl px-2.5 py-2.5 hover:bg-gray-50 transition-colors duration-100"
+    >
+      {link.icon && (
+        <span
+          className={cn(
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[16px] transition-transform group-hover/link:scale-105",
+            link.color ?? "bg-gray-100 text-gray-600",
+          )}
+        >
+          <link.icon />
+        </span>
+      )}
+      <span className="flex flex-col gap-0.5 min-w-0 flex-1">
+        <span className="flex items-center gap-1 text-[13.5px] font-semibold text-gray-800 group-hover/link:text-blue-600 transition-colors leading-tight">
+          {link.label}
+          {link.redirect && (
+            <RiExternalLinkLine className="text-[11px] text-gray-400 group-hover/link:text-blue-600 transition-colors shrink-0" />
+          )}
+        </span>
+        {link.description && (
+          <span className="text-[11.5px] text-gray-500 leading-snug">
+            {link.description}
+          </span>
+        )}
+      </span>
+    </Link>
+  );
 }
 
 export function MegaMenuPanel({
   mega,
   align = "left",
-  isTech = false,
   serviceWidth,
   expertiseWidth,
 }: MegaMenuPanelProps) {
   const colCount = mega.columns.length;
-  
+  const isSingleSection = colCount === 1; // Dhan "Investments"-style: one heading, 2-col icon grid
 
   const alignClass =
-    align === "right"
-      ? "right-0"
-      : align === "center"
-        ? "left-1/2 -translate-x-1/2"
-        : "left-0";
+    align === "right" ? "right-0" : align === "center" ? "left-1/2 -translate-x-1/2" : "left-0";
 
-  
-
-  const totalCols =  colCount;
-  const minWidth = expertiseWidth || serviceWidth || Math.min(totalCols * 215, 920); // Use customWidth if provided
+  const minWidth = isSingleSection
+    ? (expertiseWidth ?? 480)
+    : (expertiseWidth || serviceWidth || Math.min(colCount * 240, 920));
 
   return (
     <div
@@ -50,59 +77,37 @@ export function MegaMenuPanel({
         maxWidth: serviceWidth ? `${serviceWidth}px` : "920px",
       }}
     >
-      <div
-        className="grid gap-0"
-        style={{
-          gridTemplateColumns: `repeat(${colCount}, 1fr)`,
-        }}
-      >
-        {mega.columns.map((col, ci) => (
-          <div
-            key={ci}
-            className={cn(
-              "pr-5",
-              ci > 0 && "border-l border-gray-100 pl-5",
-              ci === mega.columns.length - 1 && "pr-0",
-            )}
-          >
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2.5 pb-2 border-b border-gray-100">
-              {col.heading}
-            </p>
-            <ul className="flex flex-col gap-0.5">
-              {col.links.map((link, li) => (
-                <li key={li}>
-                  <Link
-                    href={link.href}
-                    target={link.redirect ? "_blank" : undefined}
-                    rel={link.redirect ? "noopener noreferrer" : undefined}
-                    className="group/link flex items-center gap-3 rounded-lg px-2 py-2 hover:bg-gray-50 transition-colors duration-100"
-                  >
-                    {link.icon && (
-                      <span className="  flex h-5 w-5 items-center justify-center rounded-lg bg-gray-100 text-gray-600 text-[15px] group-hover/link:bg-blue-50 group-hover/link:text-blue-600 transition-colors">
-                        <link.icon />
-                      </span>
-                    )}
-                    <span className="flex flex-col gap-0.5 min-w-0 flex-1">
-                      <span className="flex items-center gap-1 text-[13px] font-medium text-gray-800 group-hover/link:text-blue-600 transition-colors leading-tight">
-                        {link.label}
-                        {link.redirect && (
-                          <RiExternalLinkLine className="text-[11px] text-gray-400 group-hover/link:text-blue-600 transition-colors shrink-0" />
-                        )}
-                      </span>
-                      {link.description && (
-                        <span className="text-[11px] text-gray-500 leading-snug truncate">
-                          {link.description}
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-        
-      </div>
+      {isSingleSection ? (
+        // Dhan "Investments" style — single 2-column icon grid, no heading dividers
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+          {mega.columns[0].links.map((link, li) => (
+            <IconItem key={li} link={link} />
+          ))}
+        </div>
+      ) : (
+        // Dhan "More" style — multiple headings side by side, each a vertical icon list
+        <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
+          {mega.columns.map((col, ci) => (
+            <div
+              key={ci}
+              className={cn(
+                "pr-5",
+                ci > 0 && "border-l border-gray-100 pl-5",
+                ci === mega.columns.length - 1 && "pr-0",
+              )}
+            >
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2 pb-2 border-b border-gray-100">
+                {col.heading}
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {col.links.map((link, li) => (
+                  <IconItem key={li} link={link} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
