@@ -1,6 +1,6 @@
 # Pennytor Frontend
 
-A modern fintech/investment platform built with Next.js and React 19.
+A modern fintech/investment platform built with Next.js and React 19
 
 ## Tech Stack
 
