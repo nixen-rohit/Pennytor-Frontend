@@ -39,6 +39,16 @@ function getPasswordStrength(password: string) {
   return score;
 }
 
+function passwordMeetsRequirements(password: string): boolean {
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /[0-9]/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  );
+}
+
 function getStrengthLabel(score: number) {
   if (score <= 1) return "Weak";
   if (score <= 3) return "Medium";
@@ -59,11 +69,17 @@ export default function RegisterForm({
   // Local state kept in sync with RHF via subscription — avoids
   // watch()-in-render reactivity issues.
   const [password, setPassword] = useState(form.getValues("password") || "");
+  const [agreeToTerms, setAgreeToTerms] = useState(
+    form.getValues("agreeToTerms") || false,
+  );
 
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === "password" || name === undefined) {
         setPassword(value.password || "");
+      }
+      if (name === "agreeToTerms" || name === undefined) {
+        setAgreeToTerms(value.agreeToTerms || false);
       }
     });
     return () => subscription.unsubscribe();
@@ -263,14 +279,14 @@ export default function RegisterForm({
                       I agree to the{" "}
                       <Link
                         href="/terms"
-                        className="font-medium text-foreground underline"
+                        className="font-bold text-blue-600 underline"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
                         href="/privacy"
-                        className="font-medium text-foreground underline"
+                      className="font-bold text-blue-600 underline"
                       >
                         Privacy Policy
                       </Link>
@@ -315,7 +331,7 @@ export default function RegisterForm({
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={formLoading}
+            disabled={formLoading || !passwordMeetsRequirements(password) || !agreeToTerms}
             className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
           >
             {formLoading ? (

@@ -169,7 +169,7 @@ export default function ForgotPasswordForm({
             </Button>
 
             <Link
-              href="/auth/login"
+              href="/login"
               className="inline-flex items-center text-sm text-slate-600 hover:text-slate-900"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
