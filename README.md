@@ -26,7 +26,7 @@ A modern fintech/investment platform built with Next.js and React 19.
 - **Framer Motion** — Declarative animations
 
 ### Build / Dev Tools
-- **React Compiler** (experimental) — Automatic memoization
+- **React Compiler** - (experimental) — Automatic memoization
 - **ESLint 9** with `eslint-config-next`
 - **PostCSS** with `@tailwindcss/postcss`
 
