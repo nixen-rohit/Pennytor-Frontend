@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import RegisteredOtpForm from "./RegisteredOtpForm";
 import { validateRegisteredOtpForm, hasErrors } from "./RegisteredValidation";
 import { OtpService } from "@/services/otp.service";
+import { handleApiError } from "@/services/api";
 import type { RegisteredOtpFieldErrors } from "./RegisteredTypes";
 
 interface RegisteredOtpDialogProps {
@@ -65,8 +66,10 @@ export default function RegisteredOtpDialog({
       handleOpenChange(false);
       router.push("/dashboard");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Verification failed. Please try again.";
-      setErrorMsg(message);
+      handleApiError(err, setErrorMsg, {
+        400: "Invalid verification code. Please check and try again.",
+        410: "This code has expired. Please request a new one.",
+      });
     } finally {
       setFormLoading(false);
     }
@@ -76,9 +79,9 @@ export default function RegisteredOtpDialog({
     try {
       await OtpService.resendOtp({ email });
       setResendCooldown(60);
+      setErrorMsg("");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to resend code. Please try again.";
-      setErrorMsg(message);
+      handleApiError(err, setErrorMsg);
     }
   }, [email]);
 
