@@ -10,6 +10,7 @@ import {
   type ForgotPasswordFormValues,
 } from "@/lib/validations";
 import { AuthService } from "@/services/auth.service";
+import { handleApiError } from "@/services/api";
 
 export default function ForgotPasswordPage() {
   const [formLoading, setFormLoading] = useState(false);

@@ -3,6 +3,7 @@ export {
   loginSchema,
   forgotPasswordSchema,
   registeredOtpSchema,
+  resetPasswordSchema,
 } from "./auth";
 
 export type {
@@ -10,4 +11,5 @@ export type {
   LoginFormValues,
   ForgotPasswordFormValues,
   RegisteredOtpFormValues,
+  ResetPasswordFormValues,
 } from "./auth";

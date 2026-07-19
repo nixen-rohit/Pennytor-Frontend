@@ -41,7 +41,18 @@ export const registeredOtpSchema = z.object({
   otp: z.string().regex(/^\d{6}$/, "Please enter a valid 6-digit code"),
 });
 
+export const resetPasswordSchema = z
+  .object({
+    password: registerPasswordField,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
 export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export type RegisteredOtpFormValues = z.infer<typeof registeredOtpSchema>;
+export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;

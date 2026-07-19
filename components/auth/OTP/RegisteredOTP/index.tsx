@@ -61,7 +61,7 @@ export default function RegisteredOtpDialog({
     try {
       await OtpService.verifyOtp({ email, otp: data.otp });
       handleOpenChange(false);
-      router.push("/dashboard");
+      router.push("/login");
     } catch (err: unknown) {
       handleApiError(err, setErrorMsg, {
         400: "Invalid verification code. Please check and try again.",
