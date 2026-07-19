@@ -32,7 +32,7 @@ A modern fintech/investment platform built with Next.js and React 19.
 
 ### Fonts
 - **Poppins** — Primary font
-- **Playfair Display** — Accent font
+- **Playfair Display** — Accent fonts
 
 ## Getting Started
 
@@ -41,7 +41,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Scripts
 
