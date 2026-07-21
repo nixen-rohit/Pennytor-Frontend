@@ -8,9 +8,12 @@ import AuthBanner from "@/components/auth/Banner/AuthBanner";
 import LoginForm from "./LoginForm";
 import { loginSchema, type LoginFormValues } from "@/lib/validations";
 import { AuthService } from "@/services/auth.service";
+import { useAuthStore } from "@/store/auth.store";
+import { handleApiError } from "@/services/api";
 
 export default function LoginPage() {
   const router = useRouter();
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
@@ -31,23 +34,10 @@ export default function LoginPage() {
 
     try {
       const response = await AuthService.login(data);
-
-      if (response.data && response.data.accessToken) {
-        localStorage.setItem("accessToken", response.data.accessToken);
-        if (response.data.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-        }
-
-        if (response.data.user) {
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-        }
-
-        router.push("/dashboard");
-      } else {
-        setErrorMsg("Login failed. Please check your credentials.");
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || "An error occurred during login.");
+      setAuth(response.accessToken, response.user);
+      router.push("/dashboard");
+    } catch (err) {
+      handleApiError(err, setErrorMsg);
     } finally {
       setFormLoading(false);
     }

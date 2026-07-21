@@ -37,30 +37,15 @@ export default function RegisterPage() {
     setErrorMsg("");
 
     try {
-      const response = await AuthService.register({
+      await AuthService.register({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
         referralCode: data.referralCode || undefined,
-        acceptTerms: true, // backend expects boolean, form validation already ensures checkbox is checked
+        acceptTerms: true,
       });
-
-      if (response && (response.data?.accessToken || response.success || response.message)) {
-        if (response.data?.accessToken) {
-          localStorage.setItem("accessToken", response.data.accessToken);
-        }
-        if (response.data?.refreshToken) {
-          localStorage.setItem("refreshToken", response.data.refreshToken);
-        }
-        if (response.data?.user) {
-          localStorage.setItem("user", JSON.stringify(response.data.user));
-        }
-        // Show OTP verification dialog on successful registration
-        setOpen(true);
-      } else {
-        setErrorMsg("Registration failed. Please try again.");
-      }
+      setOpen(true);
     } catch (err) {
       handleApiError(err, setErrorMsg, {
         409: "This email is already registered. Please log in or use a different email.",

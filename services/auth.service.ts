@@ -1,31 +1,68 @@
-import { fetchApi } from './api';
+import { fetchApi } from "./api";
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  VerifyEmailRequest,
+  ResendOtpRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  ChangePasswordRequest,
+  RefreshResponse,
+} from "@/types/auth";
 
 export const AuthService = {
-  login: async (data: any) => {
-    return fetchApi('/auth/login', {
-      method: 'POST',
+  login: async (data: LoginRequest) =>
+    fetchApi<LoginResponse>("/auth/login", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  },
+    }),
 
-  forgotPassword: async (data: any) => {
-    return fetchApi('/auth/forgot-password', {
-      method: 'POST',
+  register: async (data: RegisterRequest) =>
+    fetchApi<RegisterResponse>("/auth/register", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  },
+    }),
 
-  register: async (data: any) => {
-    return fetchApi('/auth/register', {
-      method: 'POST',
+  verifyEmail: async (data: VerifyEmailRequest) =>
+    fetchApi<{ message: string }>("/auth/verify-email", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  },
+    }),
 
-  resetPassword: async (data: any) => {
-    return fetchApi('/auth/reset-password', {
-      method: 'POST',
+  resendOtp: async (data: ResendOtpRequest) =>
+    fetchApi<{ message: string }>("/auth/resend-otp", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  }
+    }),
+
+  refresh: async () =>
+    fetchApi<RefreshResponse>("/auth/refresh", {
+      method: "POST",
+    }),
+
+  logout: async (all = false) =>
+    fetchApi<{ message: string }>("/auth/logout", {
+      method: "POST",
+      body: JSON.stringify({ all }),
+    }),
+
+  forgotPassword: async (data: ForgotPasswordRequest) =>
+    fetchApi<{ message: string }>("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  resetPassword: async (data: ResetPasswordRequest) =>
+    fetchApi<{ message: string }>("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  changePassword: async (data: ChangePasswordRequest) =>
+    fetchApi<{ message: string }>("/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
