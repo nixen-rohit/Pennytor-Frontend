@@ -34,7 +34,7 @@ export default function LoginPage() {
 
     try {
       const response = await AuthService.login(data);
-      setAuth(response.accessToken, response.user);
+      setAuth(response.data.accessToken, response.data.user, keepSignedIn);
       router.push("/dashboard");
     } catch (err) {
       handleApiError(err, setErrorMsg);

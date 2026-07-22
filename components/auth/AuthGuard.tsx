@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { AuthService } from "@/services/auth.service";
@@ -10,29 +10,29 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, user, setAuth, setLoading, clearAuth } =
     useAuthStore();
 
-  useEffect(() => {
+  const restoreSession = useCallback(async () => {
     if (isAuthenticated && user) {
       setLoading(false);
       return;
     }
 
-    const restoreSession = async () => {
-      try {
-        const { accessToken } = await AuthService.refresh();
-        if (user) {
-          setAuth(accessToken, user);
-        } else {
-          clearAuth();
-          router.push("/login");
-        }
-      } catch {
-        clearAuth();
-        router.push("/login");
+    try {
+      const refreshResponse = await AuthService.refresh();
+      const accessToken = refreshResponse.data.accessToken;
+      if (user) {
+        setAuth(accessToken, user);
+        return;
       }
-    };
+    } catch {
+      // refresh failed — not authenticated
+    }
+    clearAuth();
+    router.push("/login");
+  }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
 
+  useEffect(() => {
     restoreSession();
-  }, [isAuthenticated, user, setLoading, setAuth, clearAuth, router]);
+  }, [restoreSession]);
 
   if (isLoading) {
     return (
