@@ -1,25 +1,16 @@
-import { fetchApi } from './api';
+import { fetchApi } from "./api";
+import type { VerifyEmailRequest, ResendOtpRequest } from "@/types/auth";
 
 export const OtpService = {
-  /**
-   * Verify the OTP code sent to the user's email after registration.
-   * Backend endpoint: POST /auth/verify-email
-   */
-  verifyOtp: async (data: { email: string; otp: string }) => {
-    return fetchApi('/auth/verify-email', {
-      method: 'POST',
+  verifyOtp: (data: VerifyEmailRequest) =>
+    fetchApi<{ message: string }>("/auth/verify-email", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  },
+    }),
 
-  /**
-   * Resend a new OTP code to the user's email.
-   * Backend endpoint: POST /auth/resend-otp
-   */
-  resendOtp: async (data: { email: string }) => {
-    return fetchApi('/auth/resend-otp', {
-      method: 'POST',
+  resendOtp: (data: ResendOtpRequest) =>
+    fetchApi<{ message: string }>("/auth/resend-otp", {
+      method: "POST",
       body: JSON.stringify(data),
-    });
-  },
+    }),
 };

@@ -1,3 +1,5 @@
+import { useAuthStore } from "@/store/auth.store";
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export class ApiError extends Error {
@@ -10,12 +12,14 @@ export class ApiError extends Error {
   }
 }
 
-export async function fetchApi(endpoint: string, options: RequestInit = {}) {
+export async function fetchApi<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<T> {
   const headers = new Headers(options.headers || {});
   headers.set("Content-Type", "application/json");
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+  const token = useAuthStore.getState().accessToken;
   if (token) {
     headers.set("Authorization", `Bearer ${token}`);
   }
@@ -23,6 +27,7 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: "include",
   });
 
   const data = await response.json().catch(() => null);
@@ -34,18 +39,13 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     );
   }
 
-  return data;
+  return data as T;
 }
 
 /**
  * Reusable API error handler.
  * Pass your setErrorMsg state setter and an optional map of
  * custom messages keyed by HTTP status code.
- *
- * Usage:
- *   } catch (err) {
- *     handleApiError(err, setErrorMsg, { 409: 'Email already registered.' });
- *   }
  */
 export function handleApiError(
   err: unknown,
