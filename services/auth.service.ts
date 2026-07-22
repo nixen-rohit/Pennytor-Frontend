@@ -9,6 +9,7 @@ import type {
   ForgotPasswordRequest,
   ResetPasswordRequest,
   ChangePasswordRequest,
+  LogoutRequest,
   RefreshResponse,
 } from "@/types/auth";
 
@@ -42,10 +43,10 @@ export const AuthService = {
       method: "POST",
     }),
 
-  logout: async (all = false) =>
+  logout: async (data: LogoutRequest = { all: false }) =>
     fetchApi<{ message: string }>("/auth/logout", {
       method: "POST",
-      body: JSON.stringify({ all }),
+      body: JSON.stringify(data),
     }),
 
   forgotPassword: async (data: ForgotPasswordRequest) =>

@@ -12,8 +12,11 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  accessToken: string;
-  user: User;
+  message: string;
+  data: {
+    accessToken: string;
+    user: User;
+  };
 }
 
 export interface RegisterRequest {
@@ -55,8 +58,14 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+export interface LogoutRequest {
+  all: boolean;
+}
+
 export interface RefreshResponse {
-  accessToken: string;
+  data: {
+    accessToken: string;
+  };
 }
 
 export interface ApiErrorResponse {

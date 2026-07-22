@@ -12,6 +12,53 @@ export class ApiError extends Error {
   }
 }
 
+let isRefreshing = false;
+let pendingRequests: Array<{
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}> = [];
+
+async function refreshAccessToken(): Promise<string> {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      pendingRequests.push({ resolve, reject });
+    });
+  }
+
+  isRefreshing = true;
+  try {
+    const response = await fetch(`${API_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new ApiError(response.status, "Refresh failed");
+    }
+
+    const data = await response.json();
+    const newToken = data.accessToken;
+
+    useAuthStore.getState().setAccessToken(newToken);
+
+    pendingRequests.forEach(({ resolve }) => resolve(newToken));
+    pendingRequests = [];
+
+    return newToken;
+  } catch (err) {
+    pendingRequests.forEach(({ reject }) => reject(err));
+    pendingRequests = [];
+    useAuthStore.getState().clearAuth();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw err;
+  } finally {
+    isRefreshing = false;
+  }
+}
+
 export async function fetchApi<T = unknown>(
   endpoint: string,
   options: RequestInit = {},
@@ -30,6 +77,32 @@ export async function fetchApi<T = unknown>(
     credentials: "include",
   });
 
+  if (response.status === 401 && !endpoint.includes("/auth/refresh")) {
+    try {
+      const newToken = await refreshAccessToken();
+      headers.set("Authorization", `Bearer ${newToken}`);
+
+      const retryResponse = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+        credentials: "include",
+      });
+
+      const retryData = await retryResponse.json().catch(() => null);
+
+      if (!retryResponse.ok) {
+        throw new ApiError(
+          retryResponse.status,
+          retryData?.message || "Something went wrong",
+        );
+      }
+
+      return retryData as T;
+    } catch {
+      // refresh failed or retry failed — re-throw
+    }
+  }
+
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
@@ -42,11 +115,6 @@ export async function fetchApi<T = unknown>(
   return data as T;
 }
 
-/**
- * Reusable API error handler.
- * Pass your setErrorMsg state setter and an optional map of
- * custom messages keyed by HTTP status code.
- */
 export function handleApiError(
   err: unknown,
   setErrorMsg: (msg: string) => void,

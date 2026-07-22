@@ -9,7 +9,7 @@ import {
   registeredOtpSchema,
   type RegisteredOtpFormValues,
 } from "@/lib/validations";
-import { OtpService } from "@/services/otp.service";
+import { AuthService } from "@/services/auth.service";
 import { handleApiError } from "@/services/api";
 
 interface RegisteredOtpDialogProps {
@@ -59,7 +59,7 @@ export default function RegisteredOtpDialog({
     setErrorMsg("");
 
     try {
-      await OtpService.verifyOtp({ email, otp: data.otp });
+      await AuthService.verifyEmail({ email, otp: data.otp });
       handleOpenChange(false);
       router.push("/login");
     } catch (err: unknown) {
@@ -74,7 +74,7 @@ export default function RegisteredOtpDialog({
 
   const handleResend = useCallback(async () => {
     try {
-      await OtpService.resendOtp({ email });
+      await AuthService.resendOtp({ email });
       setResendCooldown(60);
       setErrorMsg("");
     } catch (err: unknown) {

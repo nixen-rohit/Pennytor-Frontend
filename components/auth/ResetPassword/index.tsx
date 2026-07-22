@@ -53,6 +53,12 @@ export default function ResetPasswordPage({
     setFormLoading(true);
     setErrorMsg("");
 
+    if (!token || !email) {
+      setErrorMsg("Invalid reset link. Missing token or email.");
+      setFormLoading(false);
+      return;
+    }
+
     try {
       await AuthService.resetPassword({
         token,
