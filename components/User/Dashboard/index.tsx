@@ -1,9 +1,17 @@
-import React from 'react'
- 
-const index = () => {
+"use client"
+
+import PortfolioCard from "./PortfolioCard"
+import WalletSummary from "./WalletSummary"
+import InvestmentSummary from "./InvestmentSummary"
+import RecentTransactions from "./RecentTransactions"
+
+export default function Dashboard() {
   return (
-  <h1>home</h1>
+    <div className="space-y-6">
+      <PortfolioCard />
+      <WalletSummary />
+      <InvestmentSummary />
+      <RecentTransactions />
+    </div>
   )
 }
-
-export default index
