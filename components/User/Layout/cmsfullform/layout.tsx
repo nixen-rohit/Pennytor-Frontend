@@ -80,10 +80,10 @@ export default function Layout({ children }: LayoutProps) {
           marginLeft: getMarginLeft(),
         }}
       >
-        <header className="h-16 border-b border-gray-200 dark:border-[#1F1F23] flex-shrink-0">
+        <header className="h-16 border-b border-[#1F1F23] shrink-0">
           <TopNav />
         </header>
-        <main className="flex-1 overflow-auto p-3 sm:p-6 bg-white dark:bg-[#0F0F12] min-w-0">
+        <main className="flex-1 overflow-auto p-3 sm:p-6 bg-[#0F0F12] min-w-0">
           {children}
         </main>
       </div>
