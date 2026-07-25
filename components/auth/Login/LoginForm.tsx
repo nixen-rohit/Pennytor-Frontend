@@ -121,7 +121,7 @@ export default function LoginForm({
                 type="checkbox"
                 checked={keepSignedIn}
                 onChange={onToggleKeepSignedIn}
-                className="rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                className="rounded border-zinc-300 text-indigo-600"
               />
               <span className="text-zinc-600">Keep me signed in</span>
             </label>

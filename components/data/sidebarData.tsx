@@ -149,9 +149,9 @@ export const menuData: MenuSection[] = [
         icon: UserCheck,
       },
       {
-        id: "kyc",
+        id: "account-kyc",
         label: "Account Kyc",
-        href: "/accounts/kyc",
+        href: "/account-kyc",
         icon: UserCheck,
       },
     ],

@@ -165,7 +165,7 @@ const router = useRouter();
         className={cn(
           "flex items-center py-2 text-sm rounded-md transition-colors sidebar-menu-item relative group cursor-pointer",
           isActive
-            ? "bg-[#2A2A30] text-white"
+            ? " text-white"
             : "hover:bg-[#1F1F23]",
           paddingLeft,
         )}
@@ -221,7 +221,7 @@ const router = useRouter();
 
         {/* Tooltip for collapsed state when not hovered and not mobile */}
         {menuState === "collapsed" && !isHovered && !isMobile && (
-          <div className="absolute left-full ml-2 px-2 py-1  bg-gray-100  text-gray-900 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          <div className="absolute left-full ml-2 px-2 py-1   text-gray-900 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
             {item.label}
             {item.badge && (
               <span className="ml-1 text-blue-300">({item.badge})</span>
@@ -282,7 +282,7 @@ const router = useRouter();
         {/* Mobile sidebar overlay */}
         <nav
           className={`
-            fixed inset-y-0 left-0 z-70 w-64 bg-[#0F0F12] 
+            fixed inset-y-0 left-0 z-70 w-64  
             border-r border-[#1F1F23] 
             transform transition-transform duration-300 ease-in-out
             ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
@@ -342,7 +342,7 @@ const router = useRouter();
         {/* Mobile overlay backdrop */}
         {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-65"
+            className="fixed inset-0   bg-opacity-50 z-65"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -354,7 +354,7 @@ const router = useRouter();
   return (
     <nav
       className={`
-        fixed inset-y-0 left-0 z-60 bg-[#0F0F12] 
+        fixed inset-y-0 left-0 z-60  
         border-r border-[#1F1F23] transition-all duration-300 ease-in-out
         ${menuState === "hidden" ? "w-0 border-r-0" : getSidebarWidth()}
       `}
