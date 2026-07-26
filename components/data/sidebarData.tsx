@@ -19,6 +19,8 @@ import {
   FileBarChart,
   Building2Icon,
 } from "lucide-react";
+import { MdOutlineVerified } from "react-icons/md";
+
 
 interface SubMenuItem {
   id: string;
@@ -146,11 +148,11 @@ export const menuData: MenuSection[] = [
         id: "profile",
         label: "Profile",
         href: "/profile",
-        icon: UserCheck,
+        icon: MdOutlineVerified,
       },
       {
         id: "account-kyc",
-        label: "Account Kyc",
+        label: "Account ",
         href: "/account-kyc",
         icon: UserCheck,
       },
