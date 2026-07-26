@@ -143,15 +143,15 @@ export const menuData: MenuSection[] = [
     label: "Accounts",
     items: [
       {
-        id: "acound-info",
-        label: "Acount Details",
-        href: "/accounts/details",
+        id: "profile",
+        label: "Profile",
+        href: "/profile",
         icon: UserCheck,
       },
       {
-        id: "kyc",
-        label: "Kyc",
-        href: "/accounts/kyc",
+        id: "account-kyc",
+        label: "Account Kyc",
+        href: "/account-kyc",
         icon: UserCheck,
       },
     ],

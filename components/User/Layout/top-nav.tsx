@@ -79,10 +79,10 @@ export default function TopNav() {
         </Button>
 
         {/* Breadcrumbs */}
-        <nav className="hidden sm:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
+        <nav className="hidden sm:flex items-center space-x-2 text-sm text-gray-300">
           <Link
             href="/dashboard"
-            className="flex items-center hover:text-gray-900 dark:hover:text-white"
+            className="flex items-center hover:text-white"
           >
             <Home className="h-4 w-4 mr-1" />
             Dashboard
@@ -95,7 +95,7 @@ export default function TopNav() {
               <span
                 className={
                   index === pathSegments.length - 1
-                    ? "text-gray-900 dark:text-white font-medium"
+                    ? "text-white font-medium"
                     : ""
                 }
               >
@@ -113,7 +113,7 @@ export default function TopNav() {
           <Input
             type="search"
             placeholder="Search..."
-            className="pl-10 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+            className="pl-10 bg-gray-800 border-gray-700"
           />
         </div>
       </div>
@@ -147,10 +147,10 @@ export default function TopNav() {
                 </AvatarFallback>
               </Avatar>
               <div className="hidden lg:flex flex-col items-start">
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
+                <span className="text-sm font-medium text-white">
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
+                <span className="text-xs text-gray-400">
                   {user?.role === "ADMIN" ? "Administrator" : "User"}
                 </span>
               </div>
@@ -163,7 +163,7 @@ export default function TopNav() {
           >
             <DropdownMenuItem
               asChild
-              className=" hover:bg-neutral-800  hover:text-white"
+              className=" hover:bg-neutral-800 text-white "
             >
               <Link href="/profile">
                 <User className="mr-2 h-4 w-4" />
@@ -172,14 +172,14 @@ export default function TopNav() {
             </DropdownMenuItem>
             <DropdownMenuItem
               asChild
-              className=" hover:bg-neutral-800  hover:text-white"
+              className=" hover:bg-neutral-800   text-white"
             >
               <Link href="/profile/settings">
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="border-b border-white/20" />
             <DropdownMenuItem
               className="text-red-600/70 hover:bg-red-600 hover:text-white cursor-pointer text-sm"
               onClick={async () => {

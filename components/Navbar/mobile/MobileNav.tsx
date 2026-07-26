@@ -63,7 +63,7 @@ export function MobileNav({ open, onClose, navItems }: MobileNavProps) {
             <input
               type="text"
               placeholder="Search…"
-              className="flex-1 bg-transparent text-[13px] text-gray-700 placeholder:text-gray-400 focus:outline-none"
+              className="flex-1 bg-transparent text-[13px] text-gray-700 placeholder:text-gray-400"
             />
           </div>
         </div>
