@@ -74,3 +74,7 @@ export interface ApiErrorResponse {
   timestamp: string;
   message: string;
 }
+
+export interface GoogleLoginRequest {
+  token: string;
+}

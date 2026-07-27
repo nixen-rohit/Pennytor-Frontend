@@ -11,11 +11,18 @@ import type {
   ChangePasswordRequest,
   LogoutRequest,
   RefreshResponse,
+  GoogleLoginRequest,
 } from "@/types/auth";
 
 export const AuthService = {
   login: async (data: LoginRequest) =>
     fetchApi<LoginResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  loginWithGoogle: async (data: GoogleLoginRequest) =>
+    fetchApi<LoginResponse>("/auth/google", {
       method: "POST",
       body: JSON.stringify(data),
     }),
