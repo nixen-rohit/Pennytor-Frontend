@@ -204,8 +204,7 @@ export default function RegisterForm({
                     <div className="space-y-1.5">
                       <div className="h-2 overflow-hidden rounded-full bg-zinc-100">
                         <div
-                          className={`h-full rounded-full transition-all ${
-                            passwordStrength <= 1
+                          className={`h-full rounded-full transition-all ${passwordStrength <= 1
                               ? "bg-red-500"
                               : passwordStrength <= 2
                                 ? "bg-yellow-500"
@@ -214,7 +213,7 @@ export default function RegisterForm({
                                   : passwordStrength <= 4
                                     ? "bg-blue-500"
                                     : "bg-green-500"
-                          }`}
+                            }`}
                           style={{
                             width: `${(passwordStrength / 5) * 100}%`,
                           }}
@@ -278,15 +277,15 @@ export default function RegisterForm({
                     <FormLabel className="text-sm text-zinc-600 leading-5 font-normal">
                       I agree to the{" "}
                       <Link
-                        href="/terms"
+                        href="/termsservice"
                         className="font-bold text-blue-600 underline"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
-                        href="/privacy"
-                      className="font-bold text-blue-600 underline"
+                        href="/privacypolicy"
+                        className="font-bold text-blue-600 underline"
                       >
                         Privacy Policy
                       </Link>

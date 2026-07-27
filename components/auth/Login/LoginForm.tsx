@@ -175,7 +175,7 @@ export default function LoginForm({
         type="button"
         variant="outline"
         onClick={onGoogleSignIn}
-        className="w-full h-12 border-zinc-200 rounded-xl gap-2 font-medium"
+        className="w-full h-12 border-zinc-200 rounded-xl gap-2 font-medium cursor-pointer"
       >
         <GoogleIcon /> Continue with Google
       </Button>
