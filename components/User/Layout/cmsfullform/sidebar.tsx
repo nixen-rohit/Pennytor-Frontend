@@ -165,8 +165,8 @@ const router = useRouter();
         className={cn(
           "flex items-center py-2 text-sm rounded-md transition-colors sidebar-menu-item relative group cursor-pointer",
           isActive
-            ? "bg-gray-300 dark:bg-[#2A2A30] text-gray-900 dark:text-white"
-            : "hover:bg-gray-50 dark:hover:bg-[#1F1F23]",
+            ? " text-white"
+            : "hover:bg-[#1F1F23]",
           paddingLeft,
         )}
         onClick={() => {
@@ -187,7 +187,7 @@ const router = useRouter();
             : undefined
         }
       >
-        <item.icon className="h-4 w-4 flex-shrink-0 sidebar-menu-icon" />
+        <item.icon className="h-4 w-4 shrink-0 sidebar-menu-icon" />
 
         {showText && (
           <>
@@ -198,12 +198,12 @@ const router = useRouter();
             {/* Badges and indicators */}
             <div className="flex items-center space-x-1">
               {item.isNew && (
-                <span className="px-1.5 py-0.5 text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded-full">
+                <span className="px-1.5 py-0.5 text-xs  bg-green-900/30 text-green-400 rounded-full">
                   New
                 </span>
               )}
               {item.badge && (
-                <span className="px-1.5 py-0.5 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded-full">
+                <span className="px-1.5 py-0.5 text-xs   bg-blue-900/30  text-blue-400 rounded-full">
                   {item.badge}
                 </span>
               )}
@@ -221,7 +221,7 @@ const router = useRouter();
 
         {/* Tooltip for collapsed state when not hovered and not mobile */}
         {menuState === "collapsed" && !isHovered && !isMobile && (
-          <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+          <div className="absolute left-full ml-2 px-2 py-1   text-gray-900 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
             {item.label}
             {item.badge && (
               <span className="ml-1 text-blue-300">({item.badge})</span>
@@ -282,15 +282,15 @@ const router = useRouter();
         {/* Mobile sidebar overlay */}
         <nav
           className={`
-            fixed inset-y-0 left-0 z-[70] w-64 bg-white dark:bg-[#0F0F12] 
-            border-r border-gray-200 dark:border-[#1F1F23] 
+            fixed inset-y-0 left-0 z-70 w-64  
+            border-r border-[#1F1F23] 
             transform transition-transform duration-300 ease-in-out
             ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
           <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="h-16 px-3 flex items-center border-b border-gray-200 dark:border-[#1F1F23]">
+            <div className="h-16 px-3 flex items-center border-b border-[#1F1F23]">
               <Link
               href="/dashboard" 
                 className="flex items-center gap-3 w-full"
@@ -300,9 +300,9 @@ const router = useRouter();
                   alt="CMSFullForm"
                   width={32}
                   height={32}
-                  className="flex-shrink-0"
+                  className=" shrink-0"
                 />
-                <span className="text-lg font-semibold hover:cursor-pointer text-gray-900 dark:text-white">
+                <span className="text-lg font-semibold hover:cursor-pointer text-white">
                   Pennytor
                 </span>
               </Link>
@@ -342,7 +342,7 @@ const router = useRouter();
         {/* Mobile overlay backdrop */}
         {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-[65]"
+            className="fixed inset-0   bg-opacity-50 z-65"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
@@ -354,8 +354,8 @@ const router = useRouter();
   return (
     <nav
       className={`
-        fixed inset-y-0 left-0 z-[60] bg-white dark:bg-[#0F0F12] 
-        border-r border-gray-200 dark:border-[#1F1F23] transition-all duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-60  
+        border-r border-[#1F1F23] transition-all duration-300 ease-in-out
         ${menuState === "hidden" ? "w-0 border-r-0" : getSidebarWidth()}
       `}
       onMouseEnter={() => setIsHovered(true)}
@@ -367,7 +367,7 @@ const router = useRouter();
       {menuState !== "hidden" && (
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="h-16 px-3 flex items-center border-b border-gray-200 dark:border-[#1F1F23]">
+          <div className="h-16 px-3 flex items-center border-b border-[#1F1F23]">
             {showText ? (
               <Link
                 href="/dashboard"
@@ -378,10 +378,10 @@ const router = useRouter();
                   alt="CMSFullForm"
                   width={32}
                   height={32}
-                  className="flex-shrink-0 hidden dark:block"
+                  className="shrink-0 hidden dark:block"
                 />
                 
-                <span className="text-lg font-semibold hover:cursor-pointer text-gray-900 dark:text-white transition-opacity duration-200">
+                <span className="text-lg font-semibold hover:cursor-pointer text-white transition-opacity duration-200">
                Pennytor
                 </span>
               </Link>
@@ -392,7 +392,7 @@ const router = useRouter();
                   alt="CMSFullForm"
                   width={32}
                   height={32}
-                  className="flex-shrink-0 hidden dark:block"
+                  className="shrink-0 hidden dark:block"
                 />
                
               </div>

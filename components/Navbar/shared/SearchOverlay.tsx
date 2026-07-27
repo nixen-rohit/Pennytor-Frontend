@@ -67,7 +67,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
             ref={inputRef}
             type="text"
             placeholder="Search services, solutions, technologies..."
-            className="flex-1 bg-transparent text-base font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-lg"
+            className="flex-1 bg-transparent text-base font-medium text-gray-900 placeholder:text-gray-400 sm:text-lg"
           />
 
           

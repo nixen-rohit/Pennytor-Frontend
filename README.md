@@ -98,7 +98,7 @@ proxy.ts               # Next.js route protection middleware
 ## Environment Variables
 
 ```
-NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_API_URL=http://localhost:3001
 NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER=...
 NEXT_PUBLIC_WHATSAPP_MESSAGE=...
 ```

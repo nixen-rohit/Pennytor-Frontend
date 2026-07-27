@@ -270,7 +270,7 @@ export default function RegisterForm({
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}
-                      className="mt-1 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                      className="mt-1 rounded border-zinc-300 text-indigo-600"
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
@@ -309,7 +309,7 @@ export default function RegisterForm({
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}
-                      className="mt-1 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                      className="mt-1 rounded border-zinc-300 text-indigo-600"
                     />
                   </FormControl>
                   <FormLabel className="text-sm text-zinc-600 font-normal">
