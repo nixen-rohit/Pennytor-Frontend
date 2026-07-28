@@ -85,7 +85,7 @@ export default function TopNav() {
             className="flex items-center hover:text-white"
           >
             <Home className="h-4 w-4 mr-1" />
-            Dashboard
+            Home
           </Link>
 
           {pathSegments.map((segment, index) => (
