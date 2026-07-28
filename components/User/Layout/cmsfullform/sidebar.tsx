@@ -282,7 +282,7 @@ const router = useRouter();
         {/* Mobile sidebar overlay */}
         <nav
           className={`
-            fixed inset-y-0 left-0 z-70 w-64  
+            fixed inset-y-0 left-0 z-70 w-64  bg-black
             border-r border-[#1F1F23] 
             transform transition-transform duration-300 ease-in-out
             ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}

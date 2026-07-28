@@ -134,7 +134,7 @@ export const menuData: MenuSection[] = [
       },
       {
         id: "referral-chain",
-        label: "Referral Chain",
+        label: "Referral Network",
         href: "/commission/referral-chain",
         icon: UserStar,
       },

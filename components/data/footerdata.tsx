@@ -108,14 +108,14 @@ export const footerColumns: FooterColumnData[] = [
       { label: "About Us", href: "/about" },
       { label: "Pricing", href: "/pricing" },
       { label: "Careers", href: "/careers" },
-      { label: "Contact Us", href: "/support/contact" },
+      { label: "Contact Us", href: "/contact" },
     ],
   },
 ];
 
 export const footerBottomLinks: FooterLink[] = [
   { label: "Privacy Policy", href: "/privacy-policy" },
-  { label: "Terms of Service", href: "/terms" },
+  { label: "Terms of Service", href: "/terms-services" },
 ];
 
 export const footerCopyright = `© ${new Date().getFullYear()} Pennytor. All rights reserved.`;
