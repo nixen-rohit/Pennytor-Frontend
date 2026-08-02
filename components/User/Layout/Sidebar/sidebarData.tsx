@@ -159,7 +159,7 @@ export const menuData: MenuSection[] = [
   },
   {
     id: "finance",
-    label: "Finance & Accounts",
+    label: "Finance",
     items: [
       {
         id: "my-investment",

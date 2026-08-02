@@ -1,4 +1,4 @@
-import FundDashboard from '@/components/User/Funds/FundDashboard'
+import FundDashboard from '@/components/User/Funds'
 
 
 const page = () => {
