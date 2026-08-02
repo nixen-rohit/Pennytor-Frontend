@@ -1,9 +1,7 @@
-import React from 'react'
+import WithdrawFundPage from '@/components/User/WithdrawFund'
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
+  return <WithdrawFundPage />
 }
 
 export default page
