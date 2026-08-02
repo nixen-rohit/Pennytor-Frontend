@@ -2,7 +2,7 @@
 
 A modern fintech/investment platform built with **Next.js 16**, **React 19**, and **TypeScript**.
 
-## Tech Stack
+## Tech Stacks
 
 ### Core
 - **Next.js 16** — React framework (App Router with route groups)
