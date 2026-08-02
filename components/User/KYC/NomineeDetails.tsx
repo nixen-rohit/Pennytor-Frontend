@@ -2,6 +2,23 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+
 interface Props {
   data: FormState;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
@@ -68,13 +85,37 @@ export function NomineeDetails({ data, onChange }: Props) {
           />
         </Field>
 
-        <Field label="Date of Birth" required>
-          <Input
-            type="date"
-            value={data.nomineeDob}
-            onChange={(e) => onChange("nomineeDob", e.target.value)}
-          />
-        </Field>
+        <div className="space-y-1.5">
+          <Label>
+            Date of Birth <span className="text-red-500">*</span>
+          </Label>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-slate-400 shrink-0" />
+
+                {data.nomineeDob
+                  ? format(data.nomineeDob, "dd MMM yyyy")
+                  : "Select Date of Birth"}
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={data.nomineeDob ?? undefined}
+                onSelect={(date) => date && onChange("nomineeDob", date)}
+                captionLayout="dropdown"
+                startMonth={new Date(1900, 0)}
+                endMonth={new Date()}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
 
         <Field label="Phone Number">
           <Input

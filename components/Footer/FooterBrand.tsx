@@ -1,6 +1,6 @@
 // components/Footer/FooterBrand.tsx
 import Link from "next/link";
-import { footerBrand, socialLinks } from "@/components/data/footerdata";
+import { footerBrand, socialLinks } from "@/components/Footer/footerdata";
 import Image from "next/image";
 export function FooterBrand() {
   return (
@@ -17,8 +17,12 @@ export function FooterBrand() {
           />
         </div>
       </Link>
-      <h1 className="text-foreground text-2xl font-serif text-center">{footerBrand.name}</h1>
-      <p className="text-gray-300 text-sm text-start">{footerBrand.description}</p>
+      <h1 className="text-foreground text-2xl font-serif text-center">
+        {footerBrand.name}
+      </h1>
+      <p className="text-gray-300 text-sm text-start">
+        {footerBrand.description}
+      </p>
     </div>
   );
 }

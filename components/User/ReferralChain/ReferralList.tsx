@@ -218,7 +218,7 @@ export function ReferralList({ data }: Props) {
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <span>Show</span>
               <Select value={entriesPerPage} onValueChange={(v) => { setEntriesPerPage(v); setCurrentPage(1); }}>
-                <SelectTrigger className="w-[70px] h-8">
+                <SelectTrigger className="w-[70px] h-8 bg-black">
                   <SelectValue placeholder="10" />
                 </SelectTrigger>
                 <SelectContent>

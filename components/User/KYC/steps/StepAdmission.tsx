@@ -58,8 +58,11 @@ export function StepAdmission({ data, onChange }: Props) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={data.admissionDate}
+                selected={data.admissionDate ?? undefined}
                 onSelect={(d) => d && onChange("admissionDate", d)}
+                captionLayout="dropdown"
+                startMonth={new Date(1900, 0)}
+                endMonth={new Date()}
               />
             </PopoverContent>
           </Popover>

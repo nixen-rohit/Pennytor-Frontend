@@ -5,7 +5,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiCloseLine, RiSearchLine, RiArrowRightLine } from "react-icons/ri";
-import { NavItem } from "@/components/data/navdata";
+import { NavItem } from "@/components/Navbar/navdata";
 import { MobileNavItem } from "@/components/Navbar/mobile/MobileNavItem";
 
 interface MobileNavProps {

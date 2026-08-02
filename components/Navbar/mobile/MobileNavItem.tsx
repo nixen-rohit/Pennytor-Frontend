@@ -4,7 +4,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { NavItem } from "@/components/data/navdata";
+import { NavItem } from "@/components/Navbar/navdata";
 import { RiArrowDownSLine, RiExternalLinkLine } from "react-icons/ri";
 
 interface MobileNavItemProps {
@@ -69,7 +69,6 @@ export function MobileNavItem({ item, onClose }: MobileNavItemProps) {
                     onClick={onClose}
                     className="flex items-center gap-2.5 rounded-xl p-2.5 hover:bg-white hover:shadow-sm transition-all"
                   >
-                     
                     <span className="flex items-center gap-1 text-[12px] font-bold  text-gray-700 leading-tight">
                       {link.label}
                       {link.redirect && (

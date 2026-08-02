@@ -1,6 +1,6 @@
 // components/data/tabbedNavData.tsx
 import type { IconType } from "react-icons";
-import { insuranceProducts } from "./navdata";
+import { insuranceProducts } from "../Navbar/navdata";
 
 export interface TabbedGridItem {
   label: string;
@@ -10,14 +10,14 @@ export interface TabbedGridItem {
 }
 
 export interface TabbedSidebarSection {
-  label: string;          // e.g. "Equity Funds"
+  label: string; // e.g. "Equity Funds"
   items: TabbedGridItem[]; // grid content shown when this sidebar item is active
 }
 
 export interface TabbedMegaTab {
-  label: string;                  // top tab e.g. "Health Insurance"
+  label: string; // top tab e.g. "Health Insurance"
   sidebar?: TabbedSidebarSection[]; // optional left nav (Dhan "Markets" style)
-  items?: TabbedGridItem[];         // used directly if no sidebar
+  items?: TabbedGridItem[]; // used directly if no sidebar
 }
 
 export interface TabbedMegaMenuData {

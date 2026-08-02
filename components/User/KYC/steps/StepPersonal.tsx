@@ -81,9 +81,11 @@ export function StepPersonal({ data, onChange }: Props) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={data.dob}
-                onSelect={(d) => onChange("dob", d)}
+                selected={data.dob ?? undefined}
+                onSelect={(d) => d && onChange("dob", d)}
                 captionLayout="dropdown"
+                startMonth={new Date(1900, 0)}
+                endMonth={new Date()}
               />
             </PopoverContent>
           </Popover>
