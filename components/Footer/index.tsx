@@ -1,5 +1,5 @@
 // components/Footer/Footer.tsx
-import { footerColumns } from "@/components/data/footerdata";
+import { footerColumns } from "@/components/Footer/footerdata";
 import { FooterBrand } from "@/components/Footer/FooterBrand";
 import { FooterColumn } from "@/components/Footer/FooterColumn";
 import { FooterBottom } from "@/components/Footer/FooterBottom";
@@ -12,7 +12,11 @@ export default function index() {
           <FooterBrand />
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10 flex-1">
             {footerColumns.map((col) => (
-              <FooterColumn key={col.heading} heading={col.heading} links={col.links} />
+              <FooterColumn
+                key={col.heading}
+                heading={col.heading}
+                links={col.links}
+              />
             ))}
           </div>
         </div>
@@ -21,5 +25,3 @@ export default function index() {
     </footer>
   );
 }
-
- 

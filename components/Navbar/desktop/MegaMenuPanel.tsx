@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiExternalLinkLine } from "react-icons/ri";
-import { MegaMenuData, MegaLink } from "../../data/navdata";
+import { MegaMenuData, MegaLink } from "../navdata";
 
 interface MegaMenuPanelProps {
   mega: MegaMenuData;
@@ -56,11 +56,15 @@ export function MegaMenuPanel({
   const isSingleSection = colCount === 1; // Dhan "Investments"-style: one heading, 2-col icon grid
 
   const alignClass =
-    align === "right" ? "right-0" : align === "center" ? "left-1/2 -translate-x-1/2" : "left-0";
+    align === "right"
+      ? "right-0"
+      : align === "center"
+        ? "left-1/2 -translate-x-1/2"
+        : "left-0";
 
   const minWidth = isSingleSection
     ? (expertiseWidth ?? 480)
-    : (expertiseWidth || serviceWidth || Math.min(colCount * 240, 920));
+    : expertiseWidth || serviceWidth || Math.min(colCount * 240, 920);
 
   return (
     <div
@@ -86,7 +90,10 @@ export function MegaMenuPanel({
         </div>
       ) : (
         // Dhan "More" style — multiple headings side by side, each a vertical icon list
-        <div className="grid gap-0" style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
+        <div
+          className="grid gap-0"
+          style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}
+        >
           {mega.columns.map((col, ci) => (
             <div
               key={ci}

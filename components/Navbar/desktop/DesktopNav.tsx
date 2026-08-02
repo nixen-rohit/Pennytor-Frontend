@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { RiArrowDownSLine, RiExternalLinkLine } from "react-icons/ri";
-import { NavItem } from "@/components/data/navdata";
+import { NavItem } from "@/components/Navbar/navdata";
 import { servicesTabbed } from "@/components/data/tabbedNavData";
 import { MegaMenuPanel } from "@/components/Navbar/desktop/MegaMenuPanel";
 import { TabbedMegaMenu } from "@/components/Navbar/desktop/TabbedMegaMenu";
@@ -12,14 +12,19 @@ interface DesktopNavProps {
   className?: string;
 }
 
-const getAlign = (index: number, total: number): "left" | "right" | "center" => {
+const getAlign = (
+  index: number,
+  total: number,
+): "left" | "right" | "center" => {
   if (index >= total - 2) return "right";
   return "left";
 };
 
 export function DesktopNav({ navItems, className }: DesktopNavProps) {
   return (
-    <nav className={cn("items-center gap-0.5 flex-1 justify-center", className)}>
+    <nav
+      className={cn("items-center gap-0.5 flex-1 justify-center", className)}
+    >
       {navItems.map((item, i) => {
         const isServices = item.label === "Services";
 
@@ -28,7 +33,9 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
             <Link
               href={item.href ?? "#"}
               target={item.redirect && !item.mega ? "_blank" : undefined}
-              rel={item.redirect && !item.mega ? "noopener noreferrer" : undefined}
+              rel={
+                item.redirect && !item.mega ? "noopener noreferrer" : undefined
+              }
               onClick={(e) => item.mega && e.preventDefault()}
               className={cn(
                 "flex items-center gap-0.5 px-3 py-2 rounded-lg",
@@ -45,7 +52,11 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
             </Link>
 
             {isServices ? (
-              <TabbedMegaMenu data={servicesTabbed} align={getAlign(i, navItems.length)} width={640} />
+              <TabbedMegaMenu
+                data={servicesTabbed}
+                align={getAlign(i, navItems.length)}
+                width={640}
+              />
             ) : (
               item.mega && (
                 <MegaMenuPanel

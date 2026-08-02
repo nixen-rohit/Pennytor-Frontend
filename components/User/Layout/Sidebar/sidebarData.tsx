@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
 
-
 interface SubMenuItem {
   id: string;
   label: string;
@@ -67,34 +66,34 @@ export const menuData: MenuSection[] = [
     label: "Investment",
     items: [
       {
-        id: "Discover Plans",
-        label: "Discover Plans",
-        href: "/discover-plans",
+        id: "Futures Plans",
+        label: "Futures Plans",
+        href: "/comming-soon",
         icon: ClipboardList,
         badge: "4",
         children: [
           {
             id: "all-plans",
             label: "All Plans",
-            href: "/all-plans",
+            href: "/",
             icon: History,
           },
           {
             id: "fixed-return",
             label: "Fixed Returns",
-            href: "/fixed-return",
+            href: "/",
             icon: Phone,
           },
           {
             id: "percentage-based",
             label: "Percentage Based",
-            href: "/percentage-based",
+            href: "/",
             icon: CalendarClock,
           },
           {
             id: "gulak",
             label: "Gulak",
-            href: "/gulak",
+            href: "/",
             icon: CalendarClock,
           },
         ],
@@ -103,21 +102,21 @@ export const menuData: MenuSection[] = [
       {
         id: "stock",
         label: "Stock",
-        href: "/stock",
+        href: "/comming-soon",
         icon: Mail,
         isNew: true,
       },
       {
         id: "Insurance",
         label: "Insurance",
-        href: "/insurance",
+        href: "/comming-soon",
         icon: MessageCircleQuestionMark,
         isNew: true,
       },
       {
         id: "Loan",
         label: "Loan",
-        href: "/loan",
+        href: "/comming-soon",
         icon: MessageSquareWarning,
       },
     ],
@@ -165,27 +164,27 @@ export const menuData: MenuSection[] = [
       {
         id: "my-investment",
         label: "My Investment",
-        href: "/investment/my-investment",
+        href: "/funds",
         icon: Building2Icon,
       },
 
       {
-        id: "add-fund",
-        label: "Add Fund",
-        href: "/fund/add-fund",
+        id: "fund",
+        label: "Add Funds",
+        href: "/funds/add-fund",
         icon: Wallet,
       },
       {
         id: "widthdrawal",
         label: "Withdrawal",
-        href: "/fund/widthdrawal",
+        href: "/funds/withdrawal-fund",
         icon: CreditCard,
       },
 
       {
         id: "transaction",
         label: "Transaction",
-        href: "/fund/transaction",
+        href: "/funds/transactions",
         icon: FileText,
       },
     ],
@@ -198,7 +197,7 @@ export const menuData: MenuSection[] = [
       {
         id: "report",
         label: "Report",
-        href: "/reports",
+        href: "/comming-soon",
         icon: FileBarChart,
       },
     ],

@@ -6,11 +6,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { RiSearchLine, RiMenuLine, RiArrowRightLine } from "react-icons/ri";
-import { CTA, NAV } from "@/components/data/navdata";
+import { CTA, NAV } from "@/components/Navbar/navdata";
 import { DesktopNav } from "@/components/Navbar/desktop/DesktopNav";
 import { MobileNav } from "@/components/Navbar/mobile/MobileNav";
 import { SearchOverlay } from "@/components/Navbar/shared/SearchOverlay";
- 
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

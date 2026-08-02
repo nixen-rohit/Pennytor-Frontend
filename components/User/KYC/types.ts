@@ -9,7 +9,7 @@ export const PHASES = [
 
 export interface FormState {
   fullName: string;
-  dob: string;
+  dob: Date | null;
   gender: string;
   maritalStatus: string;
 
@@ -33,7 +33,7 @@ export interface FormState {
 
   nomineeName: string;
   nomineeRelation: string;
-  nomineeDob: string;
+  nomineeDob: Date | null;
   nomineePhone: string;
   nomineeAadhaar: string;
   nomineeAllocation: string;
@@ -41,7 +41,7 @@ export interface FormState {
 
 export const initialFormState: FormState = {
   fullName: "",
-  dob: "",
+  dob: null,
   gender: "",
   maritalStatus: "",
 
@@ -65,7 +65,7 @@ export const initialFormState: FormState = {
 
   nomineeName: "",
   nomineeRelation: "",
-  nomineeDob: "",
+  nomineeDob: null,
   nomineePhone: "",
   nomineeAadhaar: "",
   nomineeAllocation: "",

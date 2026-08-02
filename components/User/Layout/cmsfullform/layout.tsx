@@ -1,8 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Sidebar from "./sidebar";
-import TopNav from "../top-nav";
+import Sidebar from "@/components/User/Layout/Sidebar/sidebar";
+import TopNav from "@/components/User/Layout/Topbar/top-nav";
 
 import { useEffect, useState } from "react";
 

@@ -5,7 +5,7 @@ import { ChevronDown, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { menuData } from "@/components/data/sidebarData";
+import { menuData } from "./sidebarData";
 import { usePathname,useRouter } from "next/navigation";
  
 

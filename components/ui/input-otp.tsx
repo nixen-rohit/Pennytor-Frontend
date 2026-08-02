@@ -1,11 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { REGEXP_ONLY_DIGITS } from "input-otp"
-import { OTPInput, OTPInputContext,  } from 'input-otp'
+import { OTPInput, OTPInputContext, REGEXP_ONLY_DIGITS } from 'input-otp'
 import { Dot } from 'lucide-react'
- 
- 
+
 import { cn } from '@/lib/utils'
 
 const InputOTP = React.forwardRef<
@@ -52,7 +50,7 @@ const InputOTPSlot = React.forwardRef<
       {char}
       {hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-4 w-px animate-caret-blink bg-black duration-1000" />
+          <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
         </div>
       )}
     </div>
@@ -70,4 +68,4 @@ const InputOTPSeparator = React.forwardRef<
 ))
 InputOTPSeparator.displayName = 'InputOTPSeparator'
 
-export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator,REGEXP_ONLY_DIGITS }
+export { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator, REGEXP_ONLY_DIGITS }

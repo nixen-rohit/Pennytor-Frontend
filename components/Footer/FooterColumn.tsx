@@ -1,6 +1,6 @@
 // components/Footer/FooterColumn.tsx
 import Link from "next/link";
-import { FooterColumnData } from "@/components/data/footerdata";
+import { FooterColumnData } from "@/components/Footer/footerdata";
 
 export function FooterColumn({ heading, links }: FooterColumnData) {
   return (

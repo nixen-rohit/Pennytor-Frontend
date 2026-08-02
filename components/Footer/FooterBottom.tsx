@@ -1,6 +1,9 @@
 // components/Footer/FooterBottom.tsx
 import Link from "next/link";
-import { footerBottomLinks, footerCopyright } from "@/components/data/footerdata";
+import {
+  footerBottomLinks,
+  footerCopyright,
+} from "@/components/Footer/footerdata";
 
 export function FooterBottom() {
   return (
