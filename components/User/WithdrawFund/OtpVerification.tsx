@@ -65,12 +65,12 @@ export function OtpVerification({ data, errors, onChange }: Props) {
             value={data.otp}
             onChange={(v) => onChange("otp", v)}
           >
-            <InputOTPGroup className="gap-2">
+            <InputOTPGroup >
               {[0, 1, 2, 3, 4, 5].map((index) => (
                 <InputOTPSlot
                   key={index}
                   index={index}
-                  className="h-12 w-11 border-neutral-700 bg-black/40 text-lg"
+                  className="h-15 w-13 border-neutral-700 bg-black/40 text-lg"
                 />
               ))}
             </InputOTPGroup>
