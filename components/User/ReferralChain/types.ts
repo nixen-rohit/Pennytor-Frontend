@@ -1,12 +1,6 @@
-import { BarChart3, Users, TreePine, DollarSign } from "lucide-react";
+import { Users, TreePine } from "lucide-react";
 
-export const PHASES = [
-  { step: 1, title: "Overview", icon: BarChart3 },
-  { step: 2, title: "My Referrals", icon: Users },
-  { step: 3, title: "Commission", icon: DollarSign },
-  { step: 4, title: "Referral Tree", icon: TreePine },
-] as const;
-
+ 
 export interface ReferralUser {
   id: string;
   fullName: string;
@@ -95,7 +89,7 @@ export const initialReferralState: ReferralState = {
       kycStatus: "Rejected",
       createdAt: new Date("2026-03-18"),
       commission: 0,
-      level: 2,
+      level: 0,
     },
     {
       id: "4",
@@ -212,9 +206,7 @@ export const initialReferralState: ReferralState = {
             id: "3",
             name: "Rohan Verma",
             earnings: 0,
-            children: [
-              { id: "7", name: "Vikram Singh", earnings: 1780 },
-            ],
+            children: [{ id: "7", name: "Vikram Singh", earnings: 1780 }],
           },
         ],
       },

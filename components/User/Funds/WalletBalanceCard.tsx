@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, Plus, ArrowUpRight, Clock } from "lucide-react";
+import { Wallet, Plus, ArrowUpRight, Clock, IndianRupee } from "lucide-react";
 import Link from "next/link";
 
 interface Props {
@@ -23,13 +23,18 @@ export function WalletBalanceCard({ balance, className }: Props) {
               <Wallet className="h-5 w-5 text-indigo-400" />
             </span>
             <div>
-              <p className="text-sm font-medium text-slate-300">Wallet Balance</p>
+              <p className="text-sm font-medium text-slate-300">
+                Wallet Balance
+              </p>
               <p className="text-xs text-slate-500">Available balance</p>
             </div>
           </div>
 
-          <p className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-50">
-            ₹
+          <p className="flex items-center gap-2 text-4xl sm:text-5xl font-bold tracking-tight text-slate-50">
+            <span>
+              <IndianRupee size={38} strokeWidth={3.5} />
+            </span>
+
             {balance.toLocaleString("en-IN", {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

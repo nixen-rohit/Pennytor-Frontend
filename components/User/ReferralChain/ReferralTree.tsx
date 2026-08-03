@@ -1,6 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { ChevronDown, ChevronRight, DollarSign, User } from "lucide-react";
-import { ReferralState, ReferralTreeData as ReferralTreeData } from "@/components/User/ReferralChain/types";
+import { ChevronDown, ChevronRight, IndianRupee, User } from "lucide-react";
+import { ReferralState, ReferralTreeData } from "@/components/User/ReferralChain/types";
 
 interface Props {
   data: ReferralState;
@@ -45,13 +47,15 @@ function TreeNode({
           </div>
         )}
 
-        <span className={`text-sm font-medium ${depth === 0 ? "text-indigo-300" : "text-slate-200"}`}>
+        <span
+          className={`text-sm font-medium ${depth === 0 ? "text-indigo-300" : "text-slate-200"}`}
+        >
           {node.name}
         </span>
 
         <div className="flex items-center gap-1 ml-auto text-xs text-slate-400">
-          <DollarSign className="h-3 w-3" />
-          <span>₹{node.earnings.toLocaleString()}</span>
+          <IndianRupee className="h-3 w-3" />
+          <span>{node.earnings.toLocaleString()}</span>
         </div>
       </div>
 
@@ -69,25 +73,12 @@ function TreeNode({
 export function ReferralTree({ data }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
-      <SectionHeading title="Referral Tree" />
-      <p className="text-sm text-slate-400 -mt-4">
-        Visual hierarchy of your referral network
-      </p>
-
       <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-4">
-        <div className="text-xs text-slate-500 mb-3 px-3">
-          Click on a node to expand/collapse its children
+        <div className="text-sm text-white mb-3 px-3 ">
+          Check Your Refferal Chain Tree here
         </div>
         <TreeNode node={data.treeData} />
       </div>
-    </div>
-  );
-}
-
-function SectionHeading({ title }: { title: string }) {
-  return (
-    <div className="border-b border-neutral-800 pb-2">
-      <h3 className="text-base font-semibold text-slate-50">{title}</h3>
     </div>
   );
 }
