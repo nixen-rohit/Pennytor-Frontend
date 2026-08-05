@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -14,13 +13,15 @@ import { handleApiError } from "@/services/api";
 
 interface RegisteredOtpDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange?: (open: boolean) => void;
   email: string;
 }
 
+const noop = () => {};
+
 export default function RegisteredOtpDialog({
   open,
-  onOpenChange,
+  onOpenChange = noop,
   email,
 }: RegisteredOtpDialogProps) {
   const router = useRouter();

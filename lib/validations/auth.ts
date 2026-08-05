@@ -21,7 +21,10 @@ export const registerSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: emailField,
   password: registerPasswordField,
-  referralCode: z.string().optional(),
+  referralCode: z
+    .string()
+    .min(1, "Referral code is required")
+    .regex(/^[A-Z0-9]{8}$/, "Referral code must be 8 uppercase alphanumeric characters"),
   agreeToTerms: z.boolean().refine((val) => val === true, {
     message: "You must agree to the terms and privacy policy",
   }),

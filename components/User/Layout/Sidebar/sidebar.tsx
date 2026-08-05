@@ -165,8 +165,10 @@ const router = useRouter();
         className={cn(
           "flex items-center py-2 text-sm rounded-md transition-colors sidebar-menu-item relative group cursor-pointer",
           isActive
-            ? " text-white"
-            : "hover:bg-[#1F1F23]",
+            ? "bg-zinc-800 text-white"
+            : hasActiveChild
+              ? "text-white hover:bg-[#1F1F23]"
+              : "hover:bg-[#1F1F23]",
           paddingLeft,
         )}
         onClick={() => {

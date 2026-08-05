@@ -13,11 +13,11 @@ import RegisteredOtpDialog from "@/components/auth/OTP/RegisteredOTP";
 
 export default function RegisterPage() {
   const router = useRouter();
-
-  const [open, setOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [otpOpen, setOtpOpen] = useState(false);
+  const [otpEmail, setOtpEmail] = useState("");
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -42,10 +42,12 @@ export default function RegisterPage() {
         lastName: data.lastName,
         email: data.email,
         password: data.password,
-        referralCode: data.referralCode || undefined,
+        referralCode: data.referralCode,
         acceptTerms: true,
+        marketingEmails: data.subscribeNewsletter,
       });
-      setOpen(true);
+      setOtpEmail(data.email);
+      setOtpOpen(true);
     } catch (err) {
       handleApiError(err, setErrorMsg, {
         409: "This email is already registered. Please log in or use a different email.",
@@ -66,9 +68,9 @@ export default function RegisterPage() {
         <AuthBanner />
       </div>
       <RegisteredOtpDialog
-        open={open}
-        onOpenChange={setOpen}
-        email={form.getValues("email")}
+        open={otpOpen}
+        onOpenChange={setOtpOpen}
+        email={otpEmail}
       />
       {/* Right Side - Scrollable */}
       <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">

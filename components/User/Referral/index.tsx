@@ -189,7 +189,7 @@ function MonthlyGrowth({ data }: { data: ReferralState }) {
                 className={cn(
                   "px-3 py-1 text-xs font-medium rounded-md transition-colors",
                   activePeriod === p
-                    ? "bg-[#E85B66] text-white"
+                    ? "bg-foreground text-white"
                     : "text-muted-foreground hover:text-white hover:bg-white/10",
                 )}
               >

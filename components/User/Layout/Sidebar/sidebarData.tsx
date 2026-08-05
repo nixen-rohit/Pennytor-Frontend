@@ -8,8 +8,8 @@ import {
   ClipboardList,
   Mail,
   LucideIcon,
-  History,
-  Phone,
+  PiggyBank ,
+  Landmark,
   CalendarClock,
   MessageSquareWarning,
   MessageCircleQuestionMark,
@@ -18,9 +18,10 @@ import {
   UserCheck,
   FileBarChart,
   Building2Icon,
+  School 
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
-
+ 
 interface SubMenuItem {
   id: string;
   label: string;
@@ -66,57 +67,57 @@ export const menuData: MenuSection[] = [
     label: "Investment",
     items: [
       {
-        id: "Futures Plans",
-        label: "Futures Plans",
-        href: "/comming-soon",
+        id: "all-schemes",
+        label: "All Schemes",
+        href: "/",
         icon: ClipboardList,
         badge: "4",
         children: [
           {
-            id: "all-plans",
-            label: "All Plans",
-            href: "/",
-            icon: History,
+            id: "gullak",
+            label: "Gullak Schemes",
+            href: "/investment/all-schemes/gullak-scheme",
+            icon: PiggyBank ,
           },
           {
-            id: "fixed-return",
-            label: "Fixed Returns",
-            href: "/",
-            icon: Phone,
+            id: "sip",
+            label: "SIP Schemes",
+            href: "/investment/all-schemes/sip-investment",
+            icon: School ,
           },
           {
-            id: "percentage-based",
-            label: "Percentage Based",
-            href: "/",
+            id: "fixed-deposite",
+            label: "Fixed Deposite",
+            href: "/investment/all-schemes/fixed-deposite",
             icon: CalendarClock,
           },
           {
-            id: "gulak",
-            label: "Gulak",
-            href: "/",
-            icon: CalendarClock,
+            id: "investment-fund-scheme",
+            label: "Investment Fund Scheme",
+            href: "/investment/all-schemes/investment-fund",
+            icon: Landmark ,
           },
         ],
       },
 
       {
-        id: "stock",
-        label: "Stock",
-        href: "/comming-soon",
+        id: "stocks",
+        label: "Stocks",
+        href: "/investment/stocks",
         icon: Mail,
         isNew: true,
       },
       {
         id: "Insurance",
         label: "Insurance",
-        href: "/comming-soon",
+        href: "/investment/insurance",
         icon: MessageCircleQuestionMark,
         isNew: true,
       },
       {
         id: "Loan",
         label: "Loan",
-        href: "/comming-soon",
+        href: "/investment/loan",
         icon: MessageSquareWarning,
       },
     ],
@@ -197,7 +198,7 @@ export const menuData: MenuSection[] = [
       {
         id: "report",
         label: "Report",
-        href: "/comming-soon",
+        href: "/report",
         icon: FileBarChart,
       },
     ],

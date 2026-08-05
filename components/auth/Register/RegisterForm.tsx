@@ -16,6 +16,9 @@ import {
 import type { UseFormReturn } from "react-hook-form";
 import type { RegisterFormValues } from "@/lib/validations";
 import PasswordRequirements from "@/components/auth/Register/Passwordrequirements";
+import { AuthService } from "@/services/auth.service";
+
+type EmailStatus = "idle" | "checking" | "available" | "taken";
 
 interface RegisterFormProps {
   form: UseFormReturn<RegisterFormValues>;
@@ -72,6 +75,8 @@ export default function RegisterForm({
   const [agreeToTerms, setAgreeToTerms] = useState(
     form.getValues("agreeToTerms") || false,
   );
+  const [email, setEmail] = useState(form.getValues("email") || "");
+  const [emailStatus, setEmailStatus] = useState<EmailStatus>("idle");
 
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
@@ -81,9 +86,43 @@ export default function RegisterForm({
       if (name === "agreeToTerms" || name === undefined) {
         setAgreeToTerms(value.agreeToTerms || false);
       }
+      if (name === "email" || name === undefined) {
+        setEmail(value.email || "");
+      }
     });
     return () => subscription.unsubscribe();
   }, [form]);
+
+  // Debounced email-availability check.
+  useEffect(() => {
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const trimmed = email.trim();
+
+    if (!trimmed || !EMAIL_REGEX.test(trimmed)) {
+      setEmailStatus("idle");
+      return;
+    }
+
+    setEmailStatus("checking");
+
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      AuthService.checkEmail(trimmed)
+        .then((res) => {
+          if (!cancelled) {
+            setEmailStatus(res.available ? "available" : "taken");
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setEmailStatus("idle");
+        });
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [email]);
 
   const passwordStrength = getPasswordStrength(password);
 
@@ -161,6 +200,24 @@ export default function RegisterForm({
                     className="h-12 rounded-xl text-black border-zinc-200 bg-zinc-50/50 block w-full"
                   />
                 </FormControl>
+                {emailStatus === "checking" && (
+                  <p className="flex items-center gap-1.5 text-xs text-zinc-500">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Checking availability...
+                  </p>
+                )}
+                {emailStatus === "available" && (
+                  <p className="text-xs font-medium text-green-600">
+                    This email is available — you&apos;re ready to create your
+                    account.
+                  </p>
+                )}
+                {emailStatus === "taken" && (
+                  <p className="text-xs font-medium text-red-500">
+                    This email is already registered. Please use a different
+                    email.
+                  </p>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -240,8 +297,7 @@ export default function RegisterForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-sm font-medium text-zinc-700">
-                  Referral code{" "}
-                  <span className="text-zinc-400 font-normal">(optional)</span>
+                  Referral code
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -330,7 +386,13 @@ export default function RegisterForm({
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={formLoading || !passwordMeetsRequirements(password) || !agreeToTerms}
+            disabled={
+              formLoading ||
+              !passwordMeetsRequirements(password) ||
+              !agreeToTerms ||
+              emailStatus === "checking" ||
+              emailStatus === "taken"
+            }
             className="w-full h-12 font-medium rounded-xl bg-foreground hover:bg-foreground/80 text-white"
           >
             {formLoading ? (
