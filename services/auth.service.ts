@@ -21,6 +21,11 @@ export const AuthService = {
       body: JSON.stringify(data),
     }),
 
+  checkEmail: (email: string) =>
+    fetchApi<{ available: boolean }>(
+      `/auth/check-email?email=${encodeURIComponent(email)}`,
+    ),
+
   loginWithGoogle: async (data: GoogleLoginRequest) =>
     fetchApi<LoginResponse>("/auth/google", {
       method: "POST",

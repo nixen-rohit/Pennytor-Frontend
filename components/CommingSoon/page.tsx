@@ -1,6 +1,6 @@
 import { FileText } from "lucide-react"
 
-export default function BlankContent() {
+export default function CommingSoon() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
       <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full">

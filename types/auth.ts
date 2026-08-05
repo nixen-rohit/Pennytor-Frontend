@@ -24,7 +24,7 @@ export interface RegisterRequest {
   lastName: string;
   email: string;
   password: string;
-  referralCode?: string;
+  referralCode: string;
   acceptTerms: boolean;
   marketingEmails?: boolean;
 }
