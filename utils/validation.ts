@@ -28,3 +28,58 @@ export const createPasswordConfirmSchema = <
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+const UNSAFE_PATTERN =
+  /(<\s*\/?\s*(script|iframe|object|embed|frame|meta|link|style)\b)|(<\s*[a-z0-9]+[^>]*\son[a-z]+\s*=)|(javascript\s*:)|(<\s*!|<\s*\?)/i;
+
+export function containsUnsafe(value: string): boolean {
+  return UNSAFE_PATTERN.test(value);
+}
+
+export function sanitizeText(value: string): string {
+  return value
+    .replace(
+      /<\s*\/?\s*(script|iframe|object|embed|frame|meta|link|style)\b[^>]*>/gi,
+      "",
+    )
+    .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]*)/gi, "")
+    .replace(/javascript\s*:/gi, "")
+    .replace(/[<>]/g, "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, "");
+}
+
+export function sanitizeDigits(value: string): string {
+  return value.replace(/[^\d\s-]/g, "").slice(0, 32);
+}
+
+export function sanitizePhone(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 15);
+}
+
+export function sanitizePAN(value: string): string {
+  return value.replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 10);
+}
+
+export function sanitizeAadhaar(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 12);
+}
+
+export function sanitizeAmount(value: string): string {
+  const clean = value.replace(/[^\d.]/g, "");
+  const firstDot = clean.indexOf(".");
+  return firstDot === -1
+    ? clean
+    : clean.slice(0, firstDot + 1) + clean.slice(firstDot + 1).replace(/\./g, "");
+}
+
+export function sanitizeTransactionId(value: string): string {
+  return value.replace(/[^\w.-]/g, "").slice(0, 40);
+}
+
+export const PAN_PATTERN = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+export const IFSC_PATTERN = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+export const AADHAAR_PATTERN = /^\d{12}$/;
+export const PHONE_PATTERN = /^\+?[0-9\s-]{10,15}$/;
+export const ACCOUNT_NUMBER_PATTERN = /^\d{9,18}$/;
+export const AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/;
+export const TRANSACTION_ID_PATTERN = /^[A-Za-z0-9_.-]{6,40}$/;

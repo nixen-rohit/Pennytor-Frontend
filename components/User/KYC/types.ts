@@ -1,10 +1,11 @@
-import { User, Upload, Landmark, Users } from "lucide-react";
+import { User, Upload, Landmark, Users, FileCheck } from "lucide-react";
 
 export const PHASES = [
   { step: 1, title: "Personal Info", icon: User },
   { step: 2, title: "Upload Document", icon: Upload },
   { step: 3, title: "Bank Details", icon: Landmark },
   { step: 4, title: "Nominee", icon: Users },
+  { step: 5, title: "Review", icon: FileCheck },
 ] as const;
 
 export interface FormState {
@@ -12,6 +13,8 @@ export interface FormState {
   dob: Date | null;
   gender: string;
   maritalStatus: string;
+
+  selfieFile: File | null;
 
   aadhaarNumber: string;
   aadhaarFrontFile: File | null;
@@ -32,11 +35,9 @@ export interface FormState {
   branchAddress: string;
 
   nomineeName: string;
-  nomineeRelation: string;
   nomineeDob: Date | null;
   nomineePhone: string;
   nomineeAadhaar: string;
-  nomineeAllocation: string;
 }
 
 export const initialFormState: FormState = {
@@ -44,6 +45,8 @@ export const initialFormState: FormState = {
   dob: null,
   gender: "",
   maritalStatus: "",
+
+  selfieFile: null,
 
   aadhaarNumber: "",
   aadhaarFrontFile: null,
@@ -64,9 +67,7 @@ export const initialFormState: FormState = {
   branchAddress: "",
 
   nomineeName: "",
-  nomineeRelation: "",
   nomineeDob: null,
   nomineePhone: "",
   nomineeAadhaar: "",
-  nomineeAllocation: "",
 };

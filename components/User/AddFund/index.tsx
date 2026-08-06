@@ -19,6 +19,14 @@ import { PaymentConfirmation } from "./PaymentConfirmation";
 import { ReviewSubmit } from "./ReviewSubmit";
 import { SubmitRequest } from "./SubmitRequest";
 import { SlipRow } from "./SlipRow";
+import {
+  containsUnsafe,
+  sanitizeAmount,
+  sanitizeText,
+  sanitizeTransactionId,
+  AMOUNT_PATTERN,
+  TRANSACTION_ID_PATTERN,
+} from "@/utils/validation";
 
 /**
  * AddPaymentPage
@@ -37,7 +45,16 @@ export default function AddPaymentPage() {
   const [submitted, setSubmitted] = useState(false);
 
   const updateField: FormChange = useCallback((key, value) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    let safeValue: FormState[keyof FormState] = value;
+    if (typeof safeValue === "string") {
+      safeValue =
+        key === "amount"
+          ? (sanitizeAmount(safeValue) as FormState[keyof FormState])
+          : key === "txnId"
+            ? (sanitizeTransactionId(safeValue) as FormState[keyof FormState])
+            : (sanitizeText(safeValue) as FormState[keyof FormState]);
+    }
+    setForm((prev) => ({ ...prev, [key]: safeValue }) as FormState);
     setErrors((prev) => {
       const next = { ...prev };
       if (key === "screenshot") {
@@ -51,16 +68,21 @@ export default function AddPaymentPage() {
 
   const validateStep1 = () => {
     const errs: FormErrors = {};
-    if (!form.amount || Number(form.amount) <= 0)
-      errs.amount = "Enter the amount you're adding.";
+    const amount = form.amount.trim();
+    if (!amount || !AMOUNT_PATTERN.test(amount) || Number(amount) <= 0)
+      errs.amount = "Enter a valid amount (e.g. 1000 or 2500.50).";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
   const validateStep2 = () => {
     const errs: FormErrors = {};
-    if (!form.txnId.trim())
-      errs.txnId = "Enter the UPI transaction id from your payment app.";
+    const txnId = form.txnId.trim();
+    if (containsUnsafe(txnId))
+      errs.txnId = "Transaction id contains invalid characters.";
+    else if (!txnId || !TRANSACTION_ID_PATTERN.test(txnId))
+      errs.txnId =
+        "Enter a valid UPI transaction id (6–40 letters, numbers, - . _).";
     if (!form.screenshot)
       errs.file = "Attach a screenshot of the payment confirmation.";
     setErrors(errs);

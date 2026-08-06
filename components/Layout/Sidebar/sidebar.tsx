@@ -5,9 +5,7 @@ import { ChevronDown, LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { menuData } from "./sidebarData";
-import { usePathname,useRouter } from "next/navigation";
- 
+import { usePathname, useRouter } from "next/navigation";
 
 type MenuState = "full" | "collapsed" | "hidden";
 
@@ -33,7 +31,17 @@ interface MenuItem {
   children?: SubMenuItem[];
 }
 
-export default function Sidebar() {
+export interface MenuSection {
+  id: string;
+  label: string;
+  items: MenuItem[];
+}
+
+interface SidebarProps {
+  menuData: MenuSection[];
+}
+
+export default function Sidebar({ menuData }: SidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [menuState, setMenuState] = useState<MenuState>("full");
   const [isHovered, setIsHovered] = useState(false);
@@ -42,7 +50,7 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const pathname = usePathname();
-const router = useRouter();
+  const router = useRouter();
 
   // Cycle through menu states: full -> collapsed -> hidden -> full
   const toggleMenuState = () => {
@@ -150,7 +158,6 @@ const router = useRouter();
 
     const isExpanded = expandedItems.has(itemId) || hasActiveChild;
 
-     
     const showText =
       menuState === "full" ||
       (menuState === "collapsed" && isHovered) ||
@@ -176,7 +183,7 @@ const router = useRouter();
             toggleExpanded(itemId);
           } else if (item.href) {
             if (item.External) {
-              window.open(item.href, '_blank', 'noopener,noreferrer');
+              window.open(item.href, "_blank", "noopener,noreferrer");
             } else {
               router.push(item.href);
             }
@@ -204,11 +211,16 @@ const router = useRouter();
                   New
                 </span>
               )}
-              {item.badge && (
-                <span className="px-1.5 py-0.5 text-xs   bg-blue-900/30  text-blue-400 rounded-full">
-                  {item.badge}
-                </span>
-              )}
+              {item.badge &&
+                (item.id == "notifications" ? (
+                  <span className="px-1.5 py-0.5 text-xs font-semibold  bg-red-600   text-white rounded-full">
+                    {item.badge}
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.5 text-xs   bg-blue-900/30  text-blue-400 rounded-full">
+                    {item.badge}
+                  </span>
+                ))}
               {showExpandIcon && (
                 <ChevronDown
                   className={cn(
@@ -237,7 +249,9 @@ const router = useRouter();
       <div>
         {item.href && !hasChildren ? (
           item.External ? (
-            <a href={item.href} target="_blank" rel="noopener noreferrer">{content}</a>
+            <a href={item.href} target="_blank" rel="noopener noreferrer">
+              {content}
+            </a>
           ) : (
             <Link href={item.href}>{content}</Link>
           )
@@ -294,7 +308,7 @@ const router = useRouter();
             {/* Header */}
             <div className="h-16 px-3 flex items-center border-b border-[#1F1F23]">
               <Link
-              href="/dashboard" 
+                href="/dashboard"
                 className="flex items-center gap-3 w-full"
               >
                 <img
@@ -336,8 +350,6 @@ const router = useRouter();
                 ))}
               </div>
             </div>
-
-            
           </div>
         </nav>
 
@@ -382,29 +394,25 @@ const router = useRouter();
                   height={32}
                   className="shrink-0 hidden dark:block"
                 />
-                
+
                 <span className="text-lg font-semibold hover:cursor-pointer text-white transition-opacity duration-200">
-               Pennytor
+                  Pennytor
                 </span>
               </Link>
             ) : (
               <div className="flex justify-center w-full">
                 <img
-                 src="/logos/Graphic.jpeg"
+                  src="/logos/Graphic.jpeg"
                   alt="CMSFullForm"
                   width={32}
                   height={32}
                   className="shrink-0 hidden dark:block"
                 />
-               
               </div>
             )}
           </div>
 
-          <div
-            className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 "
-             
-          >
+          <div className="flex-1 overflow-y-auto overflow-x-hidden py-4 px-2 ">
             <div className="space-y-6">
               {menuData.map((section) => (
                 <div key={section.id}>
@@ -426,8 +434,6 @@ const router = useRouter();
               ))}
             </div>
           </div>
-
-        
         </div>
       )}
     </nav>

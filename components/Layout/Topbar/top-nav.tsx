@@ -10,6 +10,7 @@ import {
   ChevronDown,
   Home,
   LogOut,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -28,7 +28,34 @@ import Link from "next/link";
 import { AuthService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 
-export default function TopNav() {
+export interface TopbarMenuItem {
+  id: string;
+  label: string;
+  href?: string;
+  icon: LucideIcon;
+  type?: "link" | "logout";
+}
+
+export interface TopbarConfig {
+  homeHref?: string;
+  menuItems: TopbarMenuItem[];
+}
+
+const defaultConfig: TopbarConfig = {
+  homeHref: "/dashboard",
+  menuItems: [
+    { id: "profile", label: "Profile", href: "/profile", icon: User },
+    {
+      id: "settings",
+      label: "Settings",
+      href: "/profile/settings",
+      icon: Settings,
+    },
+    { id: "logout", label: "Log out", icon: LogOut, type: "logout" },
+  ],
+};
+
+export default function TopNav({ config = defaultConfig }: { config?: TopbarConfig }) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -50,6 +77,12 @@ export default function TopNav() {
       const currentState = (window as any).isMobileMenuOpen || false;
       (window as any).setIsMobileMenuOpen(!currentState);
     }
+  };
+
+  const handleLogout = async () => {
+    await AuthService.logout({ all: true }).catch(() => {});
+    clearAuth();
+    router.push("/login");
   };
 
   return (
@@ -81,7 +114,7 @@ export default function TopNav() {
         {/* Breadcrumbs */}
         <nav className="hidden sm:flex items-center space-x-2 text-sm text-gray-300">
           <Link
-            href="/dashboard"
+            href={config.homeHref || "/dashboard"}
             className="flex items-center hover:text-white"
           >
             <Home className="h-4 w-4 mr-1" />
@@ -106,32 +139,11 @@ export default function TopNav() {
         </nav>
       </div>
 
-      {/* Center - Search (hidden on mobile) */}
-      <div className="hidden md:flex flex-1 max-w-md mx-4">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="pl-10 bg-gray-800 border-gray-700"
-          />
-        </div>
-      </div>
+       
 
       {/* Right side - Actions and Profile */}
       <div className="flex items-center space-x-5">
-        {/* Mobile Search */}
-        <Button variant="ghost" size="sm" className="md:hidden p-2">
-          <Search className="h-4 w-4" />
-        </Button>
-
-        {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative p-2">
-          <Bell className="h-4 w-4" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs bg-red-500 text-white">
-            3
-          </Badge>
-        </Button>
+         
 
         {/* Profile Dropdown */}
         <DropdownMenu>
@@ -161,36 +173,32 @@ export default function TopNav() {
             align="end"
             className="w-56 bg-black border border-white/20 "
           >
-            <DropdownMenuItem
-              asChild
-              className=" hover:bg-neutral-800 text-white "
-            >
-              <Link href="/profile">
-                <User className="mr-2 h-4 w-4" />
-                Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              asChild
-              className=" hover:bg-neutral-800   text-white"
-            >
-              <Link href="/profile/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="border-b border-white/20" />
-            <DropdownMenuItem
-              className="text-red-600/70 hover:bg-red-600 hover:text-white cursor-pointer text-sm"
-              onClick={async () => {
-                await AuthService.logout({ all: true }).catch(() => {});
-                clearAuth();
-                router.push("/login");
-              }}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Log out
-            </DropdownMenuItem>
+            {config.menuItems.map((item, index) => (
+              <span key={item.id}>
+                {item.type === "logout" && index > 0 && (
+                  <DropdownMenuSeparator className="border-b border-white/20" />
+                )}
+                {item.type === "logout" ? (
+                  <DropdownMenuItem
+                    className="text-red-600/70 hover:bg-red-600 hover:text-white cursor-pointer text-sm"
+                    onClick={handleLogout}
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem
+                    asChild
+                    className=" hover:bg-neutral-800 text-white "
+                  >
+                    <Link href={item.href || "#"}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+              </span>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

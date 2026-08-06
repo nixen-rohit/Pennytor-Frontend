@@ -1,7 +1,7 @@
 export type VerificationState =
+  |"not_started"
   | "verified"
   | "pending"
-  | "pending_approval"
   | "rejected";
 
 export interface VerificationItem {
@@ -14,8 +14,8 @@ export interface VerificationItem {
 export interface KycProfile {
   name: string;
   email: string;
-  initial: string;
-  kycPercent: number;
+  client_id: string;
+  kyc_status: VerificationState;
   items: VerificationItem[];
 }
 
@@ -23,6 +23,13 @@ export const STATE_STYLES: Record<
   VerificationState,
   { label: string; text: string; bg: string; ring: string; dot: string }
 > = {
+  not_started: {
+    label: "Not Started",
+    text: "text-gray-300",
+    bg: "bg-gray-400/10",
+    ring: "ring-gray-400/30",
+    dot: "bg-gray-400",
+  },
   verified: {
     label: "Verified",
     text: "text-emerald-300",
@@ -36,17 +43,10 @@ export const STATE_STYLES: Record<
     bg: "bg-amber-400/10",
     ring: "ring-amber-400/30",
     dot: "bg-amber-400",
-  },
-  pending_approval: {
-    label: "Pending Approval",
-    text: "text-amber-300",
-    bg: "bg-amber-400/10",
-    ring: "ring-amber-400/30",
-    dot: "bg-amber-400",
-  },
+  },  
   rejected: {
     label: "Rejected",
-    text: "text-rose-300",
+    text: "text-red-500",
     bg: "bg-rose-400/10",
     ring: "ring-rose-400/30",
     dot: "bg-rose-400",

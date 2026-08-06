@@ -1,6 +1,11 @@
+"use client";
+
 import AuthGuard from "@/components/auth/AuthGuard";
-import Layout from "@/components/User/Layout/cmsfullform/layout";
-import  "./user.css"
+import Layout from "@/components/Layout/cmsfullform/layout";
+import { menuData } from "@/components/User/Layout/sidebarData";
+import { userTopbar } from "@/components/User/Layout/topbarData";
+import "./user.css"
+
 export default function UserLayout({
   children,
 }: Readonly<{
@@ -8,8 +13,9 @@ export default function UserLayout({
 }>) {
   return (
     <AuthGuard>
-      {" "}
-      <Layout>{children}</Layout>
+      <Layout menuData={menuData} topbar={userTopbar}>
+        {children}
+      </Layout>
     </AuthGuard>
   );
 }

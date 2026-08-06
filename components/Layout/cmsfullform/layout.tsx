@@ -1,18 +1,22 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Sidebar from "@/components/User/Layout/Sidebar/sidebar";
-import TopNav from "@/components/User/Layout/Topbar/top-nav";
+import Sidebar from "@/components/Layout/Sidebar/sidebar";
+import TopNav, {
+  type TopbarConfig,
+} from "@/components/Layout/Topbar/top-nav";
+import type { MenuSection } from "@/components/Layout/Sidebar/sidebar";
 
 import { useEffect, useState } from "react";
 
-
 interface LayoutProps {
   children: ReactNode;
+  menuData: MenuSection[];
+  topbar?: TopbarConfig;
 }
 
-export default function Layout({ children }: LayoutProps) {
- 
+export default function Layout({ children, menuData, topbar }: LayoutProps) {
+
   const [mounted, setMounted] = useState(false);
   const [menuState, setMenuState] = useState<"full" | "collapsed" | "hidden">(
     "full",
@@ -73,7 +77,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className={`flex h-screen `}>
-      <Sidebar />
+      <Sidebar menuData={menuData} />
       <div
         className="w-full flex flex-1 flex-col transition-all duration-300 ease-in-out min-w-0"
         style={{
@@ -81,7 +85,7 @@ export default function Layout({ children }: LayoutProps) {
         }}
       >
         <header className="h-16 border-b border-[#1F1F23] shrink-0">
-          <TopNav />
+          <TopNav config={topbar} />
         </header>
         <main className="flex-1 overflow-auto p-3 sm:p-6 min-w-0">
           {children}
