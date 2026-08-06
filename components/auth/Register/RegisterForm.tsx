@@ -333,14 +333,14 @@ export default function RegisterForm({
                     <FormLabel className="text-sm text-zinc-600 leading-5 font-normal">
                       I agree to the{" "}
                       <Link
-                        href="/termsservice"
+                        href="/terms-services"
                         className="font-bold text-blue-600 underline"
                       >
                         Terms of Service
                       </Link>{" "}
                       and{" "}
                       <Link
-                        href="/privacypolicy"
+                        href="/privacy-policy"
                         className="font-bold text-blue-600 underline"
                       >
                         Privacy Policy
