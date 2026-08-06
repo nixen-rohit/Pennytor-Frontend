@@ -2,9 +2,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FormState } from "@/components/User/KYC/types";
+import type { FieldErrors } from "./validation";
 
 interface Props {
   data: FormState;
+  errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 }
 
@@ -35,7 +37,7 @@ function SelectNative({
   );
 }
 
-export function BankDetails({ data, onChange }: Props) {
+export function BankDetails({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Bank Account Details" />
@@ -44,7 +46,7 @@ export function BankDetails({ data, onChange }: Props) {
       </p>
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
-        <Field label="Account Holder Name" required>
+        <Field label="Account Holder Name" required error={errors?.accountHolderName}>
           <Input
             placeholder="Name as per bank account"
             value={data.accountHolderName}
@@ -53,7 +55,7 @@ export function BankDetails({ data, onChange }: Props) {
         </Field>
         <div className="sm:col-span-2" />
 
-        <Field label="Account Number" required>
+        <Field label="Account Number" required error={errors?.accountNumber}>
           <Input
             inputMode="numeric"
             placeholder="9-18 digit account number"
@@ -61,7 +63,7 @@ export function BankDetails({ data, onChange }: Props) {
             onChange={(e) => onChange("accountNumber", e.target.value)}
           />
         </Field>
-        <Field label="Confirm Account Number" required>
+        <Field label="Confirm Account Number" required error={errors?.confirmAccountNumber}>
           <Input
             inputMode="numeric"
             placeholder="Re-enter account number"
@@ -70,7 +72,7 @@ export function BankDetails({ data, onChange }: Props) {
           />
         </Field>
 
-        <Field label="IFSC Code" required>
+        <Field label="IFSC Code" required error={errors?.ifscCode}>
           <Input
             className="uppercase"
             maxLength={11}
@@ -82,14 +84,14 @@ export function BankDetails({ data, onChange }: Props) {
             11-character code (e.g., HDFC0001234)
           </p>
         </Field>
-        <Field label="Bank Name" required>
+        <Field label="Bank Name" required error={errors?.bankName}>
           <Input
             placeholder="e.g., HDFC Bank, SBI"
             value={data.bankName}
             onChange={(e) => onChange("bankName", e.target.value)}
           />
         </Field>
-        <Field label="Branch Name" required>
+        <Field label="Branch Name" required error={errors?.branchName}>
           <Input
             placeholder="e.g., MG Road Branch"
             value={data.branchName}
@@ -121,7 +123,7 @@ export function BankDetails({ data, onChange }: Props) {
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label>
@@ -129,6 +131,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

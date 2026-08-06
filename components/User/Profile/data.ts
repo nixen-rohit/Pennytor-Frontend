@@ -3,14 +3,14 @@ import { KycProfile } from "@/components/User/Profile/types";
 export const profile: KycProfile = {
   name: "Noelani Williams",
   email: "akotrjhvg@index-mail.com",
-  initial: "N",
-  kycPercent: 0,
+  client_id:"A86AS6529ZX",
+  kyc_status:"pending",
   items: [
     {
       id: "identity",
       label: "Identity",
       description: "Selfie match against your government ID",
-      state: "pending",
+      state: "not_started",
     },
     {
       id: "pan",
@@ -28,7 +28,13 @@ export const profile: KycProfile = {
       id: "bank",
       label: "Bank Details",
       description: "Penny-drop verification on your linked account",
-      state: "pending_approval",
+      state: "pending",
+    },
+    {
+      id: "status",
+      label: "Verfication Status",
+      description: "Check all your verification status",
+       state: "pending",
     },
   ],
 };

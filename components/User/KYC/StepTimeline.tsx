@@ -3,10 +3,9 @@ import { PHASES } from "@/components/User/KYC/types";
 
 interface StepTimelineProps {
   currentStep: number;
-  onStepClick?: (step: number) => void;
 }
 
-export function StepTimeline({ currentStep, onStepClick }: StepTimelineProps) {
+export function StepTimeline({ currentStep }: StepTimelineProps) {
   return (
     <div className="w-full overflow-x-  pb-2">
       <div className="overflow-x-auto pb-4 -mx-2 px-2">

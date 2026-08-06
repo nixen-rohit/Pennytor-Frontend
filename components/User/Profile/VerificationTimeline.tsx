@@ -16,7 +16,7 @@ export function VerificationTimeline({ profile }: VerificationTimelineProps) {
     <section className="rounded-2xl border border-white/[0.08] p-8">
       <div className="mb-8 flex items-baseline justify-between">
         <h3 className="text-lg font-medium text-white/95">
-          Verification Status
+          Verification History
         </h3>
         <span className="text-xs text-white/35">
           {completedCount}/{profile.items.length} complete
@@ -28,10 +28,7 @@ export function VerificationTimeline({ profile }: VerificationTimelineProps) {
           const style = STATE_STYLES[item.state];
           const isLast = idx === profile.items.length - 1;
           return (
-            <li
-              key={item.id}
-              className="relative flex gap-5 pb-9 last:pb-0"
-            >
+            <li key={item.id} className="relative flex gap-5 pb-9 last:pb-0">
               {!isLast && (
                 <span
                   className="absolute left-[19px] top-10 w-px bg-gradient-to-b from-white/15 to-white/[0.03]"

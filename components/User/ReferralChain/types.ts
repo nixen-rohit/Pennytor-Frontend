@@ -49,13 +49,13 @@ export interface ReferralState {
 
 export const initialReferralState: ReferralState = {
   stats: {
-    totalReferrals: 24,
-    activeReferrals: 18,
-    totalCommission: 12580,
-    pendingCommission: 3200,
-    clearedCommission: 9380,
-    thisMonthReferrals: 3,
-    thisMonthCommission: 1450,
+    totalReferrals: 0,
+    activeReferrals: 0,
+    totalCommission: 0,
+    pendingCommission: 0,
+    clearedCommission: 0,
+    thisMonthReferrals: 0,
+    thisMonthCommission: 0,
   },
   referrals: [
     {
@@ -66,7 +66,7 @@ export const initialReferralState: ReferralState = {
       isApproved: true,
       kycStatus: "Verified",
       createdAt: new Date("2026-01-12"),
-      commission: 1200,
+      commission: 52,
       level: 1,
     },
     {
@@ -195,7 +195,7 @@ export const initialReferralState: ReferralState = {
   treeData: {
     id: "root",
     name: "You",
-    earnings: 12580,
+    earnings: 0,
     children: [
       {
         id: "1",

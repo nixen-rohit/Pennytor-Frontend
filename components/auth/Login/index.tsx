@@ -36,7 +36,7 @@ export default function LoginPage() {
     try {
       const response = await AuthService.login(data);
       setAuth(response.data.accessToken, response.data.user, keepSignedIn);
-      router.push("/dashboard");
+      router.push(response.data.user.role === "ADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
       handleApiError(err, setErrorMsg);
     } finally {
@@ -53,7 +53,9 @@ export default function LoginPage() {
           token: tokenResponse.access_token,
         });
         setAuth(response.data.accessToken, response.data.user, keepSignedIn);
-        router.push("/dashboard");
+        router.push(
+          response.data.user.role === "ADMIN" ? "/admin" : "/dashboard",
+        );
       } catch (err) {
         handleApiError(err, setErrorMsg);
       } finally {

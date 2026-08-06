@@ -1,6 +1,9 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
+import { UploadField } from "./UploadField";
+import type { FieldErrors } from "./validation";
+import { FaCamera } from "react-icons/fa6";
 import {
   Popover,
   PopoverContent,
@@ -10,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { sanitizePhone } from "@/utils/validation";
 
 interface Props {
   data: FormState;
+  errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 }
 
@@ -48,17 +53,27 @@ function SelectNative({
 const GENDERS = ["Male", "Female", "Other"];
 const MARITAL_STATUSES = ["Single", "Married", "Divorced", "Widowed"];
 
-export function PersonalInfo({ data, onChange }: Props) {
+export function PersonalInfo({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Personal Information" />
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
-        <Field label="Full Legal Name" required>
+        <Field label="Full Legal Name" required error={errors?.fullName}>
           <Input
             placeholder="Full Name"
             value={data.fullName}
             onChange={(e) => onChange("fullName", e.target.value)}
+          />
+        </Field>
+
+        <Field label="Phone Number" required>
+          <Input
+            type="tel"
+            inputMode="tel"
+            placeholder="+91 XXXXX XXXXX"
+            value={data.nomineePhone}
+            onChange={(e) => onChange("nomineePhone", sanitizePhone(e.target.value))}
           />
         </Field>
         <div className="space-y-1.5">
@@ -91,6 +106,9 @@ export function PersonalInfo({ data, onChange }: Props) {
               />
             </PopoverContent>
           </Popover>
+          {errors?.dob && (
+            <p className="text-xs text-red-500">{errors.dob}</p>
+          )}
         </div>
 
         <Field label="Gender">
@@ -111,6 +129,23 @@ export function PersonalInfo({ data, onChange }: Props) {
           />
         </Field>
       </div>
+
+      <SectionHeading title="Selfie / Profile Photo" />
+      <p className="text-sm text-slate-400">
+        Upload a clear front-facing selfie of your face.
+      </p>
+      <div className="max-w-md">
+        <UploadField
+          label="Selfie"
+          hint="JPG, PNG · Max 2 MB"
+          accept="image/*"
+          icon={FaCamera}
+          error={errors?.selfieFile}
+          file={data.selfieFile}
+          onSelect={(f) => onChange("selfieFile", f)}
+          onRemove={() => onChange("selfieFile", null)}
+        />
+      </div>
     </div>
   );
 }
@@ -118,10 +153,12 @@ export function PersonalInfo({ data, onChange }: Props) {
 function Field({
   label,
   required,
+  error,
   children,
 }: {
   label: string;
   required?: boolean;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -131,6 +168,7 @@ function Field({
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

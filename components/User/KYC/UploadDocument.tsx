@@ -2,13 +2,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
+import type { FieldErrors } from "./validation";
+import { FaIdCard,  FaIdCardClip, FaSignature } from "react-icons/fa6";
+import { BsCardHeading } from "react-icons/bs";
+import { sanitizeAadhaar, sanitizePAN } from "@/utils/validation";
 
 interface Props {
   data: FormState;
+  errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 }
 
-export function UploadDocument({ data, onChange }: Props) {
+export function UploadDocument({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Aadhaar Card" />
@@ -16,11 +21,15 @@ export function UploadDocument({ data, onChange }: Props) {
         <div className="space-y-1.5">
           <Label>Aadhaar Number <Required /></Label>
           <Input
-            placeholder="XXXX XXXX XXXX"
+            placeholder="12-digit Aadhaar number"
+            inputMode="numeric"
             value={data.aadhaarNumber}
-            onChange={(e) => onChange("aadhaarNumber", e.target.value)}
-            maxLength={14}
+            onChange={(e) => onChange("aadhaarNumber", sanitizeAadhaar(e.target.value))}
+            maxLength={12}
           />
+          {errors?.aadhaarNumber && (
+            <p className="text-xs text-red-500">{errors.aadhaarNumber}</p>
+          )}
         </div>
       </div>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
@@ -28,14 +37,19 @@ export function UploadDocument({ data, onChange }: Props) {
           label="Aadhaar Front Image"
           hint="JPG, PNG · Max 2 MB"
           accept="image/*"
+          icon={FaIdCard}
+          error={errors?.aadhaarFrontFile}
           file={data.aadhaarFrontFile}
           onSelect={(f) => onChange("aadhaarFrontFile", f)}
           onRemove={() => onChange("aadhaarFrontFile", null)}
+          
         />
         <UploadField
           label="Aadhaar Back Image"
           hint="JPG, PNG · Max 2 MB"
           accept="image/*"
+          icon={BsCardHeading}
+          error={errors?.aadhaarBackFile}
           file={data.aadhaarBackFile}
           onSelect={(f) => onChange("aadhaarBackFile", f)}
           onRemove={() => onChange("aadhaarBackFile", null)}
@@ -50,9 +64,12 @@ export function UploadDocument({ data, onChange }: Props) {
             placeholder="ABCDE1234F"
             className="uppercase"
             value={data.panNumber}
-            onChange={(e) => onChange("panNumber", e.target.value)}
+            onChange={(e) => onChange("panNumber", sanitizePAN(e.target.value))}
             maxLength={10}
           />
+          {errors?.panNumber && (
+            <p className="text-xs text-red-500">{errors.panNumber}</p>
+          )}
         </div>
       </div>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-1">
@@ -60,6 +77,8 @@ export function UploadDocument({ data, onChange }: Props) {
           label="PAN Card Image"
           hint="JPG, PNG · Max 2 MB"
           accept="image/*"
+          icon={FaIdCardClip}
+          error={errors?.panFile}
           file={data.panFile}
           onSelect={(f) => onChange("panFile", f)}
           onRemove={() => onChange("panFile", null)}
@@ -75,6 +94,8 @@ export function UploadDocument({ data, onChange }: Props) {
           label="Signature Image"
           hint="JPG, PNG · Max 2 MB · White background"
           accept="image/*"
+          icon={FaSignature}
+          error={errors?.signatureFile}
           file={data.signatureFile}
           onSelect={(f) => onChange("signatureFile", f)}
           onRemove={() => onChange("signatureFile", null)}

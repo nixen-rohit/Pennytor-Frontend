@@ -1,14 +1,12 @@
-// data/sideData.tsx
-
 import {
   Home,
   FileText,
   Wallet,
-  CreditCard,
+  HandCoins,
   ClipboardList,
   Mail,
   LucideIcon,
-  PiggyBank ,
+  PiggyBank,
   Landmark,
   CalendarClock,
   MessageSquareWarning,
@@ -16,12 +14,12 @@ import {
   GraduationCap,
   UserStar,
   UserCheck,
-  FileBarChart,
-  Building2Icon,
-  School 
+  ChartNoAxesCombined,
+  School,
+  Bell,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
- 
+
 interface SubMenuItem {
   id: string;
   label: string;
@@ -49,6 +47,7 @@ interface MenuSection {
   label: string;
   items: MenuItem[];
 }
+
 export const menuData: MenuSection[] = [
   {
     id: "Dashboard",
@@ -59,6 +58,13 @@ export const menuData: MenuSection[] = [
         label: "Dashboard",
         href: "/dashboard",
         icon: Home,
+      },
+       {
+        id: "notifications",
+        label: "Notifications",
+        href: "/notifications",
+        badge: "4",
+        icon: Bell,
       },
     ],
   },
@@ -77,13 +83,13 @@ export const menuData: MenuSection[] = [
             id: "gullak",
             label: "Gullak Schemes",
             href: "/investment/all-schemes/gullak-scheme",
-            icon: PiggyBank ,
+            icon: PiggyBank,
           },
           {
             id: "sip",
             label: "SIP Schemes",
             href: "/investment/all-schemes/sip-investment",
-            icon: School ,
+            icon: School,
           },
           {
             id: "fixed-deposite",
@@ -95,7 +101,7 @@ export const menuData: MenuSection[] = [
             id: "investment-fund-scheme",
             label: "Investment Fund Scheme",
             href: "/investment/all-schemes/investment-fund",
-            icon: Landmark ,
+            icon: Landmark,
           },
         ],
       },
@@ -166,20 +172,20 @@ export const menuData: MenuSection[] = [
         id: "my-investment",
         label: "My Investment",
         href: "/funds",
-        icon: Building2Icon,
+        icon: ChartNoAxesCombined,
       },
 
       {
-        id: "fund",
-        label: "Add Funds",
-        href: "/funds/add-fund",
+        id: "Deposite",
+        label: "Deposite ",
+        href: "/funds/deposite",
         icon: Wallet,
       },
       {
         id: "widthdrawal",
         label: "Withdrawal",
-        href: "/funds/withdrawal-fund",
-        icon: CreditCard,
+        href: "/funds/withdrawal",
+        icon: HandCoins,
       },
 
       {
@@ -187,19 +193,6 @@ export const menuData: MenuSection[] = [
         label: "Transaction",
         href: "/funds/transactions",
         icon: FileText,
-      },
-    ],
-  },
-
-  {
-    id: "reports",
-    label: "Reports",
-    items: [
-      {
-        id: "report",
-        label: "Report",
-        href: "/report",
-        icon: FileBarChart,
       },
     ],
   },

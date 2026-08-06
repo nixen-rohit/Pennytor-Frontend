@@ -51,7 +51,7 @@ export function WalletBalanceCard({ balance, className }: Props) {
             asChild
             className="flex-1 bg-indigo-600 text-white hover:bg-indigo-700"
           >
-            <Link href="/funds/add-fund">
+            <Link href="/funds/deposite">
               <Plus className="h-4 w-4" />
               Add Funds
             </Link>
@@ -61,7 +61,7 @@ export function WalletBalanceCard({ balance, className }: Props) {
             variant="outline"
             className="flex-1 border-white/20 text-slate-200 hover:bg-white/10"
           >
-            <Link href="/funds/withdrawal-fund">
+            <Link href="/funds/withdrawal">
               <ArrowUpRight className="h-4 w-4" />
               Withdraw
             </Link>

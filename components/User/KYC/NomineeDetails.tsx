@@ -1,14 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
+import type { FieldErrors } from "./validation";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Popover,
   PopoverContent,
@@ -18,70 +12,25 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { sanitizeAadhaar } from "@/utils/validation";
 
 interface Props {
   data: FormState;
+  errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 }
 
-function SelectNative({
-  value,
-  onChange,
-  placeholder,
-  options,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder: string;
-  options: string[];
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="flex h-10 w-full rounded-md border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50 border-neutral-700 bg-neutral-950 text-slate-100"
-    >
-      <option value="" disabled>
-        {placeholder}
-      </option>
-      {options.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
-    </select>
-  );
-}
-
-const Nominee_Relationship = [
-  "Spouse",
-  "Child",
-  "Parent",
-  "Sibling",
-  "Friend",
-  "Other",
-];
-
-export function NomineeDetails({ data, onChange }: Props) {
+export function NomineeDetails({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Nominee Details" />
 
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
-        <Field label="Nominee Name" required>
+        <Field label="Nominee Name" required error={errors?.nomineeName}>
           <Input
             placeholder="Nominee Full Legal Name"
             value={data.nomineeName}
             onChange={(e) => onChange("nomineeName", e.target.value)}
-          />
-        </Field>
-
-        <Field label="Nominee Relationship" required>
-          <SelectNative
-            value={data.nomineeRelation}
-            onChange={(v) => onChange("nomineeRelation", v)}
-            placeholder="Select Relationship"
-            options={Nominee_Relationship}
           />
         </Field>
 
@@ -115,31 +64,19 @@ export function NomineeDetails({ data, onChange }: Props) {
               />
             </PopoverContent>
           </Popover>
+          {errors?.nomineeDob && (
+            <p className="text-xs text-red-500">{errors.nomineeDob}</p>
+          )}
         </div>
 
-        <Field label="Phone Number">
+       
+        <Field label="Aadhaar Number" required error={errors?.nomineeAadhaar}>
           <Input
-            type="tel"
-            inputMode="tel"
-            placeholder="+91 XXXXX XXXXX"
-            value={data.nomineePhone}
-            onChange={(e) => onChange("nomineePhone", e.target.value)}
-          />
-        </Field>
-        <Field label="Aadhaar Number" required>
-          <Input
-            placeholder="XXXX XXXX XXXX"
+            placeholder="12-digit Aadhaar number"
+            inputMode="numeric"
             value={data.nomineeAadhaar}
-            onChange={(e) => onChange("nomineeAadhaar", e.target.value)}
-            maxLength={14}
-          />
-        </Field>
-        <Field label="Allocation %" required>
-          <Input
-            type="number"
-            placeholder="e.g. 100%"
-            value={data.nomineeAllocation}
-            onChange={(e) => onChange("nomineeAllocation", e.target.value)}
+            onChange={(e) => onChange("nomineeAadhaar", sanitizeAadhaar(e.target.value))}
+            maxLength={12}
           />
         </Field>
       </div>
@@ -150,10 +87,12 @@ export function NomineeDetails({ data, onChange }: Props) {
 function Field({
   label,
   required,
+  error,
   children,
 }: {
   label: string;
   required?: boolean;
+  error?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -163,6 +102,7 @@ function Field({
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 }

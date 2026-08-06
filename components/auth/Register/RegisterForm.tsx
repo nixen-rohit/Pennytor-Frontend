@@ -208,7 +208,7 @@ export default function RegisterForm({
                 )}
                 {emailStatus === "available" && (
                   <p className="text-xs font-medium text-green-600">
-                    This email is available — you&apos;re ready to create your
+                    You&apos;re ready to create your
                     account.
                   </p>
                 )}
