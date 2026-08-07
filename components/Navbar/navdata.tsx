@@ -1,4 +1,5 @@
 // components/data/navdata.tsx
+
 import type { IconType } from "react-icons";
 import {
   FaHeartbeat,
@@ -44,6 +45,7 @@ import {
   FaListAlt,
   FaTrophy,
 } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
 
 export interface NavLink {
   label: string;
@@ -403,27 +405,39 @@ export const support: NavMenu = {
   ],
 };
 
+
+const phoneNumber =
+  process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER?.trim() || "";
+
+const whatsappUrl = `https://wa.me/${phoneNumber}`;
 export const talkToExpert: NavMenu = {
   label: "Talk to Expert",
   icon: FaComments,
   items: [
     {
+      label: "Email Us",
+      href: "/contact-us",
+      icon: MdEmail,
+      color: "bg-blue-50 text-blue-500",
+      description: "Get in Touch within 24 Hours",
+    },
+    {
       label: "Call Us",
-      href: "tel:18001234567",
+     href: whatsappUrl,
       icon: FaPhoneAlt,
       color: "bg-blue-50 text-blue-500",
       description: "Speak to an agent right now",
     },
     {
       label: "Chat on WhatsApp",
-      href: "https://wa.me/911234567890",
+      href: whatsappUrl,
       icon: FaWhatsapp,
       color: "bg-green-50 text-green-600",
       description: "Quick support via WhatsApp",
     },
     {
       label: "Schedule a Callback",
-      href: "/talk-to-expert/callback",
+    href: whatsappUrl,
       icon: FaCalendarCheck,
       color: "bg-amber-50 text-amber-600",
       description: "We'll call you at your convenience",

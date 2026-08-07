@@ -5,7 +5,7 @@ import {
   ClipboardList,
   LucideIcon,
   PiggyBank,
-  Landmark,
+  Mail  ,
   CalendarClock,
   School,
   LayoutDashboard,
@@ -50,6 +50,18 @@ export const adminNav: MenuSection[] = [
         label: "Dashboard",
         href: "/admin",
         icon: LayoutDashboard,
+      },
+    ],
+  },
+  {
+    id: "Contact",
+    label: "Contact Us",
+    items: [
+      {
+        id: "contact",
+        label: "Contact",
+        href: "/admin/contact-us",
+        icon: Mail ,
       },
     ],
   },
