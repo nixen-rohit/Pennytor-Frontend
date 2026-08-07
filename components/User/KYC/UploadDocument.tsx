@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
 import type { FieldErrors } from "./validation";
-import { FaIdCard,  FaIdCardClip, FaSignature } from "react-icons/fa6";
+import { FaIdCard,  FaIdCardClip, FaSignature, FaCamera } from "react-icons/fa6";
 import { BsCardHeading } from "react-icons/bs";
 import { sanitizeAadhaar, sanitizePAN } from "@/utils/validation";
 
@@ -16,6 +16,23 @@ interface Props {
 export function UploadDocument({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+      <SectionHeading title="Selfie / Profile Photo" />
+      <p className="text-sm text-slate-400 -mt-4">
+        Upload a clear front-facing selfie of your face.
+      </p>
+      <div className="max-w-md">
+        <UploadField
+          label="Selfie"
+          hint="JPG, PNG · Max 2 MB"
+          accept="image/*"
+          icon={FaCamera}
+          error={errors?.selfieFile}
+          file={data.selfieFile}
+          onSelect={(f) => onChange("selfieFile", f)}
+          onRemove={() => onChange("selfieFile", null)}
+        />
+      </div>
+
       <SectionHeading title="Aadhaar Card" />
       <div className="grid gap-5 grid-cols-1 sm:grid-cols-2">
         <div className="space-y-1.5">

@@ -1,766 +1,347 @@
-# Design System & Architecture Guide
+# User Module — Design System & Structure Guide
 
-This document outlines the standardized design system, component specifications, and architectural patterns used across the Next.js admin dashboards, forms, and data-heavy interfaces.
-
-## 1. Tech Stack
-- **Framework:** Next.js (App Router, utilizing `'use client'` for interactive components)
-- **UI Library:** React, shadcn/ui (Card, Button, Input, Select, Table, Popover, Calendar, Dialog, Tabs, Badges, Checkbox, Label)
-- **Styling:** Tailwind CSS (with dark mode support)
-- **Icons:** lucide-react
-- **Utilities:** date-fns (for date formatting), `cn` (clsx + tailwind-merge)
-- **Database/Storage:** MySQL (Images stored as binary BLOBs to reduce infrastructure costs)
+> This doc covers the **User-facing** theme, layout conventions, and the internal
+> structure of every folder under `frontend/components/User`.
+> The separate `frontend/design.md` covers the **Admin** theme. The two are distinct.
 
 ---
 
-## 2. Color Palette
-- **Primary:** Indigo (`indigo-600`, `indigo-700`, `indigo-100`, `indigo-800`)
-- **Text & Borders:** Slate (`slate-50`, `slate-100`, `slate-400`, `slate-500`, `slate-600`, `slate-900`)
-- **Dark Mode Overrides:** Neutral (`neutral-800`, `neutral-900`) or Gray (`gray-300`)
-- **Status Colors:**
-  - **Success/Active:** Green (`green-100`, `green-600`, `green-800`)
-  - **Warning/Pending:** Yellow/Amber (`yellow-50`, `yellow-600`, `amber-100`)
-  - **Error/Danger:** Red (`red-50`, `red-500`, `red-600`, `red-800`)
-  - **Info:** Blue/Cyan (`blue-50`, `cyan-100`)
+## 1. How to read this module
+
+Every directory under `User/` is a **feature**, and most are **pages** imported
+by route files. Each feature folder owns its own markup, types, mock data, and
+helpers — files are deliberately self-contained (no cross-folder imports except
+shared `@/components/ui/*`, `@/utils/*`, and the generic `lib/utils` `cn`).
+
+### Quick map
+
+| Folder | Route intent | Pattern |
+|---|---|---|
+| `Dashboard/` | "My dashboard" overview | Cards + stat-grid |
+| `Funds/` | "My Investments" overview | Cards (wallet + slip) |
+| `AddFund/` | Add funds (UPI deposit) | Multi-step wizard (4) |
+| `WithdrawFund/` | Withdraw funds | Multi-step wizard (3) |
+| `KYC/` | KYC onboarding | Multi-step wizard (5) |
+| `Transaction/` | Transaction history | Searchable/tabbable table |
+| `ReferralChain/` | Referral network + tree | Tabs + table + tree |
+| `Referral/` | Referral overview/stats | Cards + charts |
+| `Profile/` | Profile + verification timeline | Split cards |
+| `Layout/` | Sidebar & topbar nav data | Config data |
 
 ---
 
-## 3. Component Specifications
+## 2. Tech & conventions
 
-### Buttons
-- **Primary (Add/Create/Submit):** `bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm`
-- **Secondary/Filter:** `bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-0`
-- **Outline/Print:** `border-0 hover:bg-gray-300 dark:hover:bg-neutral-900`
-- **Action (Edit/Icon):** `variant="ghost" size="sm" border border-black/20 dark:border-white/20` (or specific icon colors like `text-indigo-600 hover:bg-indigo-50`)
-- **Pagination Active:** `bg-indigo-600 text-white hover:bg-indigo-700`
-- **Pagination Inactive:** `hover:bg-slate-100/20`
-
-### Inputs & Search
-- **Search Input:** `focus-visible:ring-indigo-500`, Search icon `text-slate-400`
-- **Calendar Icon:** `text-slate-500`
-- **General Inputs:** Standard shadcn styling with indigo focus rings.
-
-### Tables
-- **Container:** `Card` with `shadow-sm`, `CardContent` with `p-0`.
-- **Headers:** `bg-slate-50/10 hover:bg-slate-50/10`, `text-xs font-semibold text-slate-500 uppercase tracking-wider py-3`
-- **Rows:** `border-b last:border-b-0 hover:bg-gray-300 dark:hover:bg-neutral-800 transition-colors`
-- **Sticky Columns:** Used for complex reports (e.g., `sticky left-0 z-10 bg-white group-hover:bg-gray-50`).
-
-### Badges & Tags
-- **Standard:** `bg-indigo-100 text-indigo-800` (often with `rounded-full text-xs font-medium px-2.5 py-0.5`)
-- **Status:** Contextual colors (e.g., `bg-green-100 text-green-800` for Active).
-
-### Pagination
-- **Active Page:** `bg-indigo-600 text-white hover:bg-indigo-700`
-- **Inactive Page:** `hover:bg-slate-100/20`
-- **Ellipsis:** `text-slate-400`
-- **Info Text (Showing entries):** `text-sm text-slate-600`
-
-### Empty & Loading States
-- **Loading Spinner:** `border-b-2 border-indigo-600` (animated spin)
-- **No Data:** `bg-slate-100` container with `FileText` (`text-slate-400`) and text `text-slate-500`.
-- **Error/No Results:** `bg-red-50` container with `AlertCircle` (`text-red-500`) and text `text-slate-500`.
-
-### Dialogs & Modals
-- **Print/Export Dialog Icons:** PDF `text-red-500`, Excel/CSV `text-green-600`.
-- **Structure:** `DialogContent` with `DialogHeader`, `DialogTitle`, `DialogDescription`, and `DialogFooter`.
+- **Framework:** Next.js App Router — every interactive component is a
+  `"use client"` component (top of file, strict).
+- **UI primitives:** shadcn/ui from `@/components/ui/*` (`Button`, `Card`,
+  `Input`, `Select`, `Table`, `Dialog`, `Tabs`, `Badge`, `Label`).
+- **Icons:** `lucide-react` (inline `className="h-X w-X"`). Some custom SVGs
+  live inline (e.g. `Profile/icons.tsx`).
+- **Dates:** `date-fns` `format(date, "...")` — patterns like
+  `dd-MM-yyyy`, `MMM dd, yyyy`, `MMM`.
+- **Class merge:** `cn` from `@/lib/utils`.
+- **Currency (INR):** local helper `currency()` in `AddFund/format.ts` and
+  `WithdrawFund/format.ts` (en-IN locale, `₹`, 0 decimals).
+- **Images:** `next/image` (`/img/...`) — QR, bank QR, profile cover/avatar.
 
 ---
 
-## 4. Layout & Page Structure
+## 3. Theme (dark, User-specific)
 
-### Standard Admin Page Layout
-1. **Wrapper:** `min-h-screen p-4 md:p-6 lg:p-8`
-2. **Container:** `max-w-7xl mx-auto space-y-6` (or `max-w-[100rem]` for wide tables/reports).
-3. **Header Section:**
-   - Breadcrumbs: `flex text-sm text-slate-500 mb-2` (Dashboard / Page Name)
-   - Title: `text-2xl sm:text-3xl font-bold tracking-tight`
-   - Actions (Right aligned): Primary/Outline buttons.
-4. **Filter/Search Section:**
-   - Wrapped in a `Card` with `shadow-sm`.
-   - Grid layout (`grid gap-4 md:grid-cols-4` or `5`).
-   - Uses `Label`, `Input`, `Select`, `Popover` (for calendars).
-5. **Data Table Section:**
-   - Wrapped in a `Card` with `shadow-sm`, `p-0`.
-   - **Top Controls:** "Show X entries" dropdown, Search bar, "Showing X to Y of Z entries" text.
-   - **Table:** Standard shadcn Table.
-   - **Pagination:** Bottom aligned, centered or space-between with info text.
+The User UI is **always-dark** and mostly uses literal Tailwind utilities
+rather than the admin theme tokens. Two visual variants exist:
 
-### Buttons
+### Variant A — "Glass / rose" (Dashboard, Referral, chart cards)
 
-* **Primary (Add/Create/Submit):** `bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm`
-* **Secondary/Filter:** `bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-0`
-* **Outline/Print:** `border-0 hover:bg-gray-300 dark:hover:bg-neutral-900`
-
-#### Action Buttons
-
-**Edit Button**
+Used by the grid-of-stats dashboards. Semi-transparent panels over a backdrop.
 
 ```tsx
-<Button
-  variant="ghost"
-  size="sm"
-  className="border border-black/20 dark:border-white/20"
->
-  Edit
-</Button>
+<Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
 ```
 
-**Delete Button**
+- Accent color: **rose `#E85B66`** (used as solid `bg-[#E85B66]`, buttons,
+  icon color, active tab bg).
+- Chart gradients: `bg-gradient-to-t from-[#E85B66]/60 to-[#4E385E]/60`.
+- Secondary lavender tint: `text-[#4E385E]`, `from-[#4E385E]/30`.
+- Text: `text-muted-foreground` labels, `text-foreground`/`font-bold` values.
+- Positive = `text-green-500`, negative = `text-red-500`.
+
+### Variant B — "solid / indigo" forms & tables (wizard flows, tables, profile)
+
+Used by forms, tables, payment slips. Opaque dark panels.
 
 ```tsx
-<Button
-  variant="ghost"
-  size="sm"
-  className="border border-red-600 dark:border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
->
-  Delete
-</Button>
+// outer page Card
+<Card className="shadow-sm">
+// inner info/data panel
+<div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
 ```
 
-**Guidelines**
+- Accent color: **indigo** (`indigo-600` primary, `indigo-500/20 text-indigo-400`
+  badges/tags, `bg-indigo-600` active pills/steps).
+- Page bg: `bg-black` (set on the page wrapper), dark panels `bg-neutral-900/50`,
+  `bg-neutral-950`.
+- Borders/dividers: `border-neutral-700` / `border-neutral-800`,
+  `divide-neutral-800`.
+- Text: title `text-slate-50`, body `text-slate-200`/`text-slate-300`,
+  muted `text-slate-400`, faint `text-slate-500`.
+- Status: green (`text-green-400`), amber/yellow (`text-amber-300`,
+  `bg-amber-500/10`), red (`text-red-400`).
 
-* Use **Edit** for update/modify actions.
+### Shared color semantics (both variants)
 
-* Use **Delete** for destructive actions.
+| Meaning | Color |
+|---|---|
+| Primary/CTA, active | `bg-indigo-600 hover:bg-indigo-700 text-white` (forms/tables) |
+| Brand accent (marketing cards) | `#E85B66` (rose) |
+| Success / active / credit | green (`green-400`/`green-500`) |
+| Pending / warning | amber/yellow (`amber-300`/`yellow-400`) |
+| Error / debit / reject | red (`red-400`/`red-500`) |
+| Neutral info / disabled | slate / neutral gray |
 
-* Maintain consistent sizing with `size="sm"` in tables and action columns.
+---
 
-* Prefer `variant="ghost"` for row-level actions to reduce visual clutter.
+## 3. Page layout pattern
 
-* Delete actions should always use red accents to indicate destructive behavior.
+All pages follow the same shell:
 
-### Pagination
+```tsx
+// outer wrapper (dark bg)
+<div className="min-h-screen p-4">          // some pages add bg-black
+  <div className="max-w-5xl mx-auto space-y-5">  // width varies: 5xl / 6xl / 7xl
 
-#### Styles
-
-* **Active Page:** `bg-indigo-600 text-white hover:bg-indigo-700`
-* **Inactive Page:** `hover:bg-slate-100/20`
-* **Ellipsis:** `text-slate-400`
-* **Navigation Buttons:** `variant="outline" size="sm" className="h-8 w-8 p-0"`
-* **Container:** `p-4 sm:p-6 border-t border-slate-100`
-* **Layout:** `flex flex-col sm:flex-row items-center justify-between gap-4`
-
-#### Standard Pagination Component
-
-```tsx id="w06yq8"
-{/* Pagination */}
-{totalPages > 0 && (
-  <div className="p-4 sm:p-6 border-t border-slate-100">
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setCurrentPage((prev) => Math.max(1, prev - 1))
-          }
-          disabled={currentPage === 1}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map((page, index) => {
-            if (page === "...") {
-              return (
-                <span
-                  key={`ellipsis-${index}`}
-                  className="px-3 py-1 text-slate-400"
-                >
-                  ...
-                </span>
-              );
-            }
-
-            return (
-              <Button
-                key={page}
-                variant={
-                  currentPage === page ? "default" : "outline"
-                }
-                size="sm"
-                onClick={() => setCurrentPage(page as number)}
-                className={`h-8 w-8 p-0 ${
-                  currentPage === page
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "hover:bg-slate-100/20"
-                }`}
-              >
-                {page}
-              </Button>
-            );
-          })}
-        </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            setCurrentPage((prev) =>
-              Math.min(totalPages, prev + 1)
-            )
-          }
-          disabled={currentPage === totalPages}
-          className="h-8 w-8 p-0"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+    {/* Page title block */}
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
+        Page Title
+      </h1>
+      {optional && <p className="text-sm text-slate-400 mt-1">Subtitle</p>}
     </div>
+
+    {/* Cards / content */}
   </div>
-)}
-```
-
-#### Guidelines
-
-* Show pagination only when `totalPages > 0`.
-* Use numbered page buttons with ellipsis for large datasets.
-* Previous and Next buttons must be disabled at boundary pages.
-* Active page must use the Indigo primary color.
-* Pagination should appear below tables inside the Card container.
-* Maintain consistent sizing using `h-8 w-8 p-0`.
-* Use `ChevronLeft` and `ChevronRight` icons from `lucide-react`.
-
-### Dashboard / Stats Layout
-- Grid-based stat dashboards (`grid gap-4 md:grid-cols-3`).
-- Cards with left border accents (`border-l-4 border-l-indigo-600`) for stats.
-- Config-driven UI for toggling sections.
-
-### Forms / Settings Layout
-- `max-w-3xl` or `max-w-5xl` container.
-- Grouped into `Card` components by category (e.g., "School Information", "Address Information").
-- Footer actions aligned to the end (`flex justify-end`).
-
----
-
-## 6. ERP Form Standards
-
-### Standard Create/Edit Form Layout
-
-All create and edit pages should follow:
-
-```tsx
-<div className="space-y-6 p-4 md:p-6">
-```
-
-Form Container:
-
-```tsx
-<Card>
-  <CardHeader>
-    <CardTitle>Section Title</CardTitle>
-  </CardHeader>
-
-  <CardContent>
-    <form className="space-y-6">
-      ...
-    </form>
-  </CardContent>
-</Card>
-```
-
-### Required Fields
-
-Always use:
-
-```tsx
-<Label>
-  Field Name <span className="text-destructive">*</span>
-</Label>
-```
-
-Never hardcode `*` inside field text.
-
-### Form Grids
-
-Two Columns:
-
-```tsx
-<div className="grid gap-6 md:grid-cols-2">
-```
-
-Three Columns:
-
-```tsx
-<div className="grid gap-6 md:grid-cols-3">
-```
-
-Four Columns:
-
-```tsx
-<div className="grid gap-6 lg:grid-cols-4">
-```
-
-### Footer Actions
-
-Standard form footer:
-
-```tsx
-<div className="flex flex-wrap gap-3">
-  <Button type="submit">
-    Save Changes
-  </Button>
-
-  <Button variant="outline">
-    Cancel
-  </Button>
 </div>
 ```
 
----
-
-## 7. Selection Card Pattern
-
-Used For:
-
-* Subjects
-* Classes
-* Teachers
-* Permissions
-* Months
-* Students
-* Question Selection
-* Exam Selection
-
-Container:
-
-```tsx
-<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-```
-
-Selectable Card:
-
-```tsx
-<button
-  type="button"
-  className={cn(
-    "flex items-center gap-3 rounded-lg border p-3 text-left transition-all",
-    checked
-      ? "border-indigo-500 bg-indigo-50"
-      : "hover:bg-muted/50"
-  )}
->
-```
-
-Checkbox:
-
-```tsx
-<input
-  type="checkbox"
-  checked={checked}
-  readOnly
-  className="h-4 w-4"
-/>
-```
+Common responsive container widths: `max-w-5xl` (wizards/KYC/profile),
+`max-w-6xl` (Funds), `max-w-7xl` (Transaction).
 
 ---
 
-## 8. Popup Multi-Select Pattern
+## 4. Pattern A — Multi-step Wizard
 
-Used For:
+Used by `AddFund` (4 steps), `KYC` (5 steps), `WithdrawFund` (3 steps).
+Identical skeleton across the three; only the content of each step differs.
 
-* Teachers
-* Subjects
-* Classes
-* Permissions
+### Structure of a wizard folder
 
-Structure:
-
-```tsx
-<Dialog>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Select Items</DialogTitle>
-    </DialogHeader>
-
-    <div className="max-h-72 overflow-y-auto">
-      ...
-    </div>
-  </DialogContent>
-</Dialog>
+```
+Feature/
+  index.tsx        // page shell ORCHESTRATOR: state, navigation, submit, submitted screen
+  types.ts         // STEPS meta + FormState + initialFormState + FormErrors + FormChange
+  StepDots.tsx / StepTimeline.tsx  // visual stepper header
+  format.ts        // currency helper
+  <StepX>.tsx      // one component per step (fields)
 ```
 
-Trigger:
+### Data source — `types.ts`
+
+- `STEPS` / `PHASES`: `[{ step, title, icon }]` (icon from `lucide-react`).
+- `FormState` interface, `initialFormState` constant.
+- `FormErrors` interface.
+- `FormChange` generic type:
+  ```ts
+  export type FormChange = <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+  ```
+- Feature constants (bank details, quick amounts, session info, methods, limits).
+
+### Orchestrator — `index.tsx` responsibilities
 
 ```tsx
-<Button
-  variant="outline"
-  className="w-full justify-between"
->
+const [step, setStep] = useState(1)
+const [form, setForm] = useState<FormState>(initialFormState)
+const [errors, setErrors] = useState<FormErrors>({})
+const [submitted, setSubmitted] = useState(false)
 ```
+
+- `updateField` (wrapped with `useCallback`): sanitizes input, `setForm`,
+  clears that field's error. Some sanitize via `@/utils/validation` helpers.
+- `validateStepX()` per-step; sets `errors` and returns boolean.
+- `goNext` / `goBack` clamp step between `1` and `STEPS.length`.
+- `handleSubmit`: builds payload (maps form → API shape, adds session/system
+  fields), currently `console.log` (API is TODO-stubbed), sets `submitted`.
+- **Submitted screen:** swapped in early (early return) when `submitted`,
+  shows success + a read-only slip + "start over" reset link.
+- Step body rendered conditionally:
+  ```tsx
+  {step === 1 && <PaymentDetails data={form} errors={errors} onChange={updateField} />}
+  ```
+- Footer buttons: left = **Previous** (outline, disabled on step 1),
+  right = **Submit** (last step) or **Next/Continue**.
+
+### Step components signature (consistent convention)
+
+```tsx
+function StepComponent({ data, errors, onChange }) { ... }
+```
+
+Each step top-level wrapper:
+
+```tsx
+<div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+  <SectionHeading title="..." />      // <div className="border-b pb-2"><h3 .../>
+</div>
+```
+
+### Header stepper (`StepDots` / `StepTimeline`)
+
+Horizontal circles connected by progress lines; completed = filled indigo, active
+= indigo + ring, upcoming = outlined. Progress fill:
+`currentStep >= phase.step ? "bg-indigo-600" : "bg-neutral-800"`.
+Mobile: collapsed to segmented bars + "Step X of Y" label.
+
+### Reusable micro-components in wizards
+
+- **`SlipRow`** — label/value read-only row (`flex justify-between`, `divide`),
+  optional `mono`, `muted`, `badge` ("pending" | "draft"). Exists in both
+  `AddFund/` and `WithdrawFund/` (identical).
+- **`CopyField`** (`AddFund`) — label + mono value + copy button with
+  "Copied" check feedback (clipboard).
+- **`UploadField`** — drag/drop + click-to-upload, image preview, remove button,
+  error text. Local variants exist per wizard.
+
+### Two-column / input conventions
+
+- Amount inputs: leading `₹`, `inputMode="numeric"`, digit-stripped onChange
+  (`replace(/[^0-9]/g, "")`), `font-mono`. Quick-amount pill buttons use
+  `QUICK_AMOUNTS`.
+- Selectable option cards (e.g. withdrawal method): bordered button,
+  `selected ? "border-indigo-600 bg-indigo-600/10" : "border-neutral-800 ..."`,
+  trailing `Check`.
 
 ---
 
-## 9. Calendar & Date Standards
+## 5. Pattern B — Searchable/Filterable Table
 
-Never use:
+Used by `Transaction` and `ReferralChain/ReferralList`, and pagination by
+`ReferralChain`.
 
-```tsx
-<Input type="date" />
+### Folder shape
+
+```
+Transaction/
+  index.tsx                // ORCHESTRATOR: state + filtering + pagination math
+  types.ts                 // record types, seed data, option arrays
+  TransactionToolbar.tsx   // search input + Filters button (badge count)
+  TransactionFilterDialog.tsx // Dialog w/ Select filters
+  TransactionTable.tsx     // shadcn Table + badges + empty state + footer slot
+  Pagination.tsx           // page buttons w/ ellipsis
 ```
 
-Use Shadcn Calendar.
+### Orchestrator responsibilities
 
-Standard Pattern:
+Lifts all state up: `searchTerm`, individual filters, `entriesPerPage`,
+`currentPage`, `openFilterDialog`.
 
-```tsx
-<Popover>
-  <PopoverTrigger asChild>
-    <Button variant="outline">
-      <CalendarIcon />
-    </Button>
-  </PopoverTrigger>
+- Derived: `activeFilterCount`, `hasActiveFilters`.
+- `filtered` via `useMemo` (combines search + selects).
+- Pagination math: `entriesPerPageNumber`, `totalPages`,
+  `startIndex`/`endIndex`, sliced `currentData`.
+- All filter setters reset `currentPage` to `1`.
+- `clearFilters` resets selects.
 
-  <PopoverContent>
-    <Calendar
-      mode="single"
-      selected={date}
-      onSelect={setDate}
-    />
-  </PopoverContent>
-</Popover>
-```
+### Table specifics
 
-Date-Time Fields:
+- Wrapped: `<Card className="shadow-sm"><CardContent className="p-0">`.
+- Top bar: "Show `Select` entries" + "Showing X to Y of Z entries".
+- Toolbar: search `Input` with `Search` icon (`left-3`), plus `Filters` button
+  showing active-filter count badge (`bg-indigo-600`).
+- Badges: request type (DR red / CR green), status by `statusStyles` map.
+- Empty state: centered icon in `bg-neutral-800` circle + helper text +
+  conditional "Clear all filters".
+- Footer slot renders `Pagination`.
 
-```tsx
-Date = Shadcn Calendar
-Time = Input type="time"
-```
+### Pagination
+
+`h-8 w-8 p-0` square buttons; active `bg-indigo-600 text-white`, else outline.
+Ellipsis `...` for large sets. Left/right chevrons disabled at boundaries.
 
 ---
 
-## 10. Notice Box System
+## 6. Pattern C — Data + Tree
 
-### Information Notice
+`ReferralChain`:
 
-```tsx
-<div className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
-```
-
-### Warning Notice
-
-```tsx
-<div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-```
-
-### Danger Notice
-
-```tsx
-<div className="rounded-lg border border-red-200 bg-red-50 p-4">
-```
-
-### Success Notice
-
-```tsx
-<div className="rounded-lg border border-green-200 bg-green-50 p-4">
-```
-
-Text Style:
-
-```tsx
-<p className="text-sm">
-```
+- `index.tsx` wraps `Tabs` (My Referrals / Referral Tree).
+- `ReferralList.tsx` — table (same Pattern B). Uses `maskEmail` util.
+- `ReferralTree.tsx` — recursive `TreeNode` with indent per depth, expand/collapse
+  chevrons, root highlighted with indigo ring/avatar.
+- `types.ts` — `ReferralUser`, `CommissionRecord`, `ReferralStats`,
+  `ReferralTreeData`, `ReferralState` + `initialReferralState` seed.
+- `utils.ts` — `maskEmail`, `getPageNumbers` (shared by pagination).
 
 ---
 
-## 11. Danger Zone Pattern
+## 7. Profile & static-display pages
 
-Used For:
-
-* Student Deletion
-* Factory Reset
-* Data Cleanup
-* Permanent Actions
-
-Danger Card:
-
-```tsx
-<Card className="border-red-700">
-```
-
-Danger Header:
-
-```tsx
-<CardHeader className="bg-red-700">
-```
-
-Selected Danger Action:
-
-```tsx
-bg-red-600
-text-white
-hover:bg-red-700
-```
-
-Inactive Action:
-
-```tsx
-bg-white
-text-red-700
-border-red-200
-hover:bg-red-50
-```
-
-Confirmation Checkbox:
-
-```tsx
-<div className="flex items-start space-x-3 rounded-lg border p-4">
-```
+- `Profile/index.tsx` — split layout
+  `lg:grid-cols-[minmax(0,340px)_1fr]`: left `ProfileCard`, right
+  `VerificationTimeline`.
+- `data.ts` — a single typed `profile: KycProfile` object.
+- `types.ts` — `VerificationState` (`not_started|verified|pending|rejected`),
+  `KycProfile`, and a `STATE_STYLES` map (label + text/bg/ring/dot classes per
+  state) used to keep the timeline color-consistent.
+- `icons.tsx` — hand-rolled inline SVGs (`IconClock`, `IconCheck`, `IconX`)
+  wrapped by `StateIcon`.
+- Uses subtle `white/x` opacities and `#90EF5D` accent for the eyebrow label.
 
 ---
 
-## 12. Accordion Management Modules
+## 8. Navigation layout data
 
-Used For:
-
-* Roles & Permissions
-* Front Office Setup
-* Category Masters
-
-Container:
-
-```tsx
-<Accordion
-  type="multiple"
-  className="grid gap-4"
->
-```
-
-Card Style:
-
-```tsx
-<AccordionItem
-  className="overflow-hidden rounded-xl border bg-card"
->
-```
-
-Header:
-
-```tsx
-<AccordionTrigger>
-```
+- `Layout/sidebarData.tsx` — exports `menuData: MenuSection[]` (id/label/items;
+  items have id, label, href, optional badge, isNew, External, `children[]`).
+  Icons from `lucide-react` + `react-icons/md`.
+- `Layout/topbarData.tsx` — exports `userTopbar: TopbarConfig` with `homeHref`
+  and `menuItems` (link or logout).
 
 ---
 
+## 9. Shared helpers & rules
 
-### Filter & Reset Buttons
-
-#### Filter Toggle Button
-
-Used when filter section is collapsible or hidden by default:
-
-```tsx
-<Button variant="outline" className="w-full">
-  <Filter className="mr-2 h-4 w-4" />
-  Filters
-</Button>
-
-
-## 13. Dashboard Stat Cards
-
-Used For:
-
-* Cashflow
-* Reports
-* Attendance
-* Academic Dashboard
-
-Grid:
-
-```tsx
-<div className="grid gap-4 md:grid-cols-3">
-```
-
-Card Style:
-
-```tsx
-<Card className="border-l-4 border-l-indigo-600">
-```
-
-Metric:
-
-```tsx
-<p className="text-3xl font-bold">
-```
-
-Label:
-
-```tsx
-<p className="text-sm text-muted-foreground">
-```
+- **`@/utils/validation.ts`** — the single source of truth for sanitizers and
+  patterns: `sanitizeText`, `sanitizeAmount`, `sanitizeTransactionId`,
+  `sanitizeDigits`, `containsUnsafe`; patterns `PAN_PATTERN`, `IFSC_PATTERN`,
+  `AADHAAR_PATTERN`, `PHONE_PATTERN`, `ACCOUNT_NUMBER_PATTERN`,
+  `AMOUNT_PATTERN`, `TRANSACTION_ID_PATTERN`.
+  - KYC has its own `validation.ts` (`validateStep`) that reuses these.
+- **Input hygiene:** all text inputs run through sanitizers; errors shown as
+  `text-xs text-red-500` under the field. Required markers: `*` styled red.
+- **Animations:** step/result wrappers use
+  `animate-in fade-in-0 slide-in-from-right-4 duration-300`.
+- **Mock-first:** every page renders with hardcoded seed data; API wiring is
+  `TODO` (the payload is assembled in `handleSubmit` and `console.log`ged).
 
 ---
 
-## 14. File Upload Standards
+## 10. Consistency gotchas / DRY notes
 
-Used For:
+- `SlipRow` (both `AddFund/` and `WithdrawFund/`) and `UploadField`
+  (`AddFund`, `KYC`) are duplicated per feature — extract to
+  `@/components/ui/` or `@/components/User/shared/` if you add more wizards.
+- `Pagination` is duplicated between `Transaction/` and `ReferralChain/`
+  (the latter shares `getPageNumbers` from `ReferralChain/utils`).
+- `format.ts` currency helper is duplicated in `AddFund/` and `WithdrawFund/`.
+- `StepDots`/`StepTimeline` are near-identical (only the step array differs)
+  — a single shared stepper is a candidate for consolidation.
 
-* Homework
-* Assignments
-* Study Materials
-* Expenses
-* Documents
+### When adding a new wizard or table page
 
-Upload Area:
-
-```tsx
-<label
-  className="
-    flex
-    cursor-pointer
-    flex-col
-    items-center
-    justify-center
-    rounded-lg
-    border-2
-    border-dashed
-    p-8
-  "
->
-```
-
-Upload Icon:
-
-```tsx
-<Upload className="h-8 w-8" />
-```
-
-Allowed Types:
-
-```tsx
-<p className="text-sm text-muted-foreground">
-```
-
----
-
-## 15. Timetable Standards
-
-Workflow:
-
-1. Select Class
-2. Select Section
-3. Click Load Timetable
-4. Show Timetable Below
-
-Never show timetable before loading.
-
-Header Information:
-
-```tsx
-Class: NC | Section: A
-
-Class Teacher: PUJA
-```
-
-Periods:
-
-```tsx
-Period 1
-Period 2
-...
-Period 8
-```
-
-Each Period Contains:
-
-* Subject
-* Teacher
-* From Time
-* To Time
-
----
-
-## 16. ERP UX Rules
-
-### Always Use
-
-✅ Cards
-
-✅ Section Titles
-
-✅ Required Field Indicators
-
-✅ Responsive Grids
-
-✅ Calendar Components
-
-✅ Selection Cards
-
-✅ Notice Boxes
-
-✅ Confirmation Checkboxes
-
-✅ Dialog-Based Multi Selection
-
-✅ Color-Coded Status Indicators
-
-### Avoid
-
-❌ Browser Date Inputs
-
-❌ Long Forms Without Sections
-
-❌ Plain HTML Layouts
-
-❌ White Empty Screens
-
-❌ Multiple Correct Answers For MCQ
-
-❌ Using Destructive Variant For ERP Actions
-
-Instead use custom red theme:
-
-```tsx
-bg-red-600 hover:bg-red-700 text-white
-```
-
-for permanent operations.
-
----
-
-## 17. School ERP Module Consistency
-
-All modules must follow the same visual language:
-
-* Front Office
-* Students
-* Staff
-* Attendance
-* Fees
-* Accounts
-* Academic
-* Examinations
-* Competitions
-* Library
-* Hostel
-* Transport
-* Inventory
-* Communication
-* Reports
-* Settings
-
-This ensures a consistent user experience across the entire ERP system.
-
-
-
-
-## 5. Code Architecture & Patterns
-
-### Component Structure
-- Always start with `"use client";` for interactive pages.
-- Import shadcn components from `@/components/ui/...`.
-- Import icons from `lucide-react`.
-- Define TypeScript interfaces for data structures (e.g., `interface Student { id: string; name: string; ... }`).
-- Use dummy data arrays for initial rendering/mockups.
-
-### State Management
-- Use `useState` for local component state (filters, pagination, search terms, dialog visibility).
-- **Pagination Logic:**
-  ```typescript
-  const [entriesPerPage, setEntriesPerPage] = useState("10");
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(data.length / parseInt(entriesPerPage));
-  const startIndex = (currentPage - 1) * parseInt(entriesPerPage);
-  const currentData = data.slice(startIndex, startIndex + parseInt(entriesPerPage));
+1. Copy the folder pattern of `WithdrawFund/` (simple 3-step, no system fields)
+   or `Transaction/` (table) as a scaffold.
+2. Keep `index.tsx` as a thin orchestrator; put visuals in per-step / per-block
+   components.
+3. Wire all sanitization through `@/utils/validation`.
+4. Follow Variant B (indigo, `neutral-950` panels) for forms/tables, Variant A
+   (rose, translucent) for stat/marketing cards.

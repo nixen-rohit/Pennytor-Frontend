@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Mail } from "lucide-react";
- 
+import Link from "next/link";
 
 export interface FAQItem {
   question: string;
@@ -19,7 +19,6 @@ interface FAQSectionProps {
   headingTag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 }
 
-
 export default function FAQSection({
   tag,
   firstHeading,
@@ -30,7 +29,7 @@ export default function FAQSection({
 }: FAQSectionProps) {
   const [openId, setOpenId] = useState<number | null>(null);
 
-   const HeadingTag = headingTag ;
+  const HeadingTag = headingTag;
 
   const toggle = (id: number) => {
     setOpenId(openId === id ? null : id);
@@ -48,13 +47,13 @@ export default function FAQSection({
         <h2 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-normal tracking-tight text-[#111111] leading-[1.08] sm:leading-[1.04] md:leading-[1.02] max-w-6xl">
           {firstHeading}{" "}
           <span className="font-serif italic font-light text-foreground block sm:inline">
-           {secondHeading}
+            {secondHeading}
           </span>
         </h2>
 
         {/* Supporting description */}
         <p className="mt-6 max-w-3xl mx-auto text-center text-sm sm:text-base md:text-lg lg:text-xl leading-relaxed   text-gray-800 font-base">
-           {description}
+          {description}
         </p>
       </div>
 
@@ -149,8 +148,7 @@ export default function FAQSection({
             get back to you as soon as possible!
           </p>
 
-        
-          
+          <Link href="/contact-us">
             <div className="flex justify-center  ">
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -161,7 +159,7 @@ export default function FAQSection({
                 Send email
               </motion.button>
             </div>
-         
+          </Link>
         </motion.div>
       </div>
     </section>

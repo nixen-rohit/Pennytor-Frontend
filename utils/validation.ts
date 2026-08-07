@@ -83,3 +83,4 @@ export const PHONE_PATTERN = /^\+?[0-9\s-]{10,15}$/;
 export const ACCOUNT_NUMBER_PATTERN = /^\d{9,18}$/;
 export const AMOUNT_PATTERN = /^\d+(\.\d{1,2})?$/;
 export const TRANSACTION_ID_PATTERN = /^[A-Za-z0-9_.-]{6,40}$/;
+export const CLIENT_ID_PATTERN = /^[A-Z0-9]{6,9}$/;

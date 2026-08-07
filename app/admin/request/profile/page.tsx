@@ -1,9 +1,5 @@
-import React from 'react'
+import ProfileRequestList from "@/components/admin/ProfileRequestList/page";
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function page() {
+  return <ProfileRequestList />;
 }
-
-export default page
