@@ -10,7 +10,6 @@ import { loginSchema, type LoginFormValues } from "@/lib/validations";
 import { AuthService } from "@/services/auth.service";
 import { useAuthStore } from "@/store/auth.store";
 import { handleApiError } from "@/services/api";
-import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,33 +43,6 @@ export default function LoginPage() {
     }
   };
 
-  const loginWithGoogle = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setFormLoading(true);
-      setErrorMsg("");
-      try {
-        const response = await AuthService.loginWithGoogle({
-          token: tokenResponse.access_token,
-        });
-        setAuth(response.data.accessToken, response.data.user, keepSignedIn);
-        router.push(
-          response.data.user.role === "ADMIN" ? "/admin" : "/dashboard",
-        );
-      } catch (err) {
-        handleApiError(err, setErrorMsg);
-      } finally {
-        setFormLoading(false);
-      }
-    },
-    onError: () => {
-      setErrorMsg("Google sign-in failed. Please try again.");
-    },
-  });
-
-  const handleGoogleSignIn = () => {
-    loginWithGoogle();
-  };
-
   const handleResetPassword = () => {
     router.push("/forgot-password");
   };
@@ -99,7 +71,6 @@ export default function LoginPage() {
             onTogglePassword={() => setShowPassword(!showPassword)}
             onToggleKeepSignedIn={() => setKeepSignedIn(!keepSignedIn)}
             onResetPassword={handleResetPassword}
-            onGoogleSignIn={handleGoogleSignIn}
             onRegister={handleRegister}
           />
         </div>

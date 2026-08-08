@@ -11,7 +11,6 @@ import type {
   ChangePasswordRequest,
   LogoutRequest,
   RefreshResponse,
-  GoogleLoginRequest,
 } from "@/types/auth";
 
 export const AuthService = {
@@ -25,12 +24,6 @@ export const AuthService = {
     fetchApi<{ available: boolean }>(
       `/auth/check-email?email=${encodeURIComponent(email)}`,
     ),
-
-  loginWithGoogle: async (data: GoogleLoginRequest) =>
-    fetchApi<LoginResponse>("/auth/google", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
 
   register: async (data: RegisterRequest) =>
     fetchApi<RegisterResponse>("/auth/register", {

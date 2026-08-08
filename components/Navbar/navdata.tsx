@@ -46,6 +46,11 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
+import { FaCalculator } from "react-icons/fa";
+import { BsFillPiggyBankFill } from "react-icons/bs";
+import { FaHandHoldingHeart } from "react-icons/fa6";
+import { RiMoneyRupeeCircleFill } from "react-icons/ri";
+import { FaMoneyBillTrendUp } from "react-icons/fa6";
 
 export interface NavLink {
   label: string;
@@ -96,6 +101,48 @@ export interface NavItem {
   mega?: MegaMenuData;
   redirect?: boolean;
 }
+
+export const Schemes: NavMenu = {
+  label: "Schemes",
+  icon: FaFileInvoice,
+  items: [
+    {
+      label: "Gulak Scheme",
+      href: "/",
+      icon: BsFillPiggyBankFill,
+      color: "bg-amber-50 text-amber-500",
+      description: "For Daily Deposite",
+    },
+    {
+      label: "SIP For Childrens",
+      href: "/",
+      icon: FaHandHoldingHeart,
+      color: "bg-rose-50 text-rose-500",
+      description: "Monthly Saving For Your Childrens",
+    },
+    {
+      label: "Fixed Deposite (SWP)",
+      href: "/",
+      icon: RiMoneyRupeeCircleFill,
+      color: "bg-green-50 text-green-500",
+      description: " Save and Earn More",
+    },
+    {
+      label: "Investment Fund",
+      href: "/",
+      icon: FaMoneyBillTrendUp,
+      color: "bg-teal-50 text-teal-500",
+      description: "For long term Investment",
+    },
+    {
+      label: "Schemes Calculator",
+      href: "/",
+      icon: FaCalculator,
+      color: "bg-amber-50 text-amber-600",
+      description: "Calculate Your Returns",
+    },
+  ],
+};
 
 export const insuranceProducts: ProductColumn[] = [
   {
@@ -368,13 +415,6 @@ export const support: NavMenu = {
       description: "Find answers to common questions",
     },
     {
-      label: "Contact Us",
-      href: "/support/contact",
-      icon: FaPhoneAlt,
-      color: "bg-emerald-50 text-emerald-500",
-      description: "Get in touch with our team",
-    },
-    {
       label: "Branch Locator",
       href: "/support/branch-locator",
       icon: FaMapPin,
@@ -405,9 +445,7 @@ export const support: NavMenu = {
   ],
 };
 
-
-const phoneNumber =
-  process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER?.trim() || "";
+const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER?.trim() || "";
 
 const whatsappUrl = `https://wa.me/${phoneNumber}`;
 export const talkToExpert: NavMenu = {
@@ -423,7 +461,7 @@ export const talkToExpert: NavMenu = {
     },
     {
       label: "Call Us",
-     href: whatsappUrl,
+      href: whatsappUrl,
       icon: FaPhoneAlt,
       color: "bg-blue-50 text-blue-500",
       description: "Speak to an agent right now",
@@ -437,7 +475,7 @@ export const talkToExpert: NavMenu = {
     },
     {
       label: "Schedule a Callback",
-    href: whatsappUrl,
+      href: whatsappUrl,
       icon: FaCalendarCheck,
       color: "bg-amber-50 text-amber-600",
       description: "We'll call you at your convenience",
@@ -448,6 +486,11 @@ export const talkToExpert: NavMenu = {
 export const CTA: CTAType = { label: "Sign Up", href: "/login" };
 
 export const NAV: NavItem[] = [
+  {
+    label: "Schemes",
+    mega: { columns: [{ heading: "Schemes", links: Schemes.items }] },
+  },
+
   {
     label: "Services",
     mega: {
