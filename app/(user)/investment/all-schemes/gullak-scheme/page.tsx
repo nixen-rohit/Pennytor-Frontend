@@ -1,11 +1,7 @@
-import CommingSoon from "@/components/CommingSoon/page"
+import { GullakScheme } from "@/components/gullak/GullakScheme";
 
 const page = () => {
-  return (
-    <div>
-        <CommingSoon/>
-    </div>
-  )
-}
+  return <GullakScheme />;
+};
 
-export default page
+export default page;

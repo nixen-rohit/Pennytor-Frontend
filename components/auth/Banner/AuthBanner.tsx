@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-
+ 
 interface AuthBannerProps {
   title?: string;
   subtitle?: string;
@@ -11,6 +9,22 @@ interface AuthBannerProps {
   footerText?: string;
   showWave?: boolean;
 }
+
+const SaleSkipAsterisk: React.FC = () => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    className="h-16 w-16 text-white mb-6"
+  >
+    <line x1="12" y1="2" x2="12" y2="22" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+    <line x1="4.93" y1="19.07" x2="19.07" y2="4.93" />
+  </svg>
+);
 
 export default function AuthBanner({
   title = "Hello Welcome",
@@ -27,20 +41,10 @@ export default function AuthBanner({
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] rounded-full border border-white" />
       </div>
 
-      {/* Top-left Logo */}
-      <Link href="/" aria-label="Go to Pennytor Home" className="relative z-10">
-        <Image
-          src="/logos/Logo.jpeg"
-          alt="Pennytor"
-          width={110}
-          height={110}
-          className="h-auto w-auto rounded-xl"
-          priority
-        />
-      </Link>
+       
 
       <div className="flex flex-col items-start justify-center my-auto max-w-md mx-auto">
-
+  <SaleSkipAsterisk />
         <h2 className="text-5xl font-bold tracking-tight text-white mb-2">
           {title}
         </h2>
