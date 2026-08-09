@@ -80,10 +80,7 @@ export default function TopNav({ config = defaultConfig }: { config?: TopbarConf
   };
 
   const handleLogout = async () => {
-    await AuthService.logout({
-      all: true,
-      refreshToken: useAuthStore.getState().refreshToken ?? undefined,
-    }).catch(() => {});
+    await AuthService.logout().catch(() => {});
     clearAuth();
     router.push("/login");
   };

@@ -5,9 +5,17 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/auth.store";
 import { AuthService } from "@/services/auth.service";
 
+/**
+ * Authentication boundary for the user area.
+ *
+ * The session is restored SERVER-SIDE: GET /auth/me is answered by NestJS
+ * after it validates the HttpOnly session cookie. The client only renders
+ * what the API says; there is no token to check locally and no client-side
+ * decision that can bypass the backend.
+ */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, user, restoreAuth, setLoading, clearAuth } =
+  const { isAuthenticated, isLoading, user, setAuth, setLoading, clearAuth } =
     useAuthStore();
 
   const restoreSession = useCallback(async () => {
@@ -17,18 +25,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const refreshResponse = await AuthService.refresh();
-      const accessToken = refreshResponse.data.accessToken;
-      if (user) {
-        restoreAuth(accessToken, user);
-        return;
-      }
+      const meResponse = await AuthService.me();
+      setAuth(meResponse.data.user, meResponse.data.csrfToken);
     } catch {
-      // refresh failed — not authenticated
+      clearAuth();
+      router.push("/login");
     }
-    clearAuth();
-    router.push("/login");
-  }, [isAuthenticated, user, restoreAuth, setLoading, clearAuth, router]);
+  }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
 
   useEffect(() => {
     restoreSession();

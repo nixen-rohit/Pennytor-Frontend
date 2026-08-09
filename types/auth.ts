@@ -4,6 +4,7 @@ export interface User {
   lastName: string;
   email: string;
   role: "USER" | "ADMIN";
+  isApproved?: boolean;
 }
 
 export interface LoginRequest {
@@ -14,9 +15,15 @@ export interface LoginRequest {
 export interface LoginResponse {
   message: string;
   data: {
-    accessToken: string;
-    refreshToken: string;
     user: User;
+    csrfToken: string;
+  };
+}
+
+export interface MeResponse {
+  data: {
+    user: User;
+    csrfToken: string;
   };
 }
 
@@ -57,18 +64,6 @@ export interface ResetPasswordRequest {
 export interface ChangePasswordRequest {
   currentPassword: string;
   newPassword: string;
-}
-
-export interface LogoutRequest {
-  all: boolean;
-  refreshToken?: string;
-}
-
-export interface RefreshResponse {
-  data: {
-    accessToken: string;
-    refreshToken: string;
-  };
 }
 
 export interface ApiErrorResponse {
