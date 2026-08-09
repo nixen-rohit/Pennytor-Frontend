@@ -11,8 +11,14 @@ export default function AdminGuard({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, user, setAuth, setLoading, clearAuth } =
-    useAuthStore();
+  const {
+    isAuthenticated,
+    isLoading,
+    user,
+    restoreAuth,
+    setLoading,
+    clearAuth,
+  } = useAuthStore();
 
   const restoreSession = useCallback(async () => {
     if (isAuthenticated && user) {
@@ -27,7 +33,7 @@ export default function AdminGuard({
       const refreshResponse = await AuthService.refresh();
       const accessToken = refreshResponse.data.accessToken;
       if (user) {
-        setAuth(accessToken, user);
+        restoreAuth(accessToken, user);
         if (user.role !== "ADMIN") {
           router.push("/dashboard");
         }
@@ -38,7 +44,7 @@ export default function AdminGuard({
     }
     clearAuth();
     router.push("/login");
-  }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
+  }, [isAuthenticated, user, restoreAuth, setLoading, clearAuth, router]);
 
   useEffect(() => {
     restoreSession();

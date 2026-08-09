@@ -15,6 +15,7 @@ export interface LoginResponse {
   message: string;
   data: {
     accessToken: string;
+    refreshToken: string;
     user: User;
   };
 }
@@ -60,11 +61,13 @@ export interface ChangePasswordRequest {
 
 export interface LogoutRequest {
   all: boolean;
+  refreshToken?: string;
 }
 
 export interface RefreshResponse {
   data: {
     accessToken: string;
+    refreshToken: string;
   };
 }
 

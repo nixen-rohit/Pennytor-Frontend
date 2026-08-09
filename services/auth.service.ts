@@ -1,4 +1,4 @@
-import { fetchApi } from "./api";
+import { fetchApi, refreshSession } from "./api";
 import type {
   LoginRequest,
   LoginResponse,
@@ -10,7 +10,6 @@ import type {
   ResetPasswordRequest,
   ChangePasswordRequest,
   LogoutRequest,
-  RefreshResponse,
 } from "@/types/auth";
 
 export const AuthService = {
@@ -43,10 +42,10 @@ export const AuthService = {
       body: JSON.stringify(data),
     }),
 
-  refresh: async () =>
-    fetchApi<RefreshResponse>("/auth/refresh", {
-      method: "POST",
-    }),
+  refresh: async () => {
+    const accessToken = await refreshSession();
+    return { data: { accessToken } };
+  },
 
   logout: async (data: LogoutRequest = { all: false }) =>
     fetchApi<{ message: string }>("/auth/logout", {

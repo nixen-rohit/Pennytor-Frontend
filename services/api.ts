@@ -12,25 +12,33 @@ export class ApiError extends Error {
   }
 }
 
-let isRefreshing = false;
-let pendingRequests: Array<{
-  resolve: (token: string) => void;
-  reject: (err: unknown) => void;
-}> = [];
+/**
+ * Single-flight refresh: every caller (fetchApi 401 handler, AuthGuard,
+ * AdminGuard) shares ONE refresh request. The backend rotates the refresh
+ * token on every call, so concurrent refreshes would invalidate each other.
+ */
+let refreshPromise: Promise<string> | null = null;
 
-async function refreshAccessToken(): Promise<string> {
-  if (isRefreshing) {
-    return new Promise((resolve, reject) => {
-      pendingRequests.push({ resolve, reject });
+export function refreshSession(): Promise<string> {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
     });
   }
+  return refreshPromise;
+}
 
-  isRefreshing = true;
+async function refreshAccessToken(): Promise<string> {
+  const { refreshToken } = useAuthStore.getState();
+  if (!refreshToken) {
+    throw new ApiError(401, "No refresh token available");
+  }
+
   try {
     const response = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
-      credentials: "include",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
     });
 
     if (!response.ok) {
@@ -38,24 +46,18 @@ async function refreshAccessToken(): Promise<string> {
     }
 
     const data = await response.json();
-    const newToken = data.accessToken;
+    const newToken = data.data.accessToken;
+    const newRefreshToken = data.data.refreshToken;
 
-    useAuthStore.getState().setAccessToken(newToken);
-
-    pendingRequests.forEach(({ resolve }) => resolve(newToken));
-    pendingRequests = [];
+    useAuthStore.getState().setTokens(newToken, newRefreshToken);
 
     return newToken;
   } catch (err) {
-    pendingRequests.forEach(({ reject }) => reject(err));
-    pendingRequests = [];
     useAuthStore.getState().clearAuth();
     if (typeof window !== "undefined") {
       window.location.href = "/login";
     }
     throw err;
-  } finally {
-    isRefreshing = false;
   }
 }
 
@@ -74,18 +76,16 @@ export async function fetchApi<T = unknown>(
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
-    credentials: "include",
   });
 
   if (response.status === 401 && !endpoint.includes("/auth/refresh")) {
     try {
-      const newToken = await refreshAccessToken();
+      const newToken = await refreshSession();
       headers.set("Authorization", `Bearer ${newToken}`);
 
       const retryResponse = await fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
-        credentials: "include",
       });
 
       const retryData = await retryResponse.json().catch(() => null);

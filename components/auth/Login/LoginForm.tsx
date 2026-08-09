@@ -21,9 +21,7 @@ interface LoginFormProps {
   formLoading: boolean;
   errorMsg: string;
   showPassword: boolean;
-  keepSignedIn: boolean;
   onTogglePassword: () => void;
-  onToggleKeepSignedIn: () => void;
   onResetPassword: () => void;
   onRegister: () => void;
 }
@@ -34,9 +32,7 @@ export default function LoginForm({
   formLoading,
   errorMsg,
   showPassword,
-  keepSignedIn,
   onTogglePassword,
-  onToggleKeepSignedIn,
   onResetPassword,
   onRegister,
 }: LoginFormProps) {
@@ -113,16 +109,7 @@ export default function LoginForm({
             )}
           />
 
-          <div className="flex justify-between items-center text-sm">
-            <label className="flex items-center gap-2 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={keepSignedIn}
-                onChange={onToggleKeepSignedIn}
-                className="rounded border-zinc-300 text-indigo-600"
-              />
-              <span className="text-zinc-600">Keep me signed in</span>
-            </label>
+          <div className="flex justify-end items-center text-sm">
             <button
               type="button"
               onClick={onResetPassword}

@@ -1,11 +1,11 @@
-import CommingSoon from "@/components/CommingSoon/page"
+import { InvestmentFundExplorer } from "@/components/InvestmentsFunds/InvestmentFundExplorer";
 
 const page = () => {
   return (
     <div>
-        <CommingSoon/>
+      <InvestmentFundExplorer />
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default page;

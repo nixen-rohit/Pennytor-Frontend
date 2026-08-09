@@ -7,7 +7,7 @@ import { AuthService } from "@/services/auth.service";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, user, setAuth, setLoading, clearAuth } =
+  const { isAuthenticated, isLoading, user, restoreAuth, setLoading, clearAuth } =
     useAuthStore();
 
   const restoreSession = useCallback(async () => {
@@ -20,7 +20,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       const refreshResponse = await AuthService.refresh();
       const accessToken = refreshResponse.data.accessToken;
       if (user) {
-        setAuth(accessToken, user);
+        restoreAuth(accessToken, user);
         return;
       }
     } catch {
@@ -28,7 +28,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
     clearAuth();
     router.push("/login");
-  }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
+  }, [isAuthenticated, user, restoreAuth, setLoading, clearAuth, router]);
 
   useEffect(() => {
     restoreSession();
