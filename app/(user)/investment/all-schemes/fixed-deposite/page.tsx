@@ -1,11 +1,7 @@
-import CommingSoon from "@/components/CommingSoon/page"
+import { FixedDepositSwp } from "@/components/FixedDeposite/FixedDepositSwp";
 
 const page = () => {
-  return (
-    <div>
-        <CommingSoon/>
-    </div>
-  )
-}
+  return <FixedDepositSwp />;
+};
 
-export default page
+export default page;

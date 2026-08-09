@@ -1,8 +1,5 @@
-import {
-  calculateGullak,
-  formatINR,
-  PRESET_SCHEMES,
-} from "@/utils/gullak-calculations";
+ 
+import { Gullak_SCHEMES } from "./gullak-data";
 import { cn } from "@/lib/utils";
 
 const COLUMNS = [
@@ -42,8 +39,8 @@ export function ReferenceLedger() {
               </tr>
             </thead>
             <tbody>
-              {PRESET_SCHEMES.map((scheme, i) => {
-                const result = calculateGullak(scheme);
+              {Gullak_SCHEMES.map((scheme, i) => {
+                
                 return (
                   <tr
                     key={scheme.id}
@@ -53,18 +50,18 @@ export function ReferenceLedger() {
                     )}
                   >
                     <td className="px-5 py-4 font-semibold text-gullak-indigo">
-                      {scheme.label}
+                      {scheme.dailyDeposit}
                     </td>
                     <td className="px-5 py-4">{scheme.years} Years</td>
                     <td className="px-5 py-4">{scheme.annualRatePercent} %</td>
                     <td className="px-5 py-4">
-                      {formatINR(result.investedAmount)}
+                      {(scheme.investmentAmount)}
                     </td>
                     <td className="px-5 py-4 font-semibold">
-                      {formatINR(result.finalAmount)}
+                      {(scheme.finalAmount)}
                     </td>
                     <td className="px-5 py-4 font-semibold text-gullak-emerald">
-                      {formatINR(result.netProfit)}
+                      {(scheme.netProfit)}
                     </td>
                   </tr>
                 );

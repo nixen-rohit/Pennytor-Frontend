@@ -1,6 +1,6 @@
 import { GullakHero } from "./GullakHero";
 import { ReferenceLedger } from "./ReferenceLedger";
-import { GullakCalculator } from "./GullakCalculator";
+
 
 /**
  * Full "Gullak Scheme" showcase: hero, the printed reference table, and an
@@ -10,8 +10,7 @@ export function GullakScheme() {
   return (
     <div className="pb-8">
       <GullakHero />
-      <ReferenceLedger />
-      <GullakCalculator />
+      <ReferenceLedger />  
     </div>
   );
 }

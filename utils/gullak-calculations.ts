@@ -88,13 +88,25 @@ export function formatCompactINR(amount: number): string {
 
 /** The three rows printed on the original scheme poster. */
 export const PRESET_SCHEMES: PresetScheme[] = [
-  { id: "100", label: "Rs.100/-", dailyDeposit: 100, years: 5, annualRatePercent: 15 },
-  { id: "200", label: "Rs.200/-", dailyDeposit: 200, years: 5, annualRatePercent: 15 },
-  { id: "500", label: "Rs.500/-", dailyDeposit: 500, years: 5, annualRatePercent: 15 },
+  {
+    id: "100",
+    label: "Rs.100/-",
+    dailyDeposit: 100,
+    years: 5,
+    annualRatePercent: 15,
+  },
+  {
+    id: "200",
+    label: "Rs.200/-",
+    dailyDeposit: 200,
+    years: 5,
+    annualRatePercent: 15,
+  },
+  {
+    id: "500",
+    label: "Rs.500/-",
+    dailyDeposit: 500,
+    years: 5,
+    annualRatePercent: 15,
+  },
 ];
-
-export const CALCULATOR_LIMITS = {
-  dailyDeposit: { min: 10, max: 2000, step: 10, default: 100 },
-  years: { min: 1, max: 10, step: 1, default: 5 },
-  annualRatePercent: { min: 5, max: 20, step: 0.5, default: 15 },
-} as const;

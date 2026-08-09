@@ -27,7 +27,4 @@ export interface YearlyBreakdownRow extends GullakResult {
 }
 
 /** One row of the printed reference table on the scheme poster. */
-export interface PresetScheme extends GullakInput {
-  id: string;
-  label: string;
-}
+

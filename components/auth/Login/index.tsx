@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [keepSignedIn, setKeepSignedIn] = useState(true);
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -34,7 +33,11 @@ export default function LoginPage() {
 
     try {
       const response = await AuthService.login(data);
-      setAuth(response.data.accessToken, response.data.user, keepSignedIn);
+      setAuth(
+        response.data.accessToken,
+        response.data.refreshToken,
+        response.data.user,
+      );
       router.push(response.data.user.role === "ADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
       handleApiError(err, setErrorMsg);
@@ -67,9 +70,7 @@ export default function LoginPage() {
             formLoading={formLoading}
             errorMsg={errorMsg}
             showPassword={showPassword}
-            keepSignedIn={keepSignedIn}
             onTogglePassword={() => setShowPassword(!showPassword)}
-            onToggleKeepSignedIn={() => setKeepSignedIn(!keepSignedIn)}
             onResetPassword={handleResetPassword}
             onRegister={handleRegister}
           />
