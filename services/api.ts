@@ -12,55 +12,20 @@ export class ApiError extends Error {
   }
 }
 
+const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
 /**
- * Single-flight refresh: every caller (fetchApi 401 handler, AuthGuard,
- * AdminGuard) shares ONE refresh request. The backend rotates the refresh
- * token on every call, so concurrent refreshes would invalidate each other.
+ * Central API client.
+ *
+ * - Authentication is entirely cookie-based (`sid` HttpOnly cookie set by
+ *   the backend). `credentials: "include"` makes the browser attach it;
+ *   there is NO Authorization header and NO token in JavaScript.
+ * - Every state-changing request also sends the CSRF token issued by the
+ *   backend at login / /auth/me (see CsrfGuard on the API side).
+ * - On 401 the in-memory session state is cleared; the AuthGuard wrapper
+ *   reacts by redirecting to /login. API failures are never a security
+ *   decision by themselves.
  */
-let refreshPromise: Promise<string> | null = null;
-
-export function refreshSession(): Promise<string> {
-  if (!refreshPromise) {
-    refreshPromise = refreshAccessToken().finally(() => {
-      refreshPromise = null;
-    });
-  }
-  return refreshPromise;
-}
-
-async function refreshAccessToken(): Promise<string> {
-  const { refreshToken } = useAuthStore.getState();
-  if (!refreshToken) {
-    throw new ApiError(401, "No refresh token available");
-  }
-
-  try {
-    const response = await fetch(`${API_URL}/auth/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (!response.ok) {
-      throw new ApiError(response.status, "Refresh failed");
-    }
-
-    const data = await response.json();
-    const newToken = data.data.accessToken;
-    const newRefreshToken = data.data.refreshToken;
-
-    useAuthStore.getState().setTokens(newToken, newRefreshToken);
-
-    return newToken;
-  } catch (err) {
-    useAuthStore.getState().clearAuth();
-    if (typeof window !== "undefined") {
-      window.location.href = "/login";
-    }
-    throw err;
-  }
-}
-
 export async function fetchApi<T = unknown>(
   endpoint: string,
   options: RequestInit = {},
@@ -68,44 +33,30 @@ export async function fetchApi<T = unknown>(
   const headers = new Headers(options.headers || {});
   headers.set("Content-Type", "application/json");
 
-  const token = useAuthStore.getState().accessToken;
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+  const method = (options.method || "GET").toUpperCase();
+
+  if (MUTATING_METHODS.has(method)) {
+    const csrfToken = useAuthStore.getState().csrfToken;
+    if (csrfToken) {
+      headers.set("X-CSRF-Token", csrfToken);
+    }
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
+    credentials: "include",
+    cache: "no-store",
   });
-
-  if (response.status === 401 && !endpoint.includes("/auth/refresh")) {
-    try {
-      const newToken = await refreshSession();
-      headers.set("Authorization", `Bearer ${newToken}`);
-
-      const retryResponse = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers,
-      });
-
-      const retryData = await retryResponse.json().catch(() => null);
-
-      if (!retryResponse.ok) {
-        throw new ApiError(
-          retryResponse.status,
-          retryData?.message || "Something went wrong",
-        );
-      }
-
-      return retryData as T;
-    } catch {
-      // refresh failed or retry failed — re-throw
-    }
-  }
 
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
+    // A dead/expired/revoked session is a full logout: drop the in-memory
+    // user. The guards watch the store and redirect.
+    if (response.status === 401) {
+      useAuthStore.getState().clearAuth();
+    }
     throw new ApiError(
       response.status,
       data?.message || "Something went wrong",

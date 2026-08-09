@@ -33,11 +33,9 @@ export default function LoginPage() {
 
     try {
       const response = await AuthService.login(data);
-      setAuth(
-        response.data.accessToken,
-        response.data.refreshToken,
-        response.data.user,
-      );
+      // The HttpOnly `sid` cookie was set by the API; only the user object
+      // and the CSRF token ever touch the client.
+      setAuth(response.data.user, response.data.csrfToken);
       router.push(response.data.user.role === "ADMIN" ? "/admin" : "/dashboard");
     } catch (err) {
       handleApiError(err, setErrorMsg);
