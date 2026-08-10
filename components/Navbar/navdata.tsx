@@ -134,13 +134,7 @@ export const Schemes: NavMenu = {
       color: "bg-teal-50 text-teal-500",
       description: "For long term Investment",
     },
-    {
-      label: "Schemes Calculator",
-      href: "/",
-      icon: FaCalculator,
-      color: "bg-amber-50 text-amber-600",
-      description: "Calculate Your Returns",
-    },
+     
   ],
 };
 

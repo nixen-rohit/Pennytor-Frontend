@@ -1,7 +1,16 @@
-import { GullakScheme } from "@/components/gullak/GullakScheme";
+'use client'
+import {Gullak} from "@/components/Gullak/index"
 
-const page = () => {
-  return <GullakScheme />;
-};
 
-export default page;
+export default function Page() {
+  return (
+    <Gullak
+      onContact={() => {
+        console.log('done')
+      }}
+      onApply={(plan) => {
+        console.log("Applying for:", plan);
+      }}
+    />
+  );
+}

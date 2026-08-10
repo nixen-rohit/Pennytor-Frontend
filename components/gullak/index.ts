@@ -1,5 +1,2 @@
-export { GullakScheme } from "./GullakScheme";
-export { GullakHero } from "./GullakHero";
- 
 
-
+export { Gullak } from "./Gullak";

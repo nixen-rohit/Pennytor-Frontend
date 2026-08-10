@@ -1,7 +1,15 @@
-import { FixedDepositSwp } from "@/components/FixedDeposite/FixedDepositSwp";
+"use client";
+import { FixedDeposit } from "@/components/FixedDeposit";
 
-const page = () => {
-  return <FixedDepositSwp />;
-};
-
-export default page;
+export default function Page() {
+  return (
+    <FixedDeposit
+      onContact={() => {
+        console.log("Contact");
+      }}
+      onApply={(plan) => {
+        console.log(plan);
+      }}
+    />
+  );
+}
