@@ -1,10 +1,17 @@
+"use client";
+import { SIPForChild } from "@/components/SIPForChild";
 
-import { SipChildFuture } from "@/components/sip/SipChildFuture";
 const page = () => {
   return (
-    <div>
-        <SipChildFuture />
-    </div>
+    <SIPForChild
+  example={{
+    monthlyInvestment: 10000,
+    investmentYears: 15,
+    annualReturn: 12,
+    withdrawalMonthly: 30000,
+    withdrawalYears: 10,
+  }}
+/>
   )
 }
 

@@ -1,11 +1,16 @@
-import { InvestmentFundExplorer } from "@/components/InvestmentsFunds/InvestmentFundExplorer";
+"use client"
+import { InvestmentFund } from "@/components/InvestmentFund";
 
-const page = () => {
+export default function Page() {
   return (
-    <div>
-      <InvestmentFundExplorer />
-    </div>
+    <InvestmentFund
+      onContact={() => {
+        // Open contact modal / navigate to contact
+      }}
+      onApply={(plan) => {
+        // Start application flow
+        console.log(plan);
+      }}
+    />
   );
-};
-
-export default page;
+}

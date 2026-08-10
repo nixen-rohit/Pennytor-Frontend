@@ -1,0 +1,2 @@
+
+export { InvestmentFund } from "./InvestmentFund";
