@@ -9,15 +9,12 @@ import RegisterForm from "./RegisterForm";
 import { registerSchema, type RegisterFormValues } from "@/lib/validations";
 import { AuthService } from "@/services/auth.service";
 import { handleApiError } from "@/services/api";
-import RegisteredOtpDialog from "@/components/auth/OTP/RegisteredOTP";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [otpOpen, setOtpOpen] = useState(false);
-  const [otpEmail, setOtpEmail] = useState("");
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -46,8 +43,9 @@ export default function RegisterPage() {
         acceptTerms: true,
         marketingEmails: data.subscribeNewsletter,
       });
-      setOtpEmail(data.email);
-      setOtpOpen(true);
+      router.push(
+        `/otp-verify/register-acount?email=${encodeURIComponent(data.email)}`,
+      );
     } catch (err) {
       handleApiError(err, setErrorMsg, {
         409: "This email is already registered. Please log in or use a different email.",
@@ -67,11 +65,6 @@ export default function RegisterPage() {
       <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
         <AuthBanner />
       </div>
-      <RegisteredOtpDialog
-        open={otpOpen}
-        onOpenChange={setOtpOpen}
-        email={otpEmail}
-      />
       {/* Right Side - Scrollable */}
       <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
         <div className="flex min-h-screen items-center justify-center p-8">

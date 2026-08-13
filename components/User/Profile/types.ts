@@ -17,6 +17,7 @@ export interface KycProfile {
   client_id: string;
   kyc_status: VerificationState;
   items: VerificationItem[];
+  rejection_reason: string | null;
 }
 
 export const STATE_STYLES: Record<

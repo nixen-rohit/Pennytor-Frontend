@@ -36,6 +36,15 @@ const statusStyles: Record<ReviewStatus, string> = {
   REJECTED: "bg-red-600/20 text-red-400",
 };
 
+/** Masks identifiers the same way the backend does: only the last 4 digits
+ * remain, e.g. `********7412`. Full values are never displayed — the
+ * uploaded document images are the verification source of truth. */
+const maskIdentifier = (value: string): string => {
+  const digits = value.replace(/\s+/g, "");
+  if (!digits) return value;
+  return `${"*".repeat(Math.max(4, digits.length - 4))}${digits.slice(-4)}`;
+};
+
 export default function ProfileReview() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
@@ -158,7 +167,7 @@ export default function ProfileReview() {
                     )
                   }
                 />
-                <Row label="Aadhaar Card Number" value={request.aadhaarNumber} />
+                <Row label="Aadhaar Card Number" value={maskIdentifier(request.aadhaarNumber)} />
                 <Row
                   label="Aadhaar Card Front "
                   value={
@@ -187,7 +196,7 @@ export default function ProfileReview() {
                     )
                   }
                 />
-                <Row label="PAN Number" value={request.panNumber} />
+                <Row label="PAN Number" value={maskIdentifier(request.panNumber)} />
                 <Row
                   label="PAN Card"
                   value={
@@ -223,8 +232,8 @@ export default function ProfileReview() {
                   label="Account Holder"
                   value={request.accountHolderName}
                 />
-                <Row label="Account Number" value={request.accountNumber} />
-                <Row label="IFSC Code" value={request.ifscCode} />
+                <Row label="Account Number" value={maskIdentifier(request.accountNumber)} />
+                <Row label="IFSC Code" value={maskIdentifier(request.ifscCode)} />
                 <Row label="Bank Name" value={request.bankName} />
                 <Row label="Branch Name" value={request.branchName} />
                 <Row label="Account Type" value={request.accountType} />
@@ -235,7 +244,7 @@ export default function ProfileReview() {
                 <Row label="Nominee Name" value={request.nomineeName} />
                 <Row label="Date of Birth" value={request.nomineeDob} />
                 <Row label="Phone" value={request.nomineePhone} />
-                <Row label="Aadhaar" value={request.nomineeAadhaar} />
+                <Row label="Aadhaar" value={maskIdentifier(request.nomineeAadhaar)} />
               </Section>
             </div>
 

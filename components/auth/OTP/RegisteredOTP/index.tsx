@@ -61,7 +61,7 @@ export default function RegisteredOtpDialog({
 
     try {
       await AuthService.verifyEmail({ email, otp: data.otp });
-      handleOpenChange(false);
+      resetState();
       router.push("/login");
     } catch (err: unknown) {
       handleApiError(err, setErrorMsg, {
@@ -94,6 +94,10 @@ export default function RegisteredOtpDialog({
       email={email}
       onResend={handleResend}
       resendCooldown={resendCooldown}
+      onLogin={() => {
+        resetState();
+        router.push("/login");
+      }}
     />
   );
 }

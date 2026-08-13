@@ -23,6 +23,7 @@ export function ReviewStep({ data }: Props) {
 
       <Section title="Personal Information">
         <Row label="Full Name" value={data.fullName} />
+        <Row label="Phone Number" value={data.phone} />
         <Row label="Date of Birth" value={formatDate(data.dob)} />
         <Row label="Gender" value={data.gender || "Not provided"} />
         <Row label="Marital Status" value={data.maritalStatus || "Not provided"} />

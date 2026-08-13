@@ -1,18 +1,26 @@
-import { useMemo } from "react";
+"use client";
+
+import { useState } from "react";
 import { KycProfile } from "@/components/User/Profile/types";
 import Image from "next/image";
-import { BadgeCheck, BadgeAlert } from "lucide-react";
-import { BadgeX } from "lucide-react";
+import { BadgeCheck, BadgeAlert, BadgeX, Copy, Check } from "lucide-react";
 
 interface ProfileCardProps {
   profile: KycProfile;
 }
 
 export function ProfileCard({ profile }: ProfileCardProps) {
-  const completedCount = useMemo(
-    () => profile.items.filter((i) => i.state === "verified").length,
-    [profile.items],
-  );
+  const [copied, setCopied] = useState(false);
+
+  const copyClientId = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.client_id);
+    } catch {
+      return;
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <section className="overflow-hidden rounded-2xl border border-white/10 bg-[#111]">
@@ -42,12 +50,12 @@ export function ProfileCard({ profile }: ProfileCardProps) {
           <span className="ml-2" > 
 
          
-          {profile.kyc_status === "pending" ? (
-            <BadgeAlert className="text-sm text-yellow-500" />
-          ) : profile.kyc_status === "verified" ? (
+          {profile.kyc_status === "verified" ? (
             <BadgeCheck className="text-sm text-green-500" />
-          ) : (
+          ) : profile.kyc_status === "rejected" ? (
             <BadgeX className="text-sm text-red-500" />
+          ) : (
+            <BadgeAlert className="text-sm text-yellow-500" />
           )}
            </span>
         </h2>
@@ -55,9 +63,30 @@ export function ProfileCard({ profile }: ProfileCardProps) {
 
         <div className="my-8 h-px bg-white/10" />
 
-        <p className="text-center text-sm text-white/60">
-          Client ID: {profile.client_id}
-        </p>
+        <div className="flex items-center justify-center gap-2">
+          <p className="text-sm text-white/60">
+            Client ID:{" "}
+            <span className="font-medium text-white/90">{profile.client_id}</span>
+          </p>
+          <button
+            type="button"
+            onClick={copyClientId}
+            aria-label="Copy client ID"
+            title="Copy client ID"
+            className="rounded-md p-1 text-white/40 transition-all duration-200 hover:bg-white/10 hover:text-white active:scale-75"
+          >
+            {copied ? (
+              <Check className="h-4 w-4 text-green-400 animate-in zoom-in-75 duration-200" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </button>
+          {copied && (
+            <span className="text-xs text-green-400 animate-in fade-in-0 zoom-in-75 duration-200">
+              Copied!
+            </span>
+          )}
+        </div>
       </div>
     </section>
   );

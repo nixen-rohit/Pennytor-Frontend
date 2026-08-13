@@ -18,8 +18,8 @@ export function validateStep(step: number, data: FormState): FieldErrors {
       else if (containsUnsafe(data.fullName))
         errs.fullName = "Name contains invalid characters.";
       if (!data.dob) errs.dob = "Date of birth is required.";
-      if (!PHONE_PATTERN.test(data.nomineePhone.replace(/\s/g, "")))
-        errs.nomineePhone = "Enter a valid phone number.";
+      if (!PHONE_PATTERN.test(data.phone.replace(/\s/g, "")))
+        errs.phone = "Enter a valid phone number.";
       if (data.selfieFile === null)
         errs.selfieFile = "Please upload your selfie photo.";
       return errs;

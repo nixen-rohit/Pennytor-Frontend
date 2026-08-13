@@ -67,13 +67,13 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
           />
         </Field>
 
-        <Field label="Phone Number" required>
+        <Field label="Phone Number" required error={errors?.phone}>
           <Input
             type="tel"
             inputMode="tel"
             placeholder="+91 XXXXX XXXXX"
-            value={data.nomineePhone}
-            onChange={(e) => onChange("nomineePhone", sanitizePhone(e.target.value))}
+            value={data.phone}
+            onChange={(e) => onChange("phone", sanitizePhone(e.target.value))}
           />
         </Field>
         <div className="space-y-1.5">

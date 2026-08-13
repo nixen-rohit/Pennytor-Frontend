@@ -99,14 +99,13 @@ export default function RegisterForm({
     const trimmed = email.trim();
 
     if (!trimmed || !EMAIL_REGEX.test(trimmed)) {
-      setEmailStatus("idle");
-      return;
+      const resetTimer = setTimeout(() => setEmailStatus("idle"), 0);
+      return () => clearTimeout(resetTimer);
     }
-
-    setEmailStatus("checking");
 
     let cancelled = false;
     const timer = setTimeout(() => {
+      setEmailStatus("checking");
       AuthService.checkEmail(trimmed)
         .then((res) => {
           if (!cancelled) {
