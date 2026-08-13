@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ChevronLeft, ChevronRight, Save } from "lucide-react";
+import { ShieldCheck, ChevronLeft, ChevronRight, Save, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 
 import { PHASES, FormState, initialFormState } from "@/components/User/KYC/types";
 import { StepTimeline } from "@/components/User/KYC/StepTimeline";
@@ -12,17 +13,69 @@ import { UploadDocument } from "@/components/User/KYC/UploadDocument";
 import { BankDetails } from "@/components/User/KYC/BankDetails";
 import { NomineeDetails } from "@/components/User/KYC/NomineeDetails";
 import { ReviewStep } from "@/components/User/KYC/ReviewStep";
-import { OtpVerification } from "@/components/User/KYC/OtpVerification";
 import { SubmissionSuccess } from "@/components/User/KYC/SubmissionSuccess";
 import { validateStep, type FieldErrors } from "@/components/User/KYC/validation";
 import { sanitizeText } from "@/utils/validation";
+import { KycService, type KycFileType, type KycApplicationState } from "@/services/kyc.service";
+import { AuthService } from "@/services/auth.service";
+
+const FILE_UPLOADS: Array<{ key: keyof FormState; type: KycFileType }> = [
+  { key: "selfieFile", type: "SELFIE" },
+  { key: "aadhaarFrontFile", type: "AADHAAR_FRONT" },
+  { key: "aadhaarBackFile", type: "AADHAAR_BACK" },
+  { key: "panFile", type: "PAN" },
+  { key: "signatureFile", type: "SIGNATURE" },
+];
 
 export default function KYCVerification() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
-  const [showOtp, setShowOtp] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [submittedApp, setSubmittedApp] = useState<KycApplicationState | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [statusError, setStatusError] = useState(false);
+
+  const loadStatus = async () => {
+    setStatusLoading(true);
+    setStatusError(false);
+    try {
+      const [me, app] = await Promise.all([
+        AuthService.me(),
+        KycService.myApplication(),
+      ]);
+      setClientId(me?.data?.user?.clientId ?? null);
+      if (!app) {
+        setRejectionReason(null);
+        return;
+      }
+      if (
+        app.status === "SUBMITTED" ||
+        app.status === "UNDER_REVIEW" ||
+        app.status === "VERIFIED"
+      ) {
+        // Already submitted — back from the OTP page or a returning visit.
+        // The details are locked; show them read-only.
+        setSubmittedApp(app);
+      } else if (app.status === "REJECTED") {
+        setRejectionReason(app.rejectionReason);
+      }
+    } catch {
+      // A failed fetch must never look like a fresh, unsubmitted account.
+      setStatusError(true);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => void loadStatus(), 0);
+    return () => clearTimeout(timeoutId);
+  }, []);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     const safeValue = typeof value === "string" ? sanitizeText(value) : value;
@@ -46,27 +99,71 @@ export default function KYCVerification() {
     }
   }
 
-  function handleSubmit() {
-    console.log("Submit KYC:", form);
-  }
-
   function handleSaveDraft() {
     console.log("Save draft:", form);
   }
 
-  function handleOtpVerified(otp: string) {
-    console.log("OTP verified:", otp);
-    handleSubmit();
-    setSubmitted(true);
+  function buildPayload() {
+    const {
+      selfieFile,
+      aadhaarFrontFile,
+      aadhaarBackFile,
+      panFile,
+      signatureFile,
+      confirmAccountNumber,
+      ...rest
+    } = form;
+    // confirmAccountNumber is a client-side-only validation field — it is
+    // never sent to the API.
+    void selfieFile;
+    void aadhaarFrontFile;
+    void aadhaarBackFile;
+    void panFile;
+    void signatureFile;
+    void confirmAccountNumber;
+    return {
+      ...rest,
+      dob: rest.dob ? rest.dob.toISOString() : null,
+      nomineeDob: rest.nomineeDob ? rest.nomineeDob.toISOString() : null,
+    };
   }
 
-  if (submitted) {
+  /**
+   * Review & Submit: persists the structured data (DRAFT) and uploads every
+   * selected document. Only after all of this succeeds does the user move to
+   * the OTP page at /otp-verify/kyc-acount — nothing is submitted until the
+   * OTP is verified.
+   */
+  async function handlePrepareSubmit() {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const app = await KycService.createApplication(buildPayload());
+
+      for (const { key, type } of FILE_UPLOADS) {
+        const file = form[key] as File | null;
+        if (file) {
+          await KycService.uploadFile(app.id, type, file);
+        }
+      }
+
+      router.push(`/otp-verify/kyc-acount?applicationId=${app.id}`);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error ? error.message : "Failed to prepare submission. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (submittedApp) {
     return (
       <div className="min-h-screen p-4">
         <div className="max-w-3xl mx-auto space-y-5">
           <Card className="shadow-sm">
             <CardContent className="p-6">
-              <SubmissionSuccess />
+              <SubmissionSuccess app={submittedApp} />
             </CardContent>
           </Card>
         </div>
@@ -74,16 +171,38 @@ export default function KYCVerification() {
     );
   }
 
-  if (showOtp) {
+  if (statusLoading) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center text-white">
+        <Loader2 className="h-6 w-6 animate-spin text-indigo-400" />
+      </div>
+    );
+  }
+
+  if (statusError) {
     return (
       <div className="min-h-screen p-4">
-        <div className="max-w-3xl mx-auto space-y-5">
+        <div className="max-w-3xl mx-auto">
           <Card className="shadow-sm">
-            <CardContent className="p-6">
-              <OtpVerification
-                onBack={() => setShowOtp(false)}
-                onVerified={handleOtpVerified}
-              />
+            <CardContent className="flex flex-col items-center gap-4 p-10 text-center">
+              <AlertCircle className="h-8 w-8 text-red-400" />
+              <div>
+                <h1 className="text-lg font-semibold text-slate-50">
+                  Couldn&apos;t load your KYC status
+                </h1>
+                <p className="mt-1 text-sm text-slate-400">
+                  A temporary problem fetching your application. Nothing
+                  changed — try again.
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={() => void loadStatus()}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Retry
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -95,10 +214,31 @@ export default function KYCVerification() {
     <div className="min-h-screen p-4 ">
       <div className="max-w-5xl mx-auto space-y-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
-            KYC Verification
-          </h1>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-50">
+              KYC Verification
+            </h1>
+            {clientId && (
+              <span className="inline-flex items-center rounded-full border border-indigo-400/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-300">
+                Client ID: {clientId}
+              </span>
+            )}
+          </div>
         </div>
+
+        {rejectionReason && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+            <p className="text-xs font-semibold text-red-400 uppercase tracking-wide">
+              Your previous KYC submission was rejected
+            </p>
+            <p className="mt-1 text-sm text-red-200/90">
+              {rejectionReason}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              Correct the details above and resubmit to continue.
+            </p>
+          </div>
+        )}
 
         <Card className="shadow-sm">
           <CardContent className="p-4">
@@ -155,11 +295,16 @@ export default function KYCVerification() {
                   {isLast ? (
                     <Button
                       type="button"
-                      onClick={() => setShowOtp(true)}
+                      onClick={handlePrepareSubmit}
+                      disabled={submitting}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5  border-white/20"
                     >
-                      <ShieldCheck className="h-4 w-4" />
-                      Review & Submit
+                      {submitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <ShieldCheck className="h-4 w-4" />
+                      )}
+                      {submitting ? "Uploading & Securing..." : "Review & Submit"}
                     </Button>
                   ) : (
                     <Button
@@ -173,6 +318,10 @@ export default function KYCVerification() {
                   )}
                 </div>
               </div>
+
+              {submitError && (
+                <p className="text-sm text-red-500 pt-3">{submitError}</p>
+              )}
             </form>
           </CardContent>
         </Card>

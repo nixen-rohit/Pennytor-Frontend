@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Mail, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +35,7 @@ interface RegisteredOtpFormProps {
   email: string;
   onResend: () => void;
   resendCooldown: number;
+  onLogin?: () => void;
 }
 
 export default function RegisteredOtpForm({
@@ -48,6 +48,7 @@ export default function RegisteredOtpForm({
   email,
   onResend,
   resendCooldown,
+  onLogin,
 }: RegisteredOtpFormProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -177,7 +178,7 @@ export default function RegisteredOtpForm({
           Have an account?{" "}
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={() => (onLogin ? onLogin() : onOpenChange(false))}
             className="font-semibold text-slate-900 hover:underline"
           >
             Log in

@@ -1,15 +1,16 @@
 import { User, Upload, Landmark, Users, FileCheck } from "lucide-react";
 
 export const PHASES = [
-  { step: 1, title: "Personal Info", icon: User },
-  { step: 2, title: "Upload Document", icon: Upload },
-  { step: 3, title: "Bank Details", icon: Landmark },
-  { step: 4, title: "Nominee", icon: Users },
-  { step: 5, title: "Review", icon: FileCheck },
+  { step: 1, title: "Identity data", icon: User },
+  { step: 2, title: "Identity documents", icon: Upload },
+  { step: 3, title: "Bank details", icon: Landmark },
+  { step: 4, title: "Nominee details", icon: Users },
+  { step: 5, title: "Final Review", icon: FileCheck },
 ] as const;
 
 export interface FormState {
   fullName: string;
+  phone: string;
   dob: Date | null;
   gender: string;
   maritalStatus: string;
@@ -42,6 +43,7 @@ export interface FormState {
 
 export const initialFormState: FormState = {
   fullName: "",
+  phone: "",
   dob: null,
   gender: "",
   maritalStatus: "",

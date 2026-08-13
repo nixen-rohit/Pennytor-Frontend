@@ -76,6 +76,13 @@ export const adminNav: MenuSection[] = [
         href: "/admin/request/profile",
         icon: MdOutlineVerified,
       },
+      {
+        id: "kyc-applications",
+        label: "KYC Applications",
+        href: "/admin/kyc/applications",
+        icon: MdOutlineVerified,
+        isNew: true,
+      },
     ],
   },
   {

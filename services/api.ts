@@ -35,19 +35,47 @@ export async function fetchApi<T = unknown>(
 
   const method = (options.method || "GET").toUpperCase();
 
-  if (MUTATING_METHODS.has(method)) {
+  const armCsrf = () => {
     const csrfToken = useAuthStore.getState().csrfToken;
     if (csrfToken) {
       headers.set("X-CSRF-Token", csrfToken);
     }
+  };
+
+  if (MUTATING_METHODS.has(method)) {
+    armCsrf();
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-    credentials: "include",
-    cache: "no-store",
-  });
+  const send = () =>
+    fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+      credentials: "include",
+      cache: "no-store",
+    });
+
+  let response = await send();
+
+  // A stale CSRF token (e.g. one rotated by a newer /auth/me response that
+  // the store never saw) 403s the first mutation. Re-arm the token from the
+  // server and retry the request once.
+  if (response.status === 403 && MUTATING_METHODS.has(method)) {
+    try {
+      const meResponse = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const meData = await meResponse.json().catch(() => null);
+      const freshToken = meData?.data?.csrfToken;
+      if (meResponse.ok && freshToken) {
+        useAuthStore.getState().setCsrfToken(freshToken);
+        armCsrf();
+        response = await send();
+      }
+    } catch {
+      // Network failure while re-arming — fall through with the original 403.
+    }
+  }
 
   const data = await response.json().catch(() => null);
 

@@ -5,6 +5,7 @@ export interface User {
   email: string;
   role: "USER" | "ADMIN";
   isApproved?: boolean;
+  clientId?: string | null;
 }
 
 export interface LoginRequest {
