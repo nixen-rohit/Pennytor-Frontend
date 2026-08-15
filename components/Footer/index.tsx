@@ -6,7 +6,7 @@ import { FooterBottom } from "@/components/Footer/FooterBottom";
 
 export default function index() {
   return (
-    <footer className="bg-mainground ">
+    <footer className="bg-neutral-800/60 ">
       <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-6">
           <FooterBrand />

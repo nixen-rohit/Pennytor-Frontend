@@ -108,28 +108,28 @@ export const Schemes: NavMenu = {
   items: [
     {
       label: "Gulak Scheme",
-      href: "/",
+      href: "/schemes/gulak-scheme",
       icon: BsFillPiggyBankFill,
       color: "bg-amber-50 text-amber-500",
       description: "For Daily Deposite",
     },
     {
       label: "SIP For Childrens",
-      href: "/",
+     href: "/schemes/sip-child-scheme",
       icon: FaHandHoldingHeart,
       color: "bg-rose-50 text-rose-500",
       description: "Monthly Saving For Your Childrens",
     },
     {
       label: "Fixed Deposite (SWP)",
-      href: "/",
+     href: "/schemes/fixed-swp-scheme",
       icon: RiMoneyRupeeCircleFill,
       color: "bg-green-50 text-green-500",
       description: " Save and Earn More",
     },
     {
       label: "Investment Fund",
-      href: "/",
+      href: "/schemes/investment-fund-scheme",
       icon: FaMoneyBillTrendUp,
       color: "bg-teal-50 text-teal-500",
       description: "For long term Investment",
