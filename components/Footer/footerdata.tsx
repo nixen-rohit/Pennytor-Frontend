@@ -28,14 +28,13 @@ export interface SocialLink {
 
 export interface FooterBrandData {
   name: string;
-  description: string; 
   logo: string;
 }
 
 export const footerBrand: FooterBrandData = {
   name: "Pennytor",
   logo: "/logos/Graphic.jpeg",
-  description:"Empowering investors with transparent, secure, and intelligent wealth management solutions.",    
+  
 };
 
 export const socialLinks: SocialLink[] = [
@@ -64,34 +63,28 @@ export const socialLinks: SocialLink[] = [
 ];
 
 export const footerColumns: FooterColumnData[] = [
-  
   {
     heading: "Our Products",
     links: [
-      { label: "Health Insurance", href: "/insurance/health/individual" },
-      { label: "Term Insurance", href: "/insurance/life/term" },
-      { label: "Home Insurance", href: "/insurance/home/home" },
-      { label: "ULIP Plans", href: "/insurance/life/ulip" },
+      { label: "Gulak Scheme", href: "/schemes/gulak-scheme" },
+      { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
+      { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
       {
-        label: "Guaranteed Income Plans",
-        href: "/insurance/life/guaranteed-income",
+        label: "Investment Fund Scheme",
+        href: "/schemes/investment-fund-scheme",
       },
-      { label: "Annuity Plans", href: "/insurance/life/annuity" },
-      { label: "Group Life Insurance", href: "/insurance/life/group" },
-      { label: "Shopkeeper Insurance", href: "/insurance/home/shopkeeper" },
     ],
   },
   {
     heading: "Quick Links",
     links: [
-      { label: "Get a Quote", href: "/get-quote" },
-      { label: "Renew Your Policy", href: "/renew/policy-number" },
-      { label: "Track Claim Status", href: "/claim/track" },
-      { label: "Download Forms", href: "/support/forms" },
-      { label: "Premium Calculator", href: "/calculators/premium-calculator" },
-      { label: "Insurance Glossary", href: "/insurance-glossary" },
-      { label: "Blog", href: "/blog" },
-      { label: "FAQs", href: "/support/faqs" },
+      { label: "Gulak Scheme", href: "/schemes/gulak-scheme" },
+      { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
+      { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
+      {
+        label: "Investment Fund Scheme",
+        href: "/schemes/investment-fund-scheme",
+      },
     ],
   },
   {
@@ -106,9 +99,8 @@ export const footerColumns: FooterColumnData[] = [
     heading: "Company",
     links: [
       { label: "About Us", href: "/about" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Careers", href: "/careers" },
-      { label: "Contact Us", href: "/contact" },
+      { label: "Pricing", href: "/pricing" },    
+      { label: "Contact Us", href: "/contact-us" },
     ],
   },
 ];
