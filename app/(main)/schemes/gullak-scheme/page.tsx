@@ -1,4 +1,4 @@
-"use client";
+
 import Gullak from "@/components/Gullak/Gullak";
 
 export default function Page() {

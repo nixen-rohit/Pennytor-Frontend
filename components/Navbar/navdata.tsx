@@ -107,8 +107,8 @@ export const Schemes: NavMenu = {
   icon: FaFileInvoice,
   items: [
     {
-      label: "Gulak Scheme",
-      href: "/schemes/gulak-scheme",
+      label: "Gullak Scheme",
+      href: "/schemes/gullak-scheme",
       icon: BsFillPiggyBankFill,
       color: "bg-amber-50 text-amber-500",
       description: "For Daily Deposite",
