@@ -1,6 +1,5 @@
-import Gullak from "@/components/Gullak/Gullak";
-
- 
+"use client"
+import Gullak from "@/components/Gullak/Gullak"; 
 
 const page = () => {
   return (
