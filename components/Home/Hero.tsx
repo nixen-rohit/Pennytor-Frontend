@@ -29,16 +29,16 @@ const statsCards = [
     type: "graph",
 
     graphBars: [
-      "h-2 bg-white/20",
+      "h-2 bg-white/10",
       "h-4 bg-white/20",
-      "h-6 bg-white/20",
-      "h-8 bg-white/20",
-      "h-12 bg-white/40",
+      "h-6 bg-white/30",
+      "h-8 bg-white/40",
+      "h-12 bg-white/50",
       "h-16 bg-white/60",
-      "h-20 bg-white/80",
-      "h-24 bg-white",
-      "h-26 bg-white/80",
-      "h-28 bg-white/80",
+      "h-20 bg-white/70",
+      "h-24 bg-white/80",
+      "h-26 bg-white/90",
+      "h-28 bg-white/95",
     ],
   },
 ];
@@ -75,7 +75,7 @@ export default function Hero() {
             </span>
           </h2>
 
-          <p className="mt-4 sm:mt-5 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed text-gray-600">
+          <p className="mt-4 sm:mt-5 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed text-gray-600/95">
             Everything you need to know about us and our services. Can't
             find an answer? Feel free to contact us.
           </p>
@@ -89,7 +89,7 @@ export default function Hero() {
               <span className="text-sm font-semibold tracking-wide whitespace-nowrap">
                 Get Started
               </span>
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:rotate-45">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/95 transition-transform duration-300 group-hover:rotate-45">
                 <ArrowUpRight className="h-5 w-5 text-black" />
               </div>
             </button>

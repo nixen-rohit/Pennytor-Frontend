@@ -1,22 +1,7 @@
-export const WALLET_BALANCE = 687.5;
-
-export const SLIP = {
+export const FALLBACK_SLIP = {
   beneficiary: "Pennytor Financial Services",
-  txnId: "402917583920",
-  dateTime: "02 Aug 2026, 10:45 AM",
+  txnId: "————",
+  dateTime: "—",
   requestType: "Credit (CR)",
-  status: "Pending review",
+  status: "No requests yet",
 } as const;
-
-export interface SlipRowData {
-  label: string;
-  value: string;
-  mono?: boolean;
-}
-
-export const slipRows: SlipRowData[] = [
-  { label: "Paid to", value: SLIP.beneficiary },
-  { label: "Transaction id", value: SLIP.txnId, mono: true },
-  { label: "Date and time", value: SLIP.dateTime },
-  { label: "Request type", value: SLIP.requestType },
-];

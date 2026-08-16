@@ -1,6 +1,7 @@
 import { TriangleAlert } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
 
-import { BANK_ACCOUNT, USER_EMAIL } from "./types";
+import { BANK_ACCOUNT } from "./types";
 import type { FormState } from "./types";
 import { SlipRow } from "./SlipRow";
 import { currency } from "./format";
@@ -9,7 +10,14 @@ interface Props {
   data: FormState;
 }
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  return `${local.slice(0, 1)}***@${domain}`;
+}
+
 export function ReviewWithdraw({ data }: Props) {
+  const email = useAuthStore((s) => s.user?.email ?? "");
   const destination =
     data.method === "upi"
       ? data.upiId
@@ -40,7 +48,7 @@ export function ReviewWithdraw({ data }: Props) {
             mono={data.method === "upi"}
           />
           <SlipRow label="Amount" value={data.amount ? currency(data.amount) : "-"} />
-          <SlipRow label="Email verified" value={USER_EMAIL} />
+          <SlipRow label="Email verified" value={maskEmail(email)} />
         </div>
       </div>
 

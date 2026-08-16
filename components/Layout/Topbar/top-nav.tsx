@@ -3,8 +3,6 @@ import { usePathname, useRouter } from "next/navigation";
 
 import {
   Menu,
-  Search,
-  Bell,
   Settings,
   User,
   ChevronDown,

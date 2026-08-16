@@ -1,0 +1,85 @@
+import { API_URL, ApiError } from "./api";
+import { useAuthStore } from "@/store/auth.store";
+
+export type WithdrawalStatus =
+  | "PENDING"
+  | "UNDER_REVIEW"
+  | "VERIFIED"
+  | "REJECTED";
+
+export type WithdrawMethod = "bank" | "upi";
+
+export interface WithdrawalRequestRef {
+  id: string;
+  status: WithdrawalStatus;
+  amount: string;
+}
+
+export interface MyWithdrawal {
+  id: string;
+  amount: string;
+  method: WithdrawMethod;
+  destination: string;
+  status: WithdrawalStatus;
+  reviewNote: string | null;
+  submittedAt: string | null;
+  createdAt: string;
+}
+
+export interface MyWithdrawalsResponse {
+  balance: string;
+  items: MyWithdrawal[];
+}
+
+function csrfHeaders(): Record<string, string> {
+  const token = useAuthStore.getState().csrfToken;
+  return token ? { "X-CSRF-Token": token } : {};
+}
+
+async function assertOk<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      (await response.json().catch(() => null))?.message ||
+        "Something went wrong",
+    );
+  }
+  return response.json().catch(() => null);
+}
+
+export class WithdrawalService {
+  static async sendOtp(): Promise<void> {
+    const response = await fetch(`${API_URL}/withdrawals/otp`, {
+      method: "POST",
+      headers: csrfHeaders(),
+      credentials: "include",
+      cache: "no-store",
+    });
+    await assertOk(response);
+  }
+
+  static async create(data: {
+    method: WithdrawMethod;
+    destination: string;
+    amount: string;
+    password: string;
+    otp: string;
+  }): Promise<WithdrawalRequestRef> {
+    const response = await fetch(`${API_URL}/withdrawals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
+      credentials: "include",
+      body: JSON.stringify(data),
+      cache: "no-store",
+    });
+    return assertOk(response);
+  }
+
+  static async myWithdrawals(): Promise<MyWithdrawalsResponse> {
+    const response = await fetch(`${API_URL}/withdrawals/mine`, {
+      credentials: "include",
+      cache: "no-store",
+    });
+    return assertOk(response);
+  }
+}

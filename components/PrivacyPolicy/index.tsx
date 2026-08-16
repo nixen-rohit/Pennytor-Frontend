@@ -2,7 +2,7 @@ import React from "react";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="min-h-screen bg-white text-gray-800">
+    <div className="min-h-screen bg-white/95 text-gray-800">
       {/* Hero Header */}
       <div className="bg-gradient-to-br from-[#4E385E] to-[#E85B66] relative overflow-hidden py-16 px-4">
         <div className="absolute inset-0 opacity-10 pointer-events-none">

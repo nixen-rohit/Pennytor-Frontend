@@ -307,8 +307,8 @@ export default function Sidebar({ menuData }: SidebarProps) {
           <div className="h-full flex flex-col">
             {/* Header */}
             <div className="h-16 px-3 flex items-center border-b border-[#1F1F23]">
-              <Link
-                href="/dashboard"
+              <div
+                
                 className="flex items-center gap-3 w-full"
               >
                 <img
@@ -321,7 +321,7 @@ export default function Sidebar({ menuData }: SidebarProps) {
                 <span className="text-lg font-semibold hover:cursor-pointer text-white">
                   Pennytor
                 </span>
-              </Link>
+              </div>
             </div>
 
             <div
@@ -383,8 +383,8 @@ export default function Sidebar({ menuData }: SidebarProps) {
           {/* Header */}
           <div className="h-16 px-3 flex items-center border-b border-[#1F1F23]">
             {showText ? (
-              <Link
-                href="/dashboard"
+              <div
+                
                 className="flex items-center gap-3 w-full"
               >
                 <img
@@ -398,7 +398,7 @@ export default function Sidebar({ menuData }: SidebarProps) {
                 <span className="text-lg font-semibold hover:cursor-pointer text-white transition-opacity duration-200">
                   Pennytor
                 </span>
-              </Link>
+              </div>
             ) : (
               <div className="flex justify-center w-full">
                 <img

@@ -36,7 +36,7 @@ export function TabbedMegaMenu({ data, align = "left", width = 720 }: TabbedMega
       className={cn(
         "absolute top-full z-50",
         alignClass,
-        "font-inter bg-white rounded-2xl border border-gray-200 shadow-xl overflow-hidden",
+        "font-inter bg-white/95 rounded-2xl border border-gray-200/99 shadow-xl overflow-hidden",
         "opacity-0 translate-y-2 scale-[0.98] pointer-events-none",
         "group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto",
         "transition-all duration-200 ease-out origin-top",
@@ -54,7 +54,7 @@ export function TabbedMegaMenu({ data, align = "left", width = 720 }: TabbedMega
               "whitespace-nowrap rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors",
               i === activeTab
                 ? "bg-orange-500 text-white"
-                : "text-gray-500 hover:bg-gray-100 hover:text-gray-700",
+                : "text-gray-500/90 hover:bg-gray-100 hover:text-gray-700/90",
             )}
           >
             {t.label}
@@ -75,7 +75,7 @@ export function TabbedMegaMenu({ data, align = "left", width = 720 }: TabbedMega
                   "flex w-full items-center justify-between px-4 py-2 text-left text-[13px] font-medium transition-colors",
                   si === activeSidebar
                     ? "text-orange-600 bg-orange-50 border-r-2 border-orange-500"
-                    : "text-gray-600 hover:bg-gray-50",
+                    : "text-gray-600/90 hover:bg-gray-50",
                 )}
               >
                 {section.label}

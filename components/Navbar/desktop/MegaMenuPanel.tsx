@@ -30,10 +30,10 @@ function IconItem({ link }: { link: MegaLink }) {
         </span>
       )}
       <span className="flex flex-col gap-0.5 min-w-0 flex-1">
-        <span className="flex items-center gap-1 text-[13.5px] font-semibold text-gray-800 group-hover/link:text-blue-600 transition-colors leading-tight">
+        <span className="flex items-center gap-1 text-[13.5px] font-semibold text-gray-800 group-hover/link:text-foreground transition-colors leading-tight">
           {link.label}
           {link.redirect && (
-            <RiExternalLinkLine className="text-[11px] text-gray-400 group-hover/link:text-blue-600 transition-colors shrink-0" />
+            <RiExternalLinkLine className="text-[11px] text-gray-400/90 group-hover/link:text-foreground transition-colors shrink-0" />
           )}
         </span>
         {link.description && (
@@ -71,7 +71,7 @@ export function MegaMenuPanel({
       className={cn(
         "absolute top-full z-50",
         alignClass,
-        "font-inter bg-white rounded-2xl border border-gray-200 shadow-xl",
+        "font-inter bg-white/95 rounded-2xl border border-gray-200/99 shadow-xl",
         "p-5 opacity-0 translate-y-2 scale-[0.98] pointer-events-none",
         "group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 group-hover:pointer-events-auto",
         "transition-all duration-200 ease-out origin-top",
@@ -99,7 +99,7 @@ export function MegaMenuPanel({
               key={ci}
               className={cn(
                 "pr-5",
-                ci > 0 && "border-l border-gray-100 pl-5",
+                ci > 0 && "border-l border-gray-100/95 pl-5",
                 ci === mega.columns.length - 1 && "pr-0",
               )}
             >

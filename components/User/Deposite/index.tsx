@@ -1,14 +1,13 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Wallet ,BadgeCheck } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Wallet, BadgeCheck, Loader2, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import {
   STEPS,
   BANK_DETAILS,
-  SESSION,
   initialFormState,
 } from "./types";
 import type { FormChange, FormErrors, FormState } from "./types";
@@ -19,6 +18,7 @@ import { PaymentConfirmation } from "./PaymentConfirmation";
 import { ReviewSubmit } from "./ReviewSubmit";
 import { SubmitRequest } from "./SubmitRequest";
 import { SlipRow } from "./SlipRow";
+import { DepositService, type DepositStatus } from "@/services/deposit.service";
 import {
   containsUnsafe,
   sanitizeAmount,
@@ -31,10 +31,9 @@ import {
 /**
  * AddPaymentPage
  * ---------------------------------------------------------------
- * Flow: Scan & pay -> confirm (txn id + screenshot) -> review -> submit
- * "User Name / User Type / Request Type / Current Status" are system
- * fields, not user-entered — they're pulled from the logged-in session
- * and shown read-only, then sent to the API alongside the user input.
+ * Flow: Scan & pay -> confirm (txn id + screenshot) -> review -> submit.
+ * The request is created server-side with the logged-in session user;
+ * "User Name / User Type / Request Type" are display-only configuration.
  * ---------------------------------------------------------------
  */
 
@@ -43,6 +42,13 @@ export default function AddPaymentPage() {
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    amount: string;
+    txnId: string;
+    status: DepositStatus;
+  } | null>(null);
 
   const updateField: FormChange = useCallback((key, value) => {
     let safeValue: FormState[keyof FormState] = value;
@@ -97,25 +103,30 @@ export default function AddPaymentPage() {
 
   const goBack = () => setStep((s) => Math.max(s - 1, 1));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const payload = {
-      amount: Number(form.amount),
-      bankIfsc: BANK_DETAILS.ifsc,
-      userName: SESSION.userName,
-      userType: SESSION.userType,
-      transactionId: form.txnId,
-      requestType: SESSION.requestType,
-      currentStatus: "Pending",
-      screenshotFileName: form.screenshot?.name,
-    };
-    // TODO: replace with real submit, e.g.
-    // const formData = new FormData();
-    // Object.entries(payload).forEach(([k, v]) => formData.append(k, v));
-    // formData.append("screenshot", form.screenshot);
-    // await axios.post("/api/transactions", formData);
-    console.log("submitting payment request", payload);
-    setSubmitted(true);
+    if (!form.screenshot) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await DepositService.create({
+        amount: form.amount.trim(),
+        transactionId: form.txnId.trim(),
+        screenshot: form.screenshot,
+      });
+      setResult({
+        amount: res.amount,
+        txnId: form.txnId,
+        status: res.status,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Failed to submit payment request",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -123,25 +134,31 @@ export default function AddPaymentPage() {
     setStep(1);
     setForm(initialFormState);
     setErrors({});
+    setResult(null);
+    setSubmitError(null);
   };
 
   if (submitted) {
     return (
       <div className="mx-auto flex min-h-[560px] max-w-md flex-col items-center justify-center px-6 text-center">
         <div className="mb-5 flex h-14 w-14 items-center justify-center ">
-          <BadgeCheck  className="h-14 w-14 text-emerald-400" />
+          <BadgeCheck className="h-14 w-14 text-emerald-400" />
         </div>
         <h1 className="text-lg font-medium text-slate-50">
           Payment request submitted
         </h1>
         <p className="mt-2 max-w-xs text-sm text-slate-400">
-          We&apos;ve sent {currency(form.amount)} for review. You&apos;ll see
-          it move to verified once the admin team confirms your transaction id
-          and screenshot.
+          We&apos;ve sent {currency(result?.amount ?? form.amount)} for review.
+          You&apos;ll see it move to verified once the admin team confirms your
+          transaction id and screenshot.
         </p>
         <div className="mt-6 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-left">
           <SlipRow label="Transaction id" value={form.txnId} mono />
-          <SlipRow label="Status" value="Pending" badge="pending" />
+          <SlipRow
+            label="Status"
+            value={(result?.status ?? "PENDING").replace("_", " ")}
+            badge="pending"
+          />
         </div>
         <button
           type="button"
@@ -197,12 +214,19 @@ export default function AddPaymentPage() {
               {step === 3 && <ReviewSubmit data={form} />}
               {step === 4 && <SubmitRequest data={form} />}
 
+              {submitError && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-600/40 bg-red-600/10 px-4 py-3 text-sm text-red-400">
+                  <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                  <span>{submitError}</span>
+                </div>
+              )}
+
               <div className="flex items-center justify-between gap-3 pt-5 border-t border-neutral-800">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={goBack}
-                  disabled={step === 1}
+                  disabled={step === 1 || submitting}
                   className="flex items-center gap-1.5 border-white/20"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -212,15 +236,21 @@ export default function AddPaymentPage() {
                 {isLast ? (
                   <Button
                     type="submit"
+                    disabled={submitting}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5"
                   >
-                    <Check className="h-4 w-4" />
-                    Submit Payment Request
+                    {submitting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
+                    {submitting ? "Submitting…" : "Submit Payment Request"}
                   </Button>
                 ) : (
                   <Button
                     type="button"
                     onClick={goNext}
+                    disabled={submitting}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5"
                   >
                     {step === 1

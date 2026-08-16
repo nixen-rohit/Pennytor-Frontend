@@ -52,7 +52,7 @@ export default function RegisteredOtpForm({
 }: RegisteredOtpFormProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl border-0 bg-white px-8 py-10 shadow-2xl">
+      <DialogContent className="sm:max-w-md rounded-3xl border-0 bg-white/95 px-8 py-10 shadow-2xl">
         <DialogHeader className="flex flex-col items-center text-center">
           {/* Icon */}
           <div className="relative mb-6">

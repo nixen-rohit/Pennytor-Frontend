@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Eye, EyeOff, Landmark } from "lucide-react";
+import { Check, Eye, EyeOff, TriangleAlert, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-import {
-  BANK_ACCOUNT,
-  MAX_WITHDRAWAL,
-  QUICK_AMOUNTS,
-  WITHDRAW_METHODS,
-} from "./types";
+import { QUICK_AMOUNTS, WITHDRAW_METHODS } from "./types";
 import type { FormChange, FormErrors, FormState } from "./types";
 import { SlipRow } from "./SlipRow";
 import { currency } from "./format";
@@ -19,9 +14,17 @@ interface Props {
   data: FormState;
   errors: FormErrors;
   onChange: FormChange;
+  balance: number;
+  balanceLoaded: boolean;
 }
 
-export function WithdrawDetails({ data, errors, onChange }: Props) {
+export function WithdrawDetails({
+  data,
+  errors,
+  onChange,
+  balance,
+  balanceLoaded,
+}: Props) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -62,7 +65,9 @@ export function WithdrawDetails({ data, errors, onChange }: Props) {
                   {method.description}
                 </span>
               </span>
-              {selected && <Check className="ml-auto h-4 w-4 shrink-0 text-indigo-400" />}
+              {selected && (
+                <Check className="ml-auto h-4 w-4 shrink-0 text-indigo-400" />
+              )}
             </button>
           );
         })}
@@ -70,25 +75,15 @@ export function WithdrawDetails({ data, errors, onChange }: Props) {
 
       {data.method === "bank" ? (
         <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-white">
-            <Landmark className="h-4 w-4 text-indigo-600" />
-            Registered bank account
+          <div className="flex items-start gap-2">
+            <span className="text-yellow-500">
+              <TriangleAlert className="h-5 w-5" />
+            </span>
+            <p className="text-sm font-bold leading-5 text-yellow-400">
+              The amount will be credited to your registered bank account.
+              No changes are required here.
+            </p>
           </div>
-          <div className="divide-y divide-neutral-800">
-            <SlipRow
-              label="Account holder"
-              value={BANK_ACCOUNT.accountHolderName}
-            />
-            <SlipRow
-              label="Bank / branch"
-              value={`${BANK_ACCOUNT.bankName}, ${BANK_ACCOUNT.branch}`}
-            />
-            <SlipRow label="Account number" value={BANK_ACCOUNT.accountNumber} mono />
-            <SlipRow label="IFSC code" value={BANK_ACCOUNT.ifsc} mono />
-          </div>
-          <p className="mt-3 text-xs text-slate-400">
-            The amount will be credited to this account. No changes are needed here.
-          </p>
         </div>
       ) : (
         <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
@@ -96,7 +91,7 @@ export function WithdrawDetails({ data, errors, onChange }: Props) {
             Active UPI ID *
           </label>
           <Input
-            placeholder="e.g. alok@okhdfcbank"
+            placeholder="e.g. user@okhdfcbank"
             value={data.upiId}
             onChange={(e) => onChange("upiId", e.target.value)}
             className="h-11 bg-black/40"
@@ -149,7 +144,14 @@ export function WithdrawDetails({ data, errors, onChange }: Props) {
         <p className="mt-3 text-xs text-slate-400">
           Available balance:{" "}
           <span className="font-medium text-slate-200">
-            {currency(MAX_WITHDRAWAL)}
+            {balanceLoaded
+              ? currency(balance)
+              : (
+                  <span className="inline-flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    loading…
+                  </span>
+                )}
           </span>
         </p>
       </div>

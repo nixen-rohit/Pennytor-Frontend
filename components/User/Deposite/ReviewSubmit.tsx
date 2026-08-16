@@ -1,14 +1,20 @@
-import { TriangleAlert   } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { SESSION } from "./types";
 import type { FormState } from "./types";
 import { SlipRow } from "./SlipRow";
 import { currency } from "./format";
+import { useAuthStore } from "@/store/auth.store";
 
 interface ReviewSubmitProps {
   data: FormState;
 }
 
 export function ReviewSubmit({ data }: ReviewSubmitProps) {
+  const user = useAuthStore((s) => s.user);
+  const requestedBy = user
+    ? `${user.firstName} ${user.lastName}`
+    : SESSION.userName;
+
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
@@ -27,7 +33,7 @@ export function ReviewSubmit({ data }: ReviewSubmitProps) {
         </p>
         <div className="divide-y divide-neutral-800">
           <SlipRow label="Transaction id" value={data.txnId} mono />
-          <SlipRow label="Requested by" value={SESSION.userName} />
+          <SlipRow label="Requested by" value={requestedBy} />
           <SlipRow label="User type" value={SESSION.userType} />
           <SlipRow label="Request type" value="Credit (CR)" />
           <SlipRow label="Screenshot" value={data.screenshot?.name ?? "-"} />

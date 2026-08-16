@@ -1,16 +1,84 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/auth.store";
 
-import { initialTransactions } from "./types";
+import { TransactionRecord } from "./types";
 import { TransactionToolbar } from "./TransactionToolbar";
 import { TransactionFilterDialog } from "./TransactionFilterDialog";
 import { TransactionTable } from "./TransactionTable";
 import { Pagination } from "./Pagination";
+import {
+  DepositService,
+  DepositStatus,
+  MyDeposit,
+} from "@/services/deposit.service";
+import {
+  WithdrawalService,
+  WithdrawalStatus,
+  MyWithdrawal,
+} from "@/services/withdrawal.service";
+
+type RecordStatus = TransactionRecord["currentStatus"];
+
+function mapStatus(status: DepositStatus | WithdrawalStatus): RecordStatus {
+  switch (status) {
+    case "VERIFIED":
+      return "APPROVED";
+    case "REJECTED":
+      return "REJECTED";
+    case "PENDING":
+    case "UNDER_REVIEW":
+      return "PENDING";
+  }
+}
+
+function depositToRecords(
+  items: MyDeposit[],
+  userName: string,
+  userType: string,
+): TransactionRecord[] {
+  return items.map((d) => ({
+    id: `CR-${d.id}`,
+    userName,
+    userType,
+    transactionId: d.transactionId,
+    transactionAmount: Number(d.amount) || 0,
+    requestType: "CR",
+    currentStatus: mapStatus(d.status),
+    requestDate: new Date(d.submittedAt ?? d.createdAt),
+  }));
+}
+
+function withdrawalToRecords(
+  items: MyWithdrawal[],
+  userName: string,
+  userType: string,
+): TransactionRecord[] {
+  return items.map((w) => ({
+    id: `DR-${w.id}`,
+    userName,
+    userType,
+    transactionId: w.id.slice(0, 8).toUpperCase(),
+    transactionAmount: Number(w.amount) || 0,
+    requestType: "DR",
+    currentStatus: mapStatus(w.status),
+    requestDate: new Date(w.submittedAt ?? w.createdAt),
+  }));
+}
 
 export default function Transaction() {
+  const user = useAuthStore((s) => s.user);
+  const userName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(" ").toUpperCase() ||
+    "—";
+  const userType = "Pennytor";
+
+  const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [requestTypeFilter, setRequestTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -18,12 +86,39 @@ export default function Transaction() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
 
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [dep, wdr] = await Promise.all([
+        DepositService.myDeposits(),
+        WithdrawalService.myWithdrawals(),
+      ]);
+      const records = [
+        ...depositToRecords(dep.items, userName, userType),
+        ...withdrawalToRecords(wdr.items, userName, userType),
+      ].sort((a, b) => b.requestDate.getTime() - a.requestDate.getTime());
+      setTransactions(records);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to load transactions",
+      );
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [userName, userType]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
   const activeFilterCount =
     (requestTypeFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0);
   const hasActiveFilters = activeFilterCount > 0;
 
   const filteredTransactions = useMemo(() => {
-    return initialTransactions.filter((txn) => {
+    return transactions.filter((txn) => {
       const query = searchTerm.toLowerCase();
       const matchesSearch =
         txn.userName.toLowerCase().includes(query) ||
@@ -38,10 +133,13 @@ export default function Transaction() {
 
       return matchesSearch && matchesRequestType && matchesStatus;
     });
-  }, [searchTerm, requestTypeFilter, statusFilter]);
+  }, [transactions, searchTerm, requestTypeFilter, statusFilter]);
 
   const entriesPerPageNumber = parseInt(entriesPerPage);
-  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / entriesPerPageNumber));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredTransactions.length / entriesPerPageNumber),
+  );
   const startIndex = (currentPage - 1) * entriesPerPageNumber;
   const endIndex = startIndex + entriesPerPageNumber;
   const currentTransactions = filteredTransactions.slice(startIndex, endIndex);
@@ -87,8 +185,14 @@ export default function Transaction() {
             type="button"
             variant="outline"
             className="border-white/20 text-slate-300"
+            disabled={loading}
+            onClick={() => void load()}
           >
-            <RefreshCw className="mr-2 h-4 w-4" />
+            {loading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
             Refresh
           </Button>
         </div>
@@ -110,6 +214,12 @@ export default function Transaction() {
           hasActiveFilters={hasActiveFilters}
           onOpenFilters={() => setOpenFilterDialog(true)}
         />
+
+        {error && (
+          <div className="rounded-lg border border-red-600/40 bg-red-600/10 px-4 py-3 text-sm text-red-400">
+            {error}
+          </div>
+        )}
 
         <TransactionTable
           transactions={currentTransactions}

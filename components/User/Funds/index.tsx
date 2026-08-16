@@ -1,10 +1,44 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "./WalletBalanceCard";
-import { PaymentSlipCard } from "./PaymentSlipCard";
-import { WALLET_BALANCE } from "./types";
+import { PaymentSlipCard, PaymentSlipData } from "./PaymentSlipCard";
+import { DepositService } from "@/services/deposit.service";
 
 export default function FundDashboard() {
+  const [balance, setBalance] = useState<number | null>(null);
+  const [latestSlip, setLatestSlip] = useState<PaymentSlipData | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void DepositService.myDeposits()
+      .then((res) => {
+        if (cancelled) return;
+        setBalance(Number(res.balance) || 0);
+        const latest = res.items[0];
+        if (latest) {
+          setLatestSlip({
+            txnId: latest.transactionId,
+            amount: latest.amount,
+            submittedAt: latest.submittedAt,
+            createdAt: latest.createdAt,
+            status: latest.status,
+          });
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setBalance(0);
+      })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen p-4">
       <div className="mx-auto max-w-6xl space-y-6">
@@ -18,8 +52,12 @@ export default function FundDashboard() {
         </div>
 
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-3">
-          <WalletBalanceCard balance={WALLET_BALANCE} className="lg:col-span-2" />
-          <PaymentSlipCard />
+          <WalletBalanceCard
+            balance={balance ?? 0}
+            loading={!loaded}
+            className="lg:col-span-2"
+          />
+          <PaymentSlipCard slip={latestSlip} />
         </div>
       </div>
     </div>
