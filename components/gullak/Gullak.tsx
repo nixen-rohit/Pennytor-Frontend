@@ -46,7 +46,7 @@ type GullakProps = {
   className?: string;
 };
 
-export function Gullak({ onContact, onApply }: GullakProps) {
+function Gullak({ onContact, onApply }: GullakProps) {
   return (
     <section
       aria-labelledby="gullak-heading"
@@ -329,3 +329,4 @@ export function Gullak({ onContact, onApply }: GullakProps) {
 }
 
 export default Gullak;
+ 
