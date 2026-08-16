@@ -1,6 +1,15 @@
 import { useAuthStore } from "@/store/auth.store";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL;
+/**
+ * Full API base INCLUDING the `/api` prefix. The env key only needs the
+ * host (e.g. `https://pennytor-backend.onrender.com` or
+ * `http://localhost:3001`) — this normalizes the trailing part so callers
+ * never have to write `/api` themselves.
+ */
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = rawApiUrl
+  ? `${rawApiUrl.replace(/\/+$/, "")}${rawApiUrl.endsWith("/api") ? "" : "/api"}`
+  : "";
 
 export class ApiError extends Error {
   constructor(
