@@ -1,4 +1,4 @@
-"use client"
+ 
 import { PiggyBank, ArrowRight, Phone, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
