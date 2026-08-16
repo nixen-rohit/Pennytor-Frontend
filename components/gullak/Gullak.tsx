@@ -1,4 +1,4 @@
-import * as React from "react";
+
 import { PiggyBank, ArrowRight, Phone, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,11 +46,11 @@ type GullakProps = {
   className?: string;
 };
 
-export function Gullak({ onContact, onApply, className = "" }: GullakProps) {
+export function Gullak({ onContact, onApply }: GullakProps) {
   return (
     <section
       aria-labelledby="gullak-heading"
-      className={`w-full bg-[#09090b] px-4 py-12 text-white sm:px-6 lg:px-8 ${className}`}
+      className={`w-full bg-[#09090b] px-4 py-12 text-white sm:px-6 lg:px-8`}
     >
       <div className="mx-auto w-full max-w-7xl">
         {/* Header */}

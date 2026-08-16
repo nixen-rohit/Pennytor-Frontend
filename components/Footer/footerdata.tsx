@@ -66,7 +66,7 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Our Products",
     links: [
-      { label: "Gulak Scheme", href: "/schemes/gulak-scheme" },
+      { label: "Gullak Scheme", href: "/schemes/gullak-scheme" },
       { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
       { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
       {
@@ -78,7 +78,7 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Quick Links",
     links: [
-      { label: "Gulak Scheme", href: "/schemes/gulak-scheme" },
+      { label: "Gullak Scheme", href: "/schemes/gullak-scheme" },
       { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
       { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
       {
