@@ -13,9 +13,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -80,9 +80,10 @@ export default function TopNav({ config = defaultConfig }: { config?: TopbarConf
   };
 
   const handleLogout = async () => {
+    useAuthStore.getState().setLogoutRedirect("/");
     await AuthService.logout().catch(() => {});
     clearAuth();
-    router.push("/login");
+    router.push("/");
   };
 
   return (

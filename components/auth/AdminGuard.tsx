@@ -36,8 +36,10 @@ export default function AdminGuard({
         router.push("/dashboard");
       }
     } catch {
+      const redirect = useAuthStore.getState().logoutRedirect;
+      useAuthStore.getState().setLogoutRedirect(null);
       clearAuth();
-      router.push("/login");
+      router.push(redirect ?? "/login");
     }
   }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
 
