@@ -28,8 +28,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       const meResponse = await AuthService.me();
       setAuth(meResponse.data.user, meResponse.data.csrfToken);
     } catch {
+      const redirect = useAuthStore.getState().logoutRedirect;
+      useAuthStore.getState().setLogoutRedirect(null);
       clearAuth();
-      router.push("/login");
+      router.push(redirect ?? "/login");
     }
   }, [isAuthenticated, user, setAuth, setLoading, clearAuth, router]);
 

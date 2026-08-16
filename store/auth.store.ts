@@ -33,11 +33,13 @@ interface AuthState {
   csrfToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  logoutRedirect: string | null;
 
   setAuth: (user: User, csrfToken: string) => void;
   setCsrfToken: (csrfToken: string) => void;
   clearAuth: () => void;
   setLoading: (loading: boolean) => void;
+  setLogoutRedirect: (redirect: string | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -45,6 +47,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   csrfToken: null,
   isAuthenticated: false,
   isLoading: true,
+  logoutRedirect: null,
 
   setAuth: (user, csrfToken) => {
     setAuthCookie();
@@ -69,4 +72,6 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setLoading: (isLoading) => set({ isLoading }),
+
+  setLogoutRedirect: (logoutRedirect) => set({ logoutRedirect }),
 }));
