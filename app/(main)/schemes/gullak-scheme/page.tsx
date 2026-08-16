@@ -1,15 +1,20 @@
-
 import Gullak from "@/components/Gullak/Gullak";
 
-export default function Page() {
+ 
+
+const page = () => {
   return (
-    <Gullak
-      onContact={() => {
-        console.log('done')
-      }}
-      onApply={() => {
-        console.log("Applying for:");
-      }}
-    />
+    <>
+      <Gullak
+        onContact={() => {
+          console.log("done");
+        }}
+        onApply={() => {
+          console.log("Applying for:");
+        }}
+      />
+    </>
   );
-}
+};
+
+export default page;
