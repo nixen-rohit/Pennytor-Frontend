@@ -8,19 +8,35 @@ import {
   InputOTPSlot,
   REGEXP_ONLY_DIGITS,
 } from "@/components/ui/input-otp";
+import { useAuthStore } from "@/store/auth.store";
 
-import { USER_EMAIL } from "./types";
 import type { FormChange, FormErrors, FormState } from "./types";
 
 interface Props {
   data: FormState;
   errors: FormErrors;
   onChange: FormChange;
+  onResend: () => Promise<void>;
+  resendBusy: boolean;
 }
 
 const RESEND_COOLDOWN = 30;
 
-export function OtpVerification({ data, errors, onChange }: Props) {
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  const head = local.slice(0, 1);
+  return `${head}***@${domain}`;
+}
+
+export function OtpVerification({
+  data,
+  errors,
+  onChange,
+  onResend,
+  resendBusy,
+}: Props) {
+  const email = useAuthStore((s) => s.user?.email ?? "");
   const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
   const [sending, setSending] = useState(false);
 
@@ -30,12 +46,14 @@ export function OtpVerification({ data, errors, onChange }: Props) {
     return () => clearTimeout(timer);
   }, [cooldown]);
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setSending(true);
-    setTimeout(() => {
+    try {
+      await onResend();
       setCooldown(RESEND_COOLDOWN);
+    } finally {
       setSending(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -53,7 +71,9 @@ export function OtpVerification({ data, errors, onChange }: Props) {
             </p>
             <p className="text-xs text-slate-400">
               We sent a 6-digit code to{" "}
-              <span className="font-medium text-slate-200">{USER_EMAIL}</span>
+              <span className="font-medium text-slate-200">
+                {maskEmail(email)}
+              </span>
             </p>
           </div>
         </div>
@@ -91,11 +111,13 @@ export function OtpVerification({ data, errors, onChange }: Props) {
           ) : (
             <button
               type="button"
-              onClick={handleResend}
-              disabled={sending}
+              onClick={() => void handleResend()}
+              disabled={sending || resendBusy}
               className="flex items-center gap-1.5 font-medium text-indigo-400 hover:text-indigo-300 disabled:opacity-50"
             >
-              {sending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {(sending || resendBusy) && (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              )}
               Resend OTP
             </button>
           )}

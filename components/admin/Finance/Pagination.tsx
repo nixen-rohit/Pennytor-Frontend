@@ -1,19 +1,29 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface Props {
+interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
 }
 
-function getPageNumbers(currentPage: number, totalPages: number) {
+function getPageNumbers(
+  currentPage: number,
+  totalPages: number,
+  maxVisiblePages = 5,
+): (number | string)[] {
   const pages: (number | string)[] = [];
-  const maxVisiblePages = 5;
 
   if (totalPages <= maxVisiblePages) {
-    for (let i = 1; i <= totalPages; i++) pages.push(i);
-  } else if (currentPage <= 3) {
+    for (let i = 1; i <= totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  if (currentPage <= 3) {
     for (let i = 1; i <= 4; i++) pages.push(i);
     pages.push("...");
     pages.push(totalPages);
@@ -32,9 +42,12 @@ function getPageNumbers(currentPage: number, totalPages: number) {
   return pages;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: Props) {
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) {
   if (totalPages <= 1) return null;
-
   return (
     <div className="p-4 sm:p-6 border-t border-neutral-800">
       <div className="flex items-center justify-center gap-2">
@@ -51,7 +64,10 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Props) {
           {getPageNumbers(currentPage, totalPages).map((page, index) => {
             if (page === "...") {
               return (
-                <span key={`ellipsis-${index}`} className="px-3 py-1 text-slate-400">
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-3 py-1 text-slate-400"
+                >
                   ...
                 </span>
               );

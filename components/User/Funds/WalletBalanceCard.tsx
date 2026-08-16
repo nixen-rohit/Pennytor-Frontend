@@ -6,9 +6,10 @@ import Link from "next/link";
 interface Props {
   balance: number;
   className?: string;
+  loading?: boolean;
 }
 
-export function WalletBalanceCard({ balance, className }: Props) {
+export function WalletBalanceCard({ balance, className, loading = false }: Props) {
   return (
     <Card
       className={`relative overflow-hidden border-neutral-800 bg-neutral-950 shadow-sm ${className ?? ""}`}
@@ -35,10 +36,12 @@ export function WalletBalanceCard({ balance, className }: Props) {
               <IndianRupee size={38} strokeWidth={3.5} />
             </span>
 
-            {balance.toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {loading
+              ? "—"
+              : balance.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
           </p>
 
           <p className="text-xs text-slate-400">

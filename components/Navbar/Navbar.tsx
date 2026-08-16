@@ -51,8 +51,8 @@ export default function Navbar() {
         className={cn(
           "  fixed top-0 left-0 right-0 z-60  font-normal transition-all duration-300  ",
           scrolled
-            ? "bg-white border-b border-gray-200/70 shadow-lg"
-            : "bg-white border-b border-gray-200/60",
+            ? "bg-white/95 border-b border-gray-200/70 shadow-lg"
+            : "bg-white/95 border-b border-gray-200/60",
         )}
       >
         <div className="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-1.5">
@@ -81,12 +81,12 @@ export default function Navbar() {
               {/* Search */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="hidden sm:flex items-center gap-2 rounded-full border  border-zinc-400 bg-linear-to-tr from-[#f3f8fa] via-[#fffdf9] to-[#fffbf2] /80 px-4 py-2 text-sm text-gray-600 shadow-sm transition-all hover:border-gray-300 hover:bg-linear-to-tr "
+                className="hidden sm:flex items-center gap-2 rounded-full border  border-zinc-400/90 bg-linear-to-tr from-[#f3f8fa] via-[#fffdf9] to-[#fffbf2] /80 px-4 py-2 text-sm text-gray-600/90 shadow-sm transition-all hover:border-gray-300 hover:bg-linear-to-tr "
                 aria-label="Search"
               >
                 <RiSearchLine className="text-lg" />
                 <span className="hidden md:inline">Search</span>
-                <kbd className="hidden md:inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-400"></kbd>
+                <kbd className="hidden md:inline-flex rounded-md bg-gray-100/90 px-1.5 py-0.5 text-[11px] text-gray-400/90"></kbd>
               </button>
 
               {/* Divider */}

@@ -15,7 +15,7 @@ export default function WalletSummary() {
               <Wallet className="h-5 w-5 text-[#E85B66]" />
               <span className="text-sm text-muted-foreground">Wallet Balance</span>
             </div>
-            <p className="text-3xl font-bold">₹687.5</p>
+            <p className="text-3xl font-bold">₹ 0</p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Gift className="h-4 w-4 text-green-500" />
               <span>

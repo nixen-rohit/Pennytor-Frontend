@@ -1,14 +1,11 @@
 import {
-  FileText,
   Wallet,
   CreditCard,
-  ClipboardList,
   LucideIcon,
-  PiggyBank,
-  Mail  ,
-  CalendarClock,
-  School,
+  Mail,
+  ListTodo,
   LayoutDashboard,
+  FileText,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
 
@@ -61,21 +58,15 @@ export const adminNav: MenuSection[] = [
         id: "contact",
         label: "Contact",
         href: "/admin/contact-us",
-        icon: Mail ,
+        icon: Mail,
       },
     ],
   },
 
   {
     id: "Accounts",
-    label: "Accounts Kyc Request",
+    label: "Accounts Request",
     items: [
-      {
-        id: "profile",
-        label: "Profile",
-        href: "/admin/request/profile",
-        icon: MdOutlineVerified,
-      },
       {
         id: "kyc-applications",
         label: "KYC Applications",
@@ -92,23 +83,24 @@ export const adminNav: MenuSection[] = [
       {
         id: " Deposite ",
         label: "Deposite",
-        href: "/admin/request/deposite-fund",
+        href: "/admin/finance/deposite-request",
 
         icon: Wallet,
       },
       {
         id: "widthdrawal",
         label: "Withdrawal",
-        href: "/admin/request/withdrawal-fund",
+        href: "/admin/finance/widthdrawal-request",
         icon: CreditCard,
       },
-
       {
-        id: "transaction",
-        label: "Transaction",
-        href: "/admin/request/transaction",
+        id: "finance-report",
+        label: "Finance Report",
+        href: "/admin/finance/reports",
         icon: FileText,
+        isNew: true,
       },
     ],
   },
+   
 ];

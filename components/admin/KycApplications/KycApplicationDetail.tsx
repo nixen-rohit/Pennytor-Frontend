@@ -172,10 +172,10 @@ export default function KycApplicationDetail() {
                 <h1 className="text-2xl font-semibold text-slate-50">
                   KYC Application
                 </h1>
-                <div className="mt-3 grid gap-2 grid-cols-1 sm:grid-cols-3 max-w-xl">
+                <div className="mt-3 grid gap-2 grid-cols-2 sm:grid-cols-4 max-w-xl">
                   <InfoBlock
                     label="Client ID"
-                    value={app.clientId ?? "—"}
+                    value={app.clientId ?? "N/A"}
                   />
                   <InfoBlock label="Application ID" value={app.id} />
                   <InfoBlock
@@ -184,6 +184,17 @@ export default function KycApplicationDetail() {
                       app.submittedAt
                         ? format(
                             new Date(app.submittedAt),
+                            "dd MMM yyyy, hh:mm a",
+                          )
+                        : "N/A"
+                    }
+                  />
+                  <InfoBlock
+                    label="Last Action"
+                    value={
+                      app.reviewedAt
+                        ? format(
+                            new Date(app.reviewedAt),
                             "dd MMM yyyy, hh:mm a",
                           )
                         : "—"
@@ -300,22 +311,36 @@ export default function KycApplicationDetail() {
             {app.reviewNote && (
               <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
                 <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide">
-                  {app.status === "REJECTED" ? "Rejection Reason" : "Review Note"}
+                  {app.status === "REJECTED"
+                    ? "Rejection Reason"
+                    : "Last Decision"}
                 </p>
                 <p className="text-sm text-slate-200 mt-1">{app.reviewNote}</p>
+                {app.reviewedAt && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    Decided on{" "}
+                    {format(new Date(app.reviewedAt), "dd MMM yyyy, hh:mm a")}
+                  </p>
+                )}
               </div>
             )}
 
             <div className="border-t border-neutral-800 mt-8 pt-6 space-y-4">
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
                 <p className="text-sm text-slate-400 sm:mr-auto">
-                  Verify identity documents before deciding.
+                  {app.status === "VERIFIED" || app.status === "REJECTED"
+                    ? "Final decision locked. The user can resubmit to reopen this application."
+                    : "Verify identity documents before deciding."}
                 </p>
                 <Button
                   type="button"
                   variant="outline"
-                  className="border-blue-600/40 text-blue-400 hover:bg-blue-600/10"
-                  disabled={deciding !== null}
+                  className={
+                    app.status === "REJECTED"
+                      ? "border-white/10 text-slate-600 cursor-not-allowed"
+                      : "border-blue-600/40 text-blue-400 hover:bg-blue-600/10"
+                  }
+                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
                   onClick={() => decide("UNDER_REVIEW")}
                 >
                   {deciding === "UNDER_REVIEW" ? <Spinner /> : null}
@@ -323,25 +348,34 @@ export default function KycApplicationDetail() {
                 </Button>
                 <Button
                   type="button"
-                  variant="outline"
-                  className="border-red-600/40 text-red-400 hover:bg-red-600/10"
-                  disabled={deciding !== null}
+                  variant={app.status === "REJECTED" ? "default" : "outline"}
+                  className={
+                    app.status === "REJECTED"
+                      ? "bg-red-600 text-white ring-2 ring-red-400/50 cursor-not-allowed"
+                      : "border-red-600/40 text-red-400 hover:bg-red-600/10"
+                  }
+                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
                   onClick={() => {
                     setNote("");
                     setRejecting(true);
                   }}
                 >
                   <XCircle className="mr-2 h-4 w-4" />
-                  Reject
+                  {app.status === "REJECTED" ? "Rejected" : "Reject"}
                 </Button>
                 <Button
                   type="button"
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  disabled={deciding !== null}
+                  variant={app.status === "VERIFIED" ? "default" : "default"}
+                  className={
+                    app.status === "VERIFIED"
+                      ? "bg-green-600 text-white ring-2 ring-green-400/50 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700 text-white"
+                  }
+                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
                   onClick={() => decide("VERIFIED")}
                 >
                   <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Approve
+                  {app.status === "VERIFIED" ? "Approved" : "Approve"}
                 </Button>
               </div>
 

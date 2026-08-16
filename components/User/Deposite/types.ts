@@ -17,7 +17,7 @@ export const BANK_DETAILS = {
 
 export const SESSION = {
   userName: "Alok Kumar (Admin)",
-  userType: "ASTRO WEALTH",
+  userType: "Pennytor ",
   requestType: "CR",
 } as const;
 

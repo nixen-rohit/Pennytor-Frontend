@@ -39,12 +39,12 @@ export function DesktopNav({ navItems, className }: DesktopNavProps) {
               onClick={(e) => item.mega && e.preventDefault()}
               className={cn(
                 "flex items-center gap-0.5 px-3 py-2 rounded-lg",
-                "text-[15px] font-semibold text-gray-600 hover:text-gray-500",
+                "text-[15px] font-semibold text-gray-600/90 hover:text-gray-500/90",
               )}
             >
               {item.label}
               {item.redirect && !item.mega && (
-                <RiExternalLinkLine className="text-[11px] text-gray-400 ml-0.5" />
+                <RiExternalLinkLine className="text-[11px] text-gray-400/90 ml-0.5" />
               )}
               {item.mega && (
                 <RiArrowDownSLine className="text-gray-400 text-[15px] group-hover:rotate-180 transition-transform duration-200" />

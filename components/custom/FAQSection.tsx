@@ -36,7 +36,7 @@ export default function FAQSection({
   };
 
   return (
-    <section className="bg-white py-16 px-4 font-sans">
+    <section className="bg-white/95 py-16 px-4 font-sans">
       <div className="flex flex-col justify-center items-center text-center mb-12 sm:mb-16 md:mb-20 lg:mb-24 max-w-5xl mx-auto px-4 sm:px-6">
         {/* Section label */}
         <span className="inline-block mb-3 sm:mb-4 text-xs sm:text-sm md:text-base font-medium tracking-[0.18em] sm:tracking-[0.2em] uppercase text-gray-400">

@@ -1,0 +1,446 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  ShieldCheck,
+  Loader2,
+  AlertCircle,
+  Landmark,
+  ArrowUpRight,
+} from "lucide-react";
+import { format } from "date-fns";
+import {
+  WithdrawalAdminService,
+  WithdrawalRequestDetail,
+} from "@/services/withdrawal-admin.service";
+import { useApproveFinanceTransaction, useRejectFinanceTransaction } from "@/hooks/use-finance";
+import type { WithdrawalStatus } from "@/services/withdrawal.service";
+
+const statusStyles: Record<WithdrawalStatus, string> = {
+  PENDING: "bg-yellow-500/20 text-yellow-400",
+  UNDER_REVIEW: "bg-blue-500/20 text-blue-400",
+  VERIFIED: "bg-green-600/20 text-green-400",
+  REJECTED: "bg-red-600/20 text-red-400",
+};
+
+export default function WithdrawalRequestDetailPage() {
+  const router = useRouter();
+  const params = useParams<{ id: string }>();
+  const requestId = params.id;
+
+  const [app, setApp] = useState<WithdrawalRequestDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+  const [rejecting, setRejecting] = useState(false);
+  const [deciding, setDeciding] = useState<WithdrawalStatus | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setApp(await WithdrawalAdminService.getWithdrawal(requestId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load request");
+    } finally {
+      setLoading(false);
+    }
+  }, [requestId]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => void load(), 0);
+    return () => clearTimeout(timeoutId);
+  }, [load]);
+
+  const { approve, error: approveError } = useApproveFinanceTransaction("withdrawal");
+  const { reject, error: rejectError } = useRejectFinanceTransaction("withdrawal");
+
+  const decide = async (status: WithdrawalStatus) => {
+    setDeciding(status);
+    try {
+      if (status === "VERIFIED") {
+        const ok = await approve(requestId);
+        if (!ok) {
+          setError(approveError ?? "Failed to approve");
+          return;
+        }
+      } else if (status === "REJECTED") {
+        const ok = await reject(requestId, note.trim());
+        if (!ok) {
+          setError(rejectError ?? "Failed to reject");
+          return;
+        }
+      } else {
+        await WithdrawalAdminService.updateStatus(
+          requestId,
+          status,
+          note.trim() || undefined,
+        );
+      }
+      await load();
+      setRejecting(false);
+      setNote("");
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update status");
+    } finally {
+      setDeciding(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+      </div>
+    );
+  }
+
+  if (error && !app) {
+    return (
+      <div className="min-h-screen p-4 bg-black">
+        <div className="max-w-3xl mx-auto space-y-5">
+          <Card className="shadow-sm">
+            <CardContent className="p-6 text-center space-y-4">
+              <ShieldCheck className="mx-auto h-12 w-12 text-red-400" />
+              <h1 className="text-xl font-semibold text-slate-50">
+                Withdrawal request not found
+              </h1>
+              <p className="text-sm text-red-500">{error}</p>
+              <Button
+                type="button"
+                variant="outline"
+                className="border-white/20 text-slate-300"
+                onClick={() =>
+                  router.push("/admin/finance/widthdrawal-request")
+                }
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Requests
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!app) return null;
+
+  return (
+    <div className="min-h-screen p-4 bg-black">
+      <div className="max-w-4xl mx-auto space-y-5">
+        <div className="flex items-center justify-between gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            className="border-white/20 text-slate-300"
+            onClick={() => router.push("/admin/finance/widthdrawal-request")}
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Requests
+          </Button>
+          <Badge status={app.status} />
+        </div>
+
+        <Card className="shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="min-w-0">
+                <h1 className="text-2xl font-semibold text-slate-50">
+                  Withdrawal Request
+                </h1>
+                <div className="mt-3 grid gap-2 grid-cols-2 sm:grid-cols-4 max-w-xl">
+                  <InfoBlock label="Client ID" value={app.clientId ?? "—"} />
+                  <InfoBlock label="Request ID" value={app.id} />
+                  <InfoBlock
+                    label="Submitted"
+                    value={
+                      app.submittedAt
+                        ? format(
+                            new Date(app.submittedAt),
+                            "dd MMM yyyy, hh:mm a",
+                          )
+                        : "—"
+                    }
+                  />
+                  <div className="rounded-lg border border-indigo-500/30 bg-indigo-600/10 px-3 py-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-400">
+                      Current Balance
+                    </p>
+                    <p className="mt-0.5 font-mono text-sm text-indigo-200">
+                      ₹
+                      {Number(app.currentBalance).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <ShieldCheck className="h-10 w-10 text-indigo-600 shrink-0" />
+            </div>
+
+            <div className="space-y-6">
+              <Section title="Request Details" icon={Landmark}>
+                <Row
+                  label="Amount"
+                  value={
+                    <span className="font-mono text-red-400">
+                      - ₹{app.amount}
+                    </span>
+                  }
+                />
+                <Row
+                  label="Method"
+                  value={<span className="capitalize">{app.method}</span>}
+                />
+                <Row label="Destination" value={app.destination} />
+                <Row
+                  label="Applicant"
+                  value={
+                    app.user
+                      ? `${app.user.firstName} ${app.user.lastName}`
+                      : "—"
+                  }
+                />
+                <Row label="Email" value={app.user?.email ?? "—"} />
+                <Row label="Client ID" value={app.clientId ?? "—"} />
+                <Row
+                  label="Reviewed at"
+                  value={
+                    app.reviewedAt
+                      ? format(
+                          new Date(app.reviewedAt),
+                          "dd MMM yyyy, hh:mm a",
+                        )
+                      : "—"
+                  }
+                />
+              </Section>
+            </div>
+
+            {app.reviewNote && (
+              <div className="mt-6 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+                <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide">
+                  {app.status === "REJECTED"
+                    ? "Rejection Reason"
+                    : "Last Decision"}
+                </p>
+                <p className="text-sm text-slate-200 mt-1">{app.reviewNote}</p>
+                {app.reviewedAt && (
+                  <p className="text-xs text-slate-500 mt-2">
+                    Decided on{" "}
+                    {format(new Date(app.reviewedAt), "dd MMM yyyy, hh:mm a")}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="border-t border-neutral-800 mt-8 pt-6 space-y-4">
+              {app.status === "VERIFIED" ? (
+                <div className="rounded-xl border border-green-600/40 bg-green-600/10 p-5 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <p className="text-sm font-semibold text-green-400">
+                      Request closed
+                    </p>
+                  </div>
+                  <p className="text-sm text-slate-200">
+                    This withdrawal of ₹
+                    {Number(app.amount).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    was approved
+                    {app.reviewedAt
+                      ? ` on ${format(
+                          new Date(app.reviewedAt),
+                          "dd MMM yyyy, hh:mm a",
+                        )}`
+                      : ""}{" "}
+                    and debited from the user's wallet. All actions are locked.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
+                  <p className="text-sm text-slate-400 sm:mr-auto">
+                    Verify the destination and balance before releasing funds.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={
+                      app.status === "REJECTED"
+                        ? "border-white/10 text-slate-600 cursor-not-allowed"
+                        : "border-blue-600/40 text-blue-400 hover:bg-blue-600/10"
+                    }
+                    disabled={
+                      deciding !== null || app.status === "REJECTED"
+                    }
+                    onClick={() => decide("UNDER_REVIEW")}
+                  >
+                    {deciding === "UNDER_REVIEW" ? <Spinner /> : null}
+                    Mark Under Review
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={app.status === "REJECTED" ? "default" : "outline"}
+                    className={
+                      app.status === "REJECTED"
+                        ? "bg-red-600 text-white ring-2 ring-red-400/50 cursor-not-allowed"
+                        : "border-red-600/40 text-red-400 hover:bg-red-600/10"
+                    }
+                    disabled={
+                      deciding !== null || app.status === "REJECTED"
+                    }
+                    onClick={() => {
+                      setNote("");
+                      setRejecting(true);
+                    }}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    {app.status === "REJECTED" ? "Rejected" : "Reject"}
+                  </Button>
+                  <Button
+                    type="button"
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={
+                      deciding !== null || app.status === "REJECTED"
+                    }
+                    onClick={() => decide("VERIFIED")}
+                  >
+                    <ArrowUpRight className="mr-2 h-4 w-4" />
+                    Approve
+                  </Button>
+                </div>
+              )}
+
+              {rejecting && (
+                <div className="rounded-lg border border-red-600/40 bg-red-600/5 p-4 space-y-3 animate-in fade-in-0 zoom-in-95 duration-200">
+                  <div className="space-y-1.5">
+                    <label className="text-sm text-slate-400">
+                      Note for this decision{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={note}
+                      autoFocus
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="e.g. Destination details do not match the user's bank account"
+                      className="w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+                    />
+                    <p className="text-xs text-slate-500">
+                      Required — this reason is stored and shown to the user.
+                    </p>
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="border-white/20 text-slate-300"
+                      disabled={deciding !== null}
+                      onClick={() => setRejecting(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      className="bg-red-600 hover:bg-red-700 text-white"
+                      disabled={deciding !== null || !note.trim()}
+                      onClick={() => decide("REJECTED")}
+                    >
+                      {deciding === "REJECTED" ? (
+                        <Spinner />
+                      ) : (
+                        <XCircle className="mr-2 h-4 w-4" />
+                      )}
+                      Confirm Reject
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-start gap-2 rounded-lg border border-red-600/40 bg-red-600/10 px-4 py-3 text-sm text-red-400">
+                  <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Spinner() {
+  return <Loader2 className="mr-2 h-4 w-4 animate-spin inline" />;
+}
+
+function Badge({ status }: { status: WithdrawalStatus }) {
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusStyles[status]}`}
+    >
+      {status.replace("_", " ")}
+    </span>
+  );
+}
+
+function InfoBlock({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-neutral-800 bg-neutral-950/50 px-3 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+        {label}
+      </p>
+      <p
+        className="mt-0.5 font-mono text-sm text-slate-100 truncate"
+        title={value}
+      >
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  icon: Icon,
+  children,
+}: {
+  title: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-neutral-800 bg-neutral-950/50 p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className="h-4 w-4 text-indigo-500" />
+        <h4 className="text-sm font-semibold text-indigo-500">{title}</h4>
+      </div>
+      <div className="grid gap-x-8 gap-y-2 grid-cols-1 sm:grid-cols-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-start justify-between gap-4 py-1 border-b border-neutral-900 last:border-0">
+      <span className="text-sm text-slate-400 shrink-0">{label}</span>
+      <span className="text-sm text-slate-100 text-right break-all">
+        {value || "—"}
+      </span>
+    </div>
+  );
+}

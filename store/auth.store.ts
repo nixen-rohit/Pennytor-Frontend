@@ -14,13 +14,16 @@ const AUTH_COOKIE_PATH = "/";
 const AUTH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 days
 
 /**
- * UI-only marker cookie read by Next.js middleware/proxy to decide the
- * login redirect BEFORE the client bundle loads. It is NOT a security
- * boundary — the NestJS API independently authenticates every request.
+ * UI-only marker cookie read by Next.js proxy to decide the login redirect
+ * BEFORE the client bundle loads. It is NOT a security boundary — the
+ * NestJS API independently authenticates every request. The value carries
+ * the role ("true" for USER, "admin" for ADMIN) so the proxy can keep an
+ * admin out of the user dashboard and vice-versa before any JS runs.
  */
-export function setAuthCookie() {
+export function setAuthCookie(role: "USER" | "ADMIN") {
   if (typeof document === "undefined") return;
-  document.cookie = `${AUTH_COOKIE_NAME}=true;path=${AUTH_COOKIE_PATH};max-age=${AUTH_COOKIE_MAX_AGE};sameSite=lax`;
+  const value = role === "ADMIN" ? "admin" : "true";
+  document.cookie = `${AUTH_COOKIE_NAME}=${value};path=${AUTH_COOKIE_PATH};max-age=${AUTH_COOKIE_MAX_AGE};sameSite=lax`;
 }
 
 export function clearAuthCookie() {
@@ -50,7 +53,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logoutRedirect: null,
 
   setAuth: (user, csrfToken) => {
-    setAuthCookie();
+    setAuthCookie(user.role);
     set({
       user,
       csrfToken,

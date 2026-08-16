@@ -12,6 +12,9 @@ import { AuthService } from "@/services/auth.service";
  * after it validates the HttpOnly session cookie. The client only renders
  * what the API says; there is no token to check locally and no client-side
  * decision that can bypass the backend.
+ *
+ * An ADMIN session is bounced to /admin — the user dashboard is for
+ * regular users only.
  */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -21,11 +24,20 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const restoreSession = useCallback(async () => {
     if (isAuthenticated && user) {
       setLoading(false);
+      if (user.role === "ADMIN") {
+        router.push("/admin");
+      }
       return;
     }
 
     try {
       const meResponse = await AuthService.me();
+      if (meResponse.data.user.role === "ADMIN") {
+        setAuth(meResponse.data.user, meResponse.data.csrfToken);
+        setLoading(false);
+        router.push("/admin");
+        return;
+      }
       setAuth(meResponse.data.user, meResponse.data.csrfToken);
     } catch {
       const redirect = useAuthStore.getState().logoutRedirect;

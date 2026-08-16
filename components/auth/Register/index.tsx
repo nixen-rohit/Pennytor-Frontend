@@ -60,13 +60,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen  ">
       {/* Left Side - Fixed */}
       <div className="hidden lg:fixed lg:left-0 lg:top-0 lg:flex lg:h-screen lg:w-1/2">
         <AuthBanner />
       </div>
       {/* Right Side - Scrollable */}
-      <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white">
+      <div className="w-full lg:ml-[50%] lg:w-1/2 h-screen overflow-y-auto bg-white/95">
         <div className="flex min-h-screen items-center justify-center p-8">
           <RegisterForm
             form={form}

@@ -16,7 +16,7 @@ export const initialTransactions: TransactionRecord[] = [
   {
     id: "1",
     userName: "ALOK KUMAR RANA",
-    userType: "ASTRO WEALTH",
+    userType: "Pennytor",
     transactionId: "",
     transactionAmount: 680,
     requestType: "DR",
@@ -26,7 +26,7 @@ export const initialTransactions: TransactionRecord[] = [
   {
     id: "2",
     userName: "ALOK KUMAR RANA",
-    userType: "ASTRO WEALTH",
+    userType: "Pennytor",
     transactionId: "",
     transactionAmount: 100000,
     requestType: "CR",

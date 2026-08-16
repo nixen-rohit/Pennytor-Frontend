@@ -7,10 +7,12 @@ import { currency } from "./format";
 
 interface Props {
   data: FormState;
+  requestId: string;
+  status: string;
   onReset: () => void;
 }
 
-export function Submitted({ data, onReset }: Props) {
+export function Submitted({ data, requestId, status, onReset }: Props) {
   const destination =
     data.method === "upi"
       ? data.upiId
@@ -35,6 +37,7 @@ export function Submitted({ data, onReset }: Props) {
         it.
       </p>
       <div className="mt-6 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-left">
+        <SlipRow label="Request ID" value={requestId} mono />
         <SlipRow label="Amount" value={data.amount ? currency(data.amount) : "-"} />
         <SlipRow label="Status" value="Pending review" badge="pending" />
       </div>
