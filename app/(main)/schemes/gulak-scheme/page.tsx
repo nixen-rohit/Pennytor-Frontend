@@ -1,16 +1,14 @@
-'use client'
-import {Gullak} from "@/components/Gullak/index"
-
+"use client";
+import Gullak from "@/components/Gullak/Gullak";
 
 export default function Page() {
   return (
-    <Gullak 
-   
+    <Gullak
       onContact={() => {
         console.log('done')
       }}
-      onApply={(plan) => {
-        console.log("Applying for:", plan);
+      onApply={() => {
+        console.log("Applying for:");
       }}
     />
   );
