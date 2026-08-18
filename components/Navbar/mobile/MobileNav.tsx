@@ -56,17 +56,7 @@ export function MobileNav({ open, onClose, navItems }: MobileNavProps) {
           </button>
         </div>
 
-        {/* Search bar */}
-        <div className="px-4 py-3 border-b border-gray-100 shrink-0">
-          <div className="flex items-center gap-2.5 bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5">
-            <RiSearchLine className="text-gray-400 text-sm shrink-0" />
-            <input
-              type="text"
-              placeholder="Search…"
-              className="flex-1 bg-transparent text-[13px] text-gray-700 placeholder:text-gray-400"
-            />
-          </div>
-        </div>
+        
 
         {/* Nav items — scrollable */}
         <nav className="flex-1 overflow-y-auto overscroll-contain">

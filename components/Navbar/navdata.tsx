@@ -46,7 +46,6 @@ import {
   FaTrophy,
 } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
-import { FaCalculator } from "react-icons/fa";
 import { BsFillPiggyBankFill } from "react-icons/bs";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";

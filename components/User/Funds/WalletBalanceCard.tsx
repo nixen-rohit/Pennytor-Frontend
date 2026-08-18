@@ -37,7 +37,7 @@ export function WalletBalanceCard({ balance, className, loading = false }: Props
             </span>
 
             {loading
-              ? "—"
+              ? "0.00"
               : balance.toLocaleString("en-IN", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
