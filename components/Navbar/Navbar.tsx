@@ -5,16 +5,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { RiSearchLine, RiMenuLine, RiArrowRightLine } from "react-icons/ri";
+import { RiMenuLine, } from "react-icons/ri";
 import { CTA, NAV } from "@/components/Navbar/navdata";
 import { DesktopNav } from "@/components/Navbar/desktop/DesktopNav";
 import { MobileNav } from "@/components/Navbar/mobile/MobileNav";
-import { SearchOverlay } from "@/components/Navbar/shared/SearchOverlay";
+
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+
 
   // Scroll shadow
   useEffect(() => {
@@ -31,22 +31,11 @@ export default function Navbar() {
     };
   }, [mobileOpen]);
 
-  // Keyboard shortcut: Cmd/Ctrl+K opens search
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setSearchOpen(true);
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
+  
 
   return (
     <>
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
-
+      
       <header
         className={cn(
           "  fixed top-0 left-0 right-0 z-60  font-normal transition-all duration-300  ",
@@ -78,19 +67,9 @@ export default function Navbar() {
 
             {/* ── Right Actions ── */}
             <div className="flex items-center gap-1 shrink-0">
-              {/* Search */}
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="hidden sm:flex items-center gap-2 rounded-full border  border-zinc-400/90 bg-linear-to-tr from-[#f3f8fa] via-[#fffdf9] to-[#fffbf2] /80 px-4 py-2 text-sm text-gray-600/90 shadow-sm transition-all hover:border-gray-300 hover:bg-linear-to-tr "
-                aria-label="Search"
-              >
-                <RiSearchLine className="text-lg" />
-                <span className="hidden md:inline">Search</span>
-                <kbd className="hidden md:inline-flex rounded-md bg-gray-100/90 px-1.5 py-0.5 text-[11px] text-gray-400/90"></kbd>
-              </button>
+              
 
-              {/* Divider */}
-              <div className="hidden sm:block h-8 w-px bg-gray-400 mx-1" />
+              
 
               {/* CTA */}
 
