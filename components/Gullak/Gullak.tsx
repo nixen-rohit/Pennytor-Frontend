@@ -32,7 +32,7 @@ const GULLAK_PLANS: GullakPlan[] = [
   {
     dailyDeposit: "Rs.500/-",
     timePeriod: "5 Years",
-    annualReturn: "@15%",
+    annualReturn: "@18%",
     investedAmount: "Rs.9,00,000/-",
     finalAmount: "Rs.13,45,000/-",
     netProfit: "Rs.4,45,000/-",

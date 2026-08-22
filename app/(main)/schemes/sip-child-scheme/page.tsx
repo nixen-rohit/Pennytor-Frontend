@@ -2,17 +2,7 @@
 import { SIPForChild } from "@/components/SIPForChild";
 
 const page = () => {
-  return (
-    <SIPForChild
-  example={{
-    monthlyInvestment: 10000,
-    investmentYears: 15,
-    annualReturn: 12,
-    withdrawalMonthly: 30000,
-    withdrawalYears: 10,
-  }}
-/>
-  )
-}
+  return <SIPForChild />;
+};
 
-export default page
+export default page;
