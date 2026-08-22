@@ -1,155 +1,88 @@
-import {
-  ArrowRight,
-  Calculator,
-  GraduationCap,
-  Phone,
-  ShieldCheck,
-} from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { ArrowRight, GraduationCap, Phone, ShieldCheck ,ChartNoAxesCombined ,CalendarClock, IndianRupee } from "lucide-react";
+
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type SIPExample = {
+  id: "5000" | "2500";
   monthlyInvestment: number;
   investmentYears: number;
   annualReturn: number;
+
+  // Value shown in the provided design
+  fundValue: number;
+
   withdrawalMonthly: number;
   withdrawalYears: number;
+
+  // Final value shown in the provided design
+  finalAmount: number;
 };
 
-const EXAMPLE: SIPExample = {
-  monthlyInvestment: 5000,
-  investmentYears: 10,
-  annualReturn: 22,
-  withdrawalMonthly: 50000,
-  withdrawalYears: 10,
-};
+const SIP_EXAMPLES: SIPExample[] = [
+  {
+    id: "5000",
+    monthlyInvestment: 5000,
+    investmentYears: 10,
+    annualReturn: 22,
+    fundValue: 2179000,
+    withdrawalMonthly: 50000,
+    withdrawalYears: 10,
+    finalAmount: 1117000,
+  },
+  {
+    id: "2500",
+    monthlyInvestment: 2500,
+    investmentYears: 10,
+    annualReturn: 22,
+    fundValue: 1089000,
+    withdrawalMonthly: 25000,
+    withdrawalYears: 10,
+    finalAmount: 400000,
+  },
+];
 
 const formatINR = (value: number) =>
   new Intl.NumberFormat("en-IN", {
     maximumFractionDigits: 0,
   }).format(Math.round(value));
 
-/**
- * Future value of a SIP assuming contributions
- * are made at the beginning of each month
- * (annuity-due convention).
- */
-const calculateSIP = ({
-  monthlyInvestment,
-  investmentYears,
-  annualReturn,
-}: Pick<
-  SIPExample,
-  "monthlyInvestment" | "investmentYears" | "annualReturn"
->) => {
-  const months = investmentYears * 12;
-  const monthlyRate = annualReturn / 100 / 12;
+export function SIPForChild() {
+  const [activeTab, setActiveTab] = useState<"5000" | "2500">("5000");
 
-  if (monthlyRate === 0) {
-    return monthlyInvestment * months;
-  }
+  const selectedExample =
+    SIP_EXAMPLES.find((item) => item.id === activeTab) ?? SIP_EXAMPLES[0];
 
-  return (
-    monthlyInvestment *
-    (((1 + monthlyRate) ** months - 1) / monthlyRate) *
-    (1 + monthlyRate)
-  );
-};
-
-/**
- * Calculates the estimated corpus remaining after
- * monthly withdrawals.
- */
-const calculateSWPEndValue = ({
-  startingCorpus,
-  monthlyWithdrawal,
-  withdrawalYears,
-  annualReturn,
-}: {
-  startingCorpus: number;
-  monthlyWithdrawal: number;
-  withdrawalYears: number;
-  annualReturn: number;
-}) => {
-  const months = withdrawalYears * 12;
-  const monthlyRate = annualReturn / 100 / 12;
-
-  if (monthlyRate === 0) {
-    return Math.max(
-      0,
-      startingCorpus - monthlyWithdrawal * months
-    );
-  }
-
-  return (
-    startingCorpus * (1 + monthlyRate) ** months -
-    monthlyWithdrawal *
-      (((1 + monthlyRate) ** months - 1) / monthlyRate)
-  );
-};
-
-type SIPForChildProps = {
-  example?: Partial<SIPExample>;
-  onContact?: () => void;
-  onApply?: () => void;
-  className?: string;
-};
-
-export function SIPForChild({
-  example,
-  onContact,
-  onApply,
-  className = "",
-}: SIPForChildProps) {
-  const data = {
-    ...EXAMPLE,
-    ...example,
-  };
-
+  const data = selectedExample;
   /* =========================
      SIP Calculations
   ========================= */
 
   const totalMonths = data.investmentYears * 12;
 
-  const totalInvested =
-    data.monthlyInvestment * totalMonths;
+  const totalInvested = data.monthlyInvestment * totalMonths;
 
-  const fundValue = calculateSIP(data);
-
-  const estimatedGrowth =
-    fundValue - totalInvested;
+  const estimatedGrowth = data.fundValue - totalInvested;
 
   /* =========================
      SWP Calculations
   ========================= */
 
-  const projectedEndValue = calculateSWPEndValue({
-    startingCorpus: fundValue,
-    monthlyWithdrawal: data.withdrawalMonthly,
-    withdrawalYears: data.withdrawalYears,
-    annualReturn: data.annualReturn,
-  });
-
   const totalSWPWithdrawals =
-    data.withdrawalMonthly *
-    data.withdrawalYears *
-    12;
+    data.withdrawalMonthly * data.withdrawalYears * 12;
+
+  const totalJourneyYears = data.investmentYears + data.withdrawalYears;
 
   return (
     <section
       aria-labelledby="sip-child-heading"
-      className={`w-full bg-[#09090b] px-4 py-12 text-white sm:px-6 lg:px-8 ${className}`}
+      className={`w-full bg-[#09090b] px-4 py-12 text-white sm:px-6 lg:px-8 `}
     >
       <div className="mx-auto w-full max-w-7xl">
-
         {/* =====================================================
             HERO
         ===================================================== */}
@@ -167,15 +100,10 @@ export function SIPForChild({
 
           <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-3xl">
-
               {/* Badge */}
 
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-orange-300">
-                <GraduationCap
-                  className="h-4 w-4"
-                  aria-hidden="true"
-                />
-
+                <GraduationCap className="h-4 w-4" aria-hidden="true" />
                 Child Future Planning
               </div>
 
@@ -186,17 +114,12 @@ export function SIPForChild({
                 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl"
               >
                 SIP For Child{" "}
-                <span className="text-orange-400">
-                  Future Secure
-                </span>
+                <span className="text-orange-400">Future Secure</span>
               </h2>
 
-              {/* Description */}
-
               <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
-                A simple example showing how a monthly SIP
-                can build a corpus and how a future SWP can
-                be illustrated from that corpus.
+                Build a future corpus through a monthly SIP and use a planned
+                SWP for your future financial needs.
               </p>
             </div>
 
@@ -206,31 +129,71 @@ export function SIPForChild({
               <Button
                 type="button"
                 variant="outline"
-                onClick={onContact}
                 className="h-11 border-white/15 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
               >
-                <Phone
-                  className="mr-2 h-4 w-4"
-                  aria-hidden="true"
-                />
-
+                <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
                 Contact
               </Button>
 
               <Button
                 type="button"
-                onClick={onApply}
                 className="h-11 bg-orange-400 px-5 font-semibold text-black hover:bg-orange-300"
               >
                 Start Planning
-
-                <ArrowRight
-                  className="ml-2 h-4 w-4"
-                  aria-hidden="true"
-                />
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* =====================================================
+            SIP TABS
+        ===================================================== */}
+
+        <div className="mt-6">
+          <div className="mx-auto flex w-full max-w-xl rounded-2xl border border-white/10 bg-[#111113] p-1.5">
+            {SIP_EXAMPLES.map((item) => {
+              const isActive = activeTab === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveTab(item.id)}
+                  className={`flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "bg-orange-400 text-black shadow-lg shadow-orange-400/10"
+                      : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  SIP ₹ {formatINR(item.monthlyInvestment)}
+                  /month
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* =====================================================
+            ACTIVE PLAN HEADER
+        ===================================================== */}
+
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-medium text-orange-400">Selected Plan</p>
+
+            <h3 className="mt-1 text-2xl font-bold text-white sm:text-3xl">
+              SIP of <IndianRupee className="inline-block h-[1em] w-[1em]" />{" "}
+              <span className="text-orange-400">
+                {formatINR(data.monthlyInvestment)}
+              </span>{" "}
+              /- per month
+            </h3>
+          </div>
+
+          <p className="text-sm text-zinc-500">
+            {data.investmentYears} years SIP + {data.withdrawalYears} years SWP
+          </p>
         </div>
 
         {/* =====================================================
@@ -238,7 +201,6 @@ export function SIPForChild({
         ===================================================== */}
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-
           {/* Monthly SIP */}
 
           <Card className="border-white/10 bg-[#111113] text-white">
@@ -248,7 +210,7 @@ export function SIPForChild({
               </p>
 
               <p className="mt-2 text-2xl font-bold">
-                Rs.{formatINR(data.monthlyInvestment)}/-
+                <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.monthlyInvestment)}/-
               </p>
 
               <p className="mt-1 text-xs text-zinc-500">
@@ -266,7 +228,7 @@ export function SIPForChild({
               </p>
 
               <p className="mt-2 text-2xl font-bold">
-                Rs.{formatINR(totalInvested)}/-
+                <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalInvested)}/-
               </p>
 
               <p className="mt-1 text-xs text-zinc-500">
@@ -280,7 +242,7 @@ export function SIPForChild({
           <Card className="border-white/10 bg-[#111113] text-white">
             <CardContent className="p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                Example Return
+                Assumed Return
               </p>
 
               <p className="mt-2 text-2xl font-bold text-orange-400">
@@ -298,11 +260,11 @@ export function SIPForChild({
           <Card className="border-white/10 bg-[#111113] text-white">
             <CardContent className="p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                Estimated Corpus
+                Fund Value
               </p>
 
               <p className="mt-2 text-2xl font-bold">
-                Rs.{formatINR(fundValue)}/-
+                <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.fundValue)}/-
               </p>
 
               <p className="mt-1 text-xs text-zinc-500">
@@ -313,29 +275,24 @@ export function SIPForChild({
         </div>
 
         {/* =====================================================
-            INVESTMENT SUMMARY TABLE
+            INVESTMENT SUMMARY
         ===================================================== */}
 
         <Card className="mt-6 border-white/10 bg-[#111113] text-white shadow-xl">
           <CardHeader>
-            <CardTitle className="text-2xl">
-              Investment Summary
-            </CardTitle>
+            <CardTitle className="text-2xl">Investment Summary</CardTitle>
 
             <p className="text-sm leading-6 text-zinc-500">
-              A simple breakdown of your SIP investment,
-              estimated corpus, and SWP plan.
+              A simple breakdown of your SIP investment, estimated fund value,
+              and SWP plan.
             </p>
           </CardHeader>
 
           <CardContent>
             <div className="overflow-x-auto rounded-2xl border border-white/10">
-
               <table className="w-full min-w-[700px] text-sm">
-
                 <thead>
                   <tr className="border-b border-white/10 bg-[#18181b]">
-
                     <th className="px-5 py-4 text-left font-semibold text-zinc-400">
                       Particular
                     </th>
@@ -347,12 +304,10 @@ export function SIPForChild({
                     <th className="px-5 py-4 text-left font-semibold text-zinc-400">
                       Details
                     </th>
-
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-white/10">
-
                   {/* Monthly SIP */}
 
                   <tr className="hover:bg-white/[0.02]">
@@ -361,7 +316,10 @@ export function SIPForChild({
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-orange-400">
-                      Rs.{formatINR(data.monthlyInvestment)}/-
+                      <span className="mr-2">
+                        <CalendarClock className="inline-block h-5 w-5 text-orange-400" />
+                      </span>
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(data.monthlyInvestment)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-500">
@@ -393,7 +351,7 @@ export function SIPForChild({
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-white">
-                      Rs.{formatINR(totalInvested)}/-
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalInvested)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-500">
@@ -417,20 +375,19 @@ export function SIPForChild({
                     </td>
                   </tr>
 
-                  {/* Corpus */}
+                  {/* Fund Value */}
 
                   <tr className="bg-orange-400/[0.04] hover:bg-orange-400/[0.07]">
                     <td className="px-5 py-4 font-semibold text-white">
-                      Estimated Corpus
+                      Fund Value
                     </td>
 
                     <td className="px-5 py-4 text-right text-lg font-bold text-orange-400">
-                      Rs.{formatINR(fundValue)}/-
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.fundValue)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-400">
-                      Estimated value after{" "}
-                      {data.investmentYears} years
+                      Value after {data.investmentYears} years
                     </td>
                   </tr>
 
@@ -438,15 +395,17 @@ export function SIPForChild({
 
                   <tr className="hover:bg-white/[0.02]">
                     <td className="px-5 py-4 font-medium text-white">
-                      Estimated Growth
+                      Estimated Growth 
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-emerald-400">
-                      Rs.{formatINR(estimatedGrowth)}/-
+                      <span className="mr-2">
+                        <ChartNoAxesCombined  className="inline-block h-5 w-5 text-emerald-400" />
+                      </span> <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(estimatedGrowth)}/- 
                     </td>
 
                     <td className="px-5 py-4 text-zinc-500">
-                      Estimated profit over invested amount
+                      Growth over invested amount
                     </td>
                   </tr>
 
@@ -458,7 +417,7 @@ export function SIPForChild({
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-white">
-                      Rs.{formatINR(data.withdrawalMonthly)}/-
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.withdrawalMonthly)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-500">
@@ -490,7 +449,7 @@ export function SIPForChild({
                     </td>
 
                     <td className="px-5 py-4 text-right font-bold text-white">
-                      Rs.{formatINR(totalSWPWithdrawals)}/-
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalSWPWithdrawals)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-500">
@@ -498,374 +457,46 @@ export function SIPForChild({
                     </td>
                   </tr>
 
-                  {/* Ending Corpus */}
+                  {/* Final Amount */}
 
                   <tr className="bg-emerald-400/[0.03] hover:bg-emerald-400/[0.06]">
                     <td className="px-5 py-4 font-semibold text-white">
-                      Estimated Ending Corpus
+                      Final Amount
                     </td>
 
                     <td className="px-5 py-4 text-right text-lg font-bold text-emerald-400">
-                      {projectedEndValue > 0
-                        ? `Rs.${formatINR(projectedEndValue)}/-`
-                        : "Rs.0/-"}
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.finalAmount)}/-
                     </td>
 
                     <td className="px-5 py-4 text-zinc-400">
-                      After {data.withdrawalYears} years of SWP
+                      At the end of {totalJourneyYears} years
                     </td>
                   </tr>
-
                 </tbody>
               </table>
-
             </div>
           </CardContent>
         </Card>
 
         {/* =====================================================
-            FORMULA SECTION
-        ===================================================== */}
-
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-
-          {/* SIP Formula */}
-
-          <Card className="border-white/10 bg-[#111113] text-white shadow-xl">
-
-            <CardHeader>
-
-              <div className="mb-2 inline-flex w-fit rounded-full border border-orange-400/20 bg-orange-400/10 p-2 text-orange-300">
-                <Calculator
-                  className="h-5 w-5"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <CardTitle className="text-2xl">
-                Step 1: SIP Corpus Formula
-              </CardTitle>
-
-              <p className="text-sm leading-6 text-zinc-500">
-                The future value of a monthly SIP can be
-                estimated using the following formula.
-              </p>
-
-            </CardHeader>
-
-            <CardContent className="space-y-5">
-
-              {/* Formula */}
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                <p className="font-mono text-sm leading-7 text-orange-300 sm:text-base">
-                  FV = P × [((1 + r)^n − 1) / r] × (1 + r)
-                </p>
-              </div>
-
-              {/* Variables */}
-
-              <div className="overflow-hidden rounded-2xl border border-white/10">
-
-                <table className="w-full text-sm">
-
-                  <thead>
-                    <tr className="bg-[#18181b]">
-                      <th className="px-4 py-3 text-left text-zinc-400">
-                        Symbol
-                      </th>
-
-                      <th className="px-4 py-3 text-left text-zinc-400">
-                        Meaning
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-white/10">
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        P
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Monthly SIP amount
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        r
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Annual return ÷ 12 ÷ 100
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        n
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Investment years × 12
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        FV
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Estimated future value
-                      </td>
-                    </tr>
-
-                  </tbody>
-
-                </table>
-
-              </div>
-
-              <Separator className="bg-white/10" />
-
-              {/* Example */}
-
-              <div>
-
-                <p className="mb-3 text-sm font-semibold text-white">
-                  Example using the values above
-                </p>
-
-                <div className="rounded-2xl border border-white/10 bg-[#18181b] p-5 font-mono text-xs leading-7 text-zinc-300 sm:text-sm">
-
-                  <p>
-                    P = Rs.
-                    {formatINR(data.monthlyInvestment)}
-                  </p>
-
-                  <p>
-                    r = {data.annualReturn}% ÷ 12 ÷ 100
-                  </p>
-
-                  <p>
-                    n = {data.investmentYears} × 12 ={" "}
-                    {totalMonths}
-                  </p>
-
-                  <p className="mt-2 text-orange-300">
-                    FV ≈ Rs.{formatINR(fundValue)}
-                  </p>
-
-                </div>
-
-              </div>
-
-              {/* Growth */}
-
-              <div className="rounded-xl border border-emerald-400/10 bg-emerald-400/[0.03] p-4">
-
-                <p className="text-xs text-zinc-500">
-                  Estimated growth
-                </p>
-
-                <p className="mt-1 text-xl font-bold text-emerald-400">
-                  Rs.{formatINR(estimatedGrowth)}/-
-                </p>
-
-              </div>
-
-            </CardContent>
-          </Card>
-
-          {/* SWP Formula */}
-
-          <Card className="border-white/10 bg-[#111113] text-white shadow-xl">
-
-            <CardHeader>
-
-              <div className="mb-2 inline-flex w-fit rounded-full border border-orange-400/20 bg-orange-400/10 p-2 text-orange-300">
-                <Calculator
-                  className="h-5 w-5"
-                  aria-hidden="true"
-                />
-              </div>
-
-              <CardTitle className="text-2xl">
-                Step 2: SWP Remaining Corpus
-              </CardTitle>
-
-              <p className="text-sm leading-6 text-zinc-500">
-                If the corpus is later used for monthly
-                withdrawals, the remaining value can be
-                illustrated using the SWP formula.
-              </p>
-
-            </CardHeader>
-
-            <CardContent className="space-y-5">
-
-              {/* Formula */}
-
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-5">
-                <p className="font-mono text-sm leading-7 text-orange-300 sm:text-base">
-                  FV = PV × (1 + r)^n − W × [((1 + r)^n − 1) / r]
-                </p>
-              </div>
-
-              {/* Variables */}
-
-              <div className="overflow-hidden rounded-2xl border border-white/10">
-
-                <table className="w-full text-sm">
-
-                  <thead>
-                    <tr className="bg-[#18181b]">
-
-                      <th className="px-4 py-3 text-left text-zinc-400">
-                        Symbol
-                      </th>
-
-                      <th className="px-4 py-3 text-left text-zinc-400">
-                        Meaning
-                      </th>
-
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-white/10">
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        PV
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Starting corpus
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        W
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Monthly withdrawal
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        r
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Annual return ÷ 12 ÷ 100
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td className="px-4 py-3 font-bold text-orange-300">
-                        n
-                      </td>
-
-                      <td className="px-4 py-3 text-zinc-300">
-                        Withdrawal years × 12
-                      </td>
-                    </tr>
-
-                  </tbody>
-
-                </table>
-
-              </div>
-
-              <Separator className="bg-white/10" />
-
-              {/* Example */}
-
-              <div>
-
-                <p className="mb-3 text-sm font-semibold text-white">
-                  Example using the values above
-                </p>
-
-                <div className="rounded-2xl border border-white/10 bg-[#18181b] p-5 font-mono text-xs leading-7 text-zinc-300 sm:text-sm">
-
-                  <p>
-                    PV ≈ Rs.{formatINR(fundValue)}
-                  </p>
-
-                  <p>
-                    W = Rs.
-                    {formatINR(data.withdrawalMonthly)}
-                    /month
-                  </p>
-
-                  <p>
-                    r = {data.annualReturn}% ÷ 12 ÷ 100
-                  </p>
-
-                  <p>
-                    n = {data.withdrawalYears} × 12
-                  </p>
-
-                  <p className="mt-2 text-orange-300">
-                    Total SWP withdrawals = Rs.
-                    {formatINR(totalSWPWithdrawals)}
-                  </p>
-
-                  <p className="text-orange-300">
-                    Illustrative ending value ≈{" "}
-                    {projectedEndValue > 0
-                      ? `Rs.${formatINR(projectedEndValue)}`
-                      : "Rs.0/- (corpus exhausted)"}
-                  </p>
-
-                </div>
-
-              </div>
-
-            </CardContent>
-          </Card>
-
-        </div>
-
-        {/* =====================================================
-            INVESTMENT JOURNEY TABLE
+            INVESTMENT JOURNEY
         ===================================================== */}
 
         <Card className="mt-6 border-white/10 bg-[#111113] text-white shadow-xl">
-
           <CardHeader>
-
-            <CardTitle className="text-2xl">
-              Your Investment Journey
-            </CardTitle>
+            <CardTitle className="text-2xl">Your Investment Journey</CardTitle>
 
             <p className="text-sm text-zinc-500">
-              Understand how your money moves through each
-              stage.
+              Understand how your money moves through each stage.
             </p>
-
           </CardHeader>
 
           <CardContent>
-
             <div className="overflow-x-auto rounded-2xl border border-white/10">
-
               <table className="w-full min-w-[750px] text-sm">
-
                 <thead>
-
                   <tr className="border-b border-white/10 bg-[#18181b]">
-
-                    <th className="px-5 py-4 text-left text-zinc-400">
-                      Stage
-                    </th>
+                    <th className="px-5 py-4 text-left text-zinc-400">Stage</th>
 
                     <th className="px-5 py-4 text-left text-zinc-400">
                       What Happens?
@@ -878,27 +509,20 @@ export function SIPForChild({
                     <th className="px-5 py-4 text-left text-zinc-400">
                       Duration
                     </th>
-
                   </tr>
-
                 </thead>
 
                 <tbody className="divide-y divide-white/10">
-
                   {/* Phase 1 */}
 
                   <tr className="hover:bg-white/[0.02]">
-
                     <td className="px-5 py-5">
-
                       <span className="inline-flex rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-xs font-semibold text-orange-300">
                         Phase 1
                       </span>
-
                     </td>
 
                     <td className="px-5 py-5">
-
                       <p className="font-semibold text-white">
                         Build the Corpus
                       </p>
@@ -906,223 +530,139 @@ export function SIPForChild({
                       <p className="mt-1 text-xs text-zinc-500">
                         Invest a fixed amount every month.
                       </p>
-
                     </td>
 
                     <td className="px-5 py-5 text-right font-bold text-white">
-                      Rs.
-                      {formatINR(
-                        data.monthlyInvestment
-                      )}
-                      /month
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(data.monthlyInvestment)}/month
                     </td>
 
                     <td className="px-5 py-5 text-zinc-400">
                       {data.investmentYears} years
                     </td>
-
                   </tr>
 
                   {/* Phase 2 */}
 
                   <tr className="bg-orange-400/[0.03] hover:bg-orange-400/[0.07]">
-
                     <td className="px-5 py-5">
-
                       <span className="inline-flex rounded-full border border-orange-400/20 bg-orange-400/10 px-3 py-1 text-xs font-semibold text-orange-300">
                         Phase 2
                       </span>
-
                     </td>
 
                     <td className="px-5 py-5">
-
-                      <p className="font-semibold text-white">
-                        Corpus Created
-                      </p>
+                      <p className="font-semibold text-white">Corpus Created</p>
 
                       <p className="mt-1 text-xs text-zinc-500">
-                        Your SIP grows based on the assumed
-                        return.
+                        Your SIP grows based on the illustrative return.
                       </p>
-
                     </td>
 
                     <td className="px-5 py-5 text-right font-bold text-orange-400">
-                      Rs.{formatINR(fundValue)}/-
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(data.fundValue)}/-
                     </td>
 
                     <td className="px-5 py-5 text-zinc-400">
                       After {data.investmentYears} years
                     </td>
-
                   </tr>
 
                   {/* Phase 3 */}
 
                   <tr className="hover:bg-white/[0.02]">
-
                     <td className="px-5 py-5">
-
                       <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                         Phase 3
                       </span>
-
                     </td>
 
                     <td className="px-5 py-5">
-
                       <p className="font-semibold text-white">
                         Start Monthly SWP
                       </p>
 
                       <p className="mt-1 text-xs text-zinc-500">
-                        Withdraw a fixed amount from the
-                        accumulated corpus.
+                        Withdraw a fixed amount from the accumulated corpus.
                       </p>
-
                     </td>
 
                     <td className="px-5 py-5 text-right font-bold text-white">
-                      Rs.
-                      {formatINR(
-                        data.withdrawalMonthly
-                      )}
-                      /month
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(data.withdrawalMonthly)}/month
                     </td>
 
                     <td className="px-5 py-5 text-zinc-400">
                       {data.withdrawalYears} years
                     </td>
-
                   </tr>
 
                   {/* Result */}
 
                   <tr className="bg-emerald-400/[0.03] hover:bg-emerald-400/[0.06]">
-
                     <td className="px-5 py-5">
-
                       <span className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                         Result
                       </span>
-
                     </td>
 
                     <td className="px-5 py-5">
-
                       <p className="font-semibold text-white">
                         Remaining Corpus
                       </p>
 
                       <p className="mt-1 text-xs text-zinc-500">
-                        Illustrative value after the SWP
-                        period.
+                        Illustrative value after the SWP period.
                       </p>
-
                     </td>
 
                     <td className="px-5 py-5 text-right font-bold text-emerald-400">
-                      {projectedEndValue > 0
-                        ? `Rs.${formatINR(
-                            projectedEndValue
-                          )}/-`
-                        : "Rs.0/-"}
+                      <IndianRupee className="inline-block h-[1em] w-[1em]" /> {formatINR(data.finalAmount)}/-
                     </td>
 
                     <td className="px-5 py-5 text-zinc-400">
                       After {data.withdrawalYears} years
                     </td>
-
                   </tr>
-
                 </tbody>
-
               </table>
-
             </div>
-
           </CardContent>
         </Card>
 
+         
+
         {/* =====================================================
-            SIMPLE EXPLANATION
+            FINAL RESULT HIGHLIGHT
         ===================================================== */}
 
-        <Card className="mt-6 border-orange-400/10 bg-orange-400/[0.02] text-white">
-
-          <CardContent className="p-6">
-
-            <div className="grid gap-6 md:grid-cols-3">
-
-              {/* Step 1 */}
-
+        <Card className="mt-6 overflow-hidden border-emerald-400/10 bg-gradient-to-r from-emerald-400/[0.04] to-transparent text-white">
+          <CardContent className="p-6 sm:p-8">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
               <div>
-
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-orange-400/10 text-sm font-bold text-orange-300">
-                  1
-                </div>
-
-                <h3 className="font-semibold text-white">
-                  Start SIP
-                </h3>
-
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Invest Rs.
-                  {formatINR(
-                    data.monthlyInvestment
-                  )}
-                  every month for{" "}
-                  {data.investmentYears} years.
+                <p className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+                  Final Amount After {totalJourneyYears} Years
                 </p>
 
-              </div>
-
-              {/* Step 2 */}
-
-              <div>
-
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-orange-400/10 text-sm font-bold text-orange-300">
-                  2
-                </div>
-
-                <h3 className="font-semibold text-white">
-                  Build Corpus
-                </h3>
-
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Based on the illustrative return
-                  assumption, the estimated corpus is
-                  Rs.{formatINR(fundValue)}/-.
+                <p className="mt-2 text-3xl font-bold text-emerald-400 sm:text-4xl">
+                  <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(data.finalAmount)}/-
                 </p>
 
-              </div>
-
-              {/* Step 3 */}
-
-              <div>
-
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-emerald-400/10 text-sm font-bold text-emerald-300">
-                  3
-                </div>
-
-                <h3 className="font-semibold text-white">
-                  Start SWP
-                </h3>
-
-                <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Withdraw Rs.
-                  {formatINR(
-                    data.withdrawalMonthly
-                  )}
-                  /month for{" "}
-                  {data.withdrawalYears} years.
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
+                  After investing <IndianRupee className="inline-block h-[1em] w-[1em]" />
+                  {formatINR(data.monthlyInvestment)}
+                  /month for {data.investmentYears} years and withdrawing <IndianRupee className="inline-block h-[1em] w-[1em]" />
+                  {formatINR(data.withdrawalMonthly)}
+                  /month through SWP for the next {data.withdrawalYears} years.
                 </p>
-
               </div>
 
+              <div className="shrink-0 rounded-2xl border border-emerald-400/10 bg-emerald-400/5 px-6 py-5">
+                <p className="text-xs text-zinc-500">Total SWP Withdrawals</p>
+
+                <p className="mt-1 text-xl font-bold text-white">
+                  <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalSWPWithdrawals)}/-
+                </p>
+              </div>
             </div>
-
           </CardContent>
         </Card>
 
@@ -1131,40 +671,27 @@ export function SIPForChild({
         ===================================================== */}
 
         <div className="mt-6 rounded-2xl border border-dashed border-orange-400/20 bg-orange-400/[0.03] p-5 sm:p-6">
-
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-
             <div>
-
               <p className="text-base font-bold text-white">
-                Want a different SIP amount or time
-                period?
+                Want a different SIP amount or time period?
               </p>
 
               <p className="mt-1 text-sm text-zinc-500">
-                Contact us to create an example based on
-                your preferred monthly contribution and
-                target.
+                Contact us to create an example based on your preferred monthly
+                contribution and target.
               </p>
-
             </div>
 
             <Button
               type="button"
               variant="outline"
-              onClick={onContact}
               className="shrink-0 border-orange-400/20 bg-orange-400/10 text-orange-300 hover:bg-orange-400/20 hover:text-orange-200"
             >
-              <Phone
-                className="mr-2 h-4 w-4"
-                aria-hidden="true"
-              />
-
+              <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
               Contact Us
             </Button>
-
           </div>
-
         </div>
 
         {/* =====================================================
@@ -1172,23 +699,18 @@ export function SIPForChild({
         ===================================================== */}
 
         <div className="mt-5 flex items-start gap-2 rounded-xl border border-white/10 bg-white/[0.025] px-4 py-3 text-xs leading-5 text-zinc-500">
-
           <ShieldCheck
             className="mt-0.5 h-4 w-4 shrink-0 text-zinc-400"
             aria-hidden="true"
           />
 
           <p>
-            This component uses illustrative example data
-            and mathematical formulas for demonstration
-            only. Actual investment returns are not
-            guaranteed and can differ materially. Replace
-            the example values and assumptions with
-            approved product terms before production use.
+            This component uses illustrative example data based on the provided
+            investment illustration. The assumed 22% return is not guaranteed
+            and actual investment returns may differ materially. The displayed
+            corpus and final amount are illustrative figures only.
           </p>
-
         </div>
-
       </div>
     </section>
   );
