@@ -5,9 +5,6 @@ import {
   FaHeartbeat,
   FaUserShield,
   FaHome,
-  FaPhoneAlt,
-  FaWhatsapp,
-  FaCalendarCheck,
   FaRedo,
   FaFileInvoice,
   FaHeadset,
@@ -42,10 +39,7 @@ import {
   FaFileDownload,
   FaFileAlt,
   FaMapPin,
-  FaListAlt,
-  FaTrophy,
 } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
 import { BsFillPiggyBankFill } from "react-icons/bs";
 import { FaHandHoldingHeart } from "react-icons/fa6";
 import { RiMoneyRupeeCircleFill } from "react-icons/ri";
@@ -71,6 +65,7 @@ export interface ProductColumn {
   items: NavLink[];
 }
 
+ 
 export interface CTAType {
   href: string;
   label: string;
@@ -114,14 +109,14 @@ export const Schemes: NavMenu = {
     },
     {
       label: "SIP For Childrens",
-     href: "/schemes/sip-child-scheme",
+      href: "/schemes/sip-child-scheme",
       icon: FaHandHoldingHeart,
       color: "bg-rose-50 text-rose-500",
       description: "Monthly Saving For Your Childrens",
     },
     {
       label: "Fixed Deposite (SWP)",
-     href: "/schemes/fixed-swp-scheme",
+      href: "/schemes/fixed-swp-scheme",
       icon: RiMoneyRupeeCircleFill,
       color: "bg-green-50 text-green-500",
       description: " Save and Earn More",
@@ -133,7 +128,6 @@ export const Schemes: NavMenu = {
       color: "bg-teal-50 text-teal-500",
       description: "For long term Investment",
     },
-     
   ],
 };
 
@@ -437,45 +431,7 @@ export const support: NavMenu = {
     },
   ],
 };
-
-const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_PHONE_NUMBER?.trim() || "";
-
-const whatsappUrl = `https://wa.me/${phoneNumber}`;
-export const talkToExpert: NavMenu = {
-  label: "Talk to Expert",
-  icon: FaComments,
-  items: [
-    {
-      label: "Email Us",
-      href: "/contact-us",
-      icon: MdEmail,
-      color: "bg-blue-50 text-blue-500",
-      description: "Get in Touch within 24 Hours",
-    },
-    {
-      label: "Call Us",
-      href: whatsappUrl,
-      icon: FaPhoneAlt,
-      color: "bg-blue-50 text-blue-500",
-      description: "Speak to an agent right now",
-    },
-    {
-      label: "Chat on WhatsApp",
-      href: whatsappUrl,
-      icon: FaWhatsapp,
-      color: "bg-green-50 text-green-600",
-      description: "Quick support via WhatsApp",
-    },
-    {
-      label: "Schedule a Callback",
-      href: whatsappUrl,
-      icon: FaCalendarCheck,
-      color: "bg-amber-50 text-amber-600",
-      description: "We'll call you at your convenience",
-    },
-  ],
-};
-
+ 
 export const CTA: CTAType = { label: "Sign Up", href: "/login" };
 
 export const NAV: NavItem[] = [
@@ -515,6 +471,6 @@ export const NAV: NavItem[] = [
   },
   {
     label: "Contact Us",
-    mega: { columns: [{ heading: "Get in Touch", links: talkToExpert.items }] },
+    href: "/contact-us",
   },
 ];

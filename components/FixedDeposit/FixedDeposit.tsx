@@ -16,27 +16,27 @@ type FixedDepositPlan = {
 const FIXED_DEPOSIT_PLANS: FixedDepositPlan[] = [
   {
     serialNumber: "1.",
-    amount: "Rs.25,000/-",
+    amount: "Rs. 25,000/-",
     lockInPeriod: "48 Months",
     payoutMode: "Quatarly",
     emi: "16 X Rs.3,130/-",
-    totalPayout: "Rs.50,080/-",
+    totalPayout: "Rs. 50,080/-",
   },
   {
     serialNumber: "2.",
-    amount: "Rs.50,000/-",
+    amount: "Rs. 50,000/-",
     lockInPeriod: "42 Months",
     payoutMode: "Quatarly",
-    emi: "14 X Rs.7,155/-",
-    totalPayout: "Rs.1,00,170/-",
+    emi: "14 X Rs.7,145/-",
+    totalPayout: "Rs. 1,00,030/-",
   },
   {
     serialNumber: "3.",
-    amount: "Rs.1,00,000/-",
-    lockInPeriod: "36 Months",
+    amount: "Rs. 1,00,000/-",
+    lockInPeriod: "40 Months",
     payoutMode: "Monthly",
-    emi: "36 X Rs.5,560/-",
-    totalPayout: "Rs.2,00,160/-",
+    emi: "40 X Rs.5,000/-",
+    totalPayout: "Rs. 2,00,000/-",
   },
 ];
 
@@ -54,7 +54,7 @@ export function FixedDeposit({
   return (
     <section
       aria-labelledby="fixed-deposit-heading"
-      className={`w-full bg-[#08090f] px-4 py-12 text-white sm:px-6 lg:px-8 ${className}`}
+      className={`w-full bg-[#09090b] px-4 py-12 text-white sm:px-6 lg:px-8`}
     >
       <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
@@ -176,7 +176,7 @@ export function FixedDeposit({
                         {plan.emi}
                       </td>
 
-                      <td className="border-b border-white/10 px-5 py-6 text-base font-bold text-white">
+                      <td className="border-b border-white/10 px-5 py-6 text-base font-bold text-emerald-400">
                         {plan.totalPayout}
                       </td>
 
@@ -184,9 +184,11 @@ export function FixedDeposit({
                         <Button
                           type="button"
                           size="sm"
-                          variant={index === 0 ? "default" : "outline"}
+                          variant="outline"
                           onClick={() => onApply?.(plan)}
-                          className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
+                          className={
+                            "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                          }
                         >
                           Apply
                           <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -270,7 +272,7 @@ export function FixedDeposit({
 
                   <div className="bg-[#111217] p-4">
                     <p className="text-xs text-zinc-500">Total Payout</p>
-                    <p className="mt-1 font-bold text-white">
+                    <p className="mt-1 font-bold   text-emerald-400">
                       {plan.totalPayout}
                     </p>
                   </div>
@@ -280,8 +282,10 @@ export function FixedDeposit({
                   <Button
                     type="button"
                     onClick={() => onApply?.(plan)}
-                    className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
-                    variant={index === 0 ? "default" : "outline"}
+                    variant="outline"
+                    className={
+                      "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                    }
                   >
                     Apply for {plan.amount}
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -298,8 +302,8 @@ export function FixedDeposit({
                 Don&apos;t find a plan that fits your budget?
               </p>
               <p className="mt-1 text-sm leading-5 text-zinc-500">
-                Contact us and we&apos;ll help you find a suitable Fixed
-                Deposit plan.
+                Contact us and we&apos;ll help you find a suitable Fixed Deposit
+                plan.
               </p>
 
               <Button
