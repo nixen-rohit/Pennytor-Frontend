@@ -1,4 +1,3 @@
- 
 import { PiggyBank, ArrowRight, Phone, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -97,6 +96,7 @@ function Gullak({ onContact, onApply }: GullakProps) {
 
               <Button
                 type="button"
+                variant="outline"
                 onClick={() => onApply?.(GULLAK_PLANS[0])}
                 className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
               >
@@ -180,6 +180,7 @@ function Gullak({ onContact, onApply }: GullakProps) {
                         <Button
                           type="button"
                           size="sm"
+                          variant="outline"
                           onClick={() => onApply?.(plan)}
                           className={
                             "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
@@ -329,4 +330,3 @@ function Gullak({ onContact, onApply }: GullakProps) {
 }
 
 export default Gullak;
- 

@@ -87,8 +87,8 @@ export function InvestmentFund({
               </h2>
 
               <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
-                Explore investment plans based on your investment amount, with
-                a fixed 3-year lock-in period and monthly ROI.
+                Explore investment plans based on your investment amount, with a
+                fixed 3-year lock-in period and monthly ROI.
               </p>
             </div>
 
@@ -192,9 +192,11 @@ export function InvestmentFund({
                         <Button
                           type="button"
                           size="sm"
-                         
+                          variant="outline"
                           onClick={() => onApply?.(plan)}
-                          className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
+                          className={
+                            "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                          }
                         >
                           Apply
                           <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
@@ -273,9 +275,11 @@ export function InvestmentFund({
                 <div className="p-4">
                   <Button
                     type="button"
+                    variant="outline"
                     onClick={() => onApply?.(plan)}
-                    className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
-                    
+                    className={
+                      "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                    }
                   >
                     Apply for Plan {plan.serialNumber}
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -316,8 +320,8 @@ export function InvestmentFund({
             aria-hidden="true"
           />
           <p>
-            The figures shown are dummy/demo data for UI purposes. Replace
-            these values with your approved investment terms before using this
+            The figures shown are dummy/demo data for UI purposes. Replace these
+            values with your approved investment terms before using this
             component in production.
           </p>
         </div>
