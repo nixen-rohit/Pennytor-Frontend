@@ -332,20 +332,7 @@ export default function KycApplicationDetail() {
                     ? "Final decision locked. The user can resubmit to reopen this application."
                     : "Verify identity documents before deciding."}
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={
-                    app.status === "REJECTED"
-                      ? "border-white/10 text-slate-600 cursor-not-allowed"
-                      : "border-blue-600/40 text-blue-400 hover:bg-blue-600/10"
-                  }
-                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
-                  onClick={() => decide("UNDER_REVIEW")}
-                >
-                  {deciding === "UNDER_REVIEW" ? <Spinner /> : null}
-                  Mark Under Review
-                </Button>
+                 
                 <Button
                   type="button"
                   variant={app.status === "REJECTED" ? "default" : "outline"}
