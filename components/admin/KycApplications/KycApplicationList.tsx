@@ -15,7 +15,6 @@ import {
 const STATUS_FILTERS: Array<{ label: string; value?: KycStatus }> = [
   { label: "All" },
   { label: "Submitted", value: "SUBMITTED" },
-  { label: "Under Review", value: "UNDER_REVIEW" },
   { label: "Verified", value: "VERIFIED" },
   { label: "Rejected", value: "REJECTED" },
   { label: "Draft", value: "DRAFT" },

@@ -40,7 +40,6 @@ import { Pagination } from "@/components/admin/Finance/Pagination";
 const STATUS_FILTERS: Array<{ label: string; value?: DepositStatus }> = [
   { label: "All" },
   { label: "Pending", value: "PENDING" },
-  { label: "Under Review", value: "UNDER_REVIEW" },
   { label: "Approved", value: "VERIFIED" },
   { label: "Rejected", value: "REJECTED" },
 ];
