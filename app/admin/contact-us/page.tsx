@@ -1,9 +1,7 @@
 import React from 'react'
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
-}
+import ContactList from "@/components/admin/Contact";
 
-export default page
+export default function ContactUsPage() {
+  return <ContactList />;
+}
