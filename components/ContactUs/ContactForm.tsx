@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { Mail, Phone, Send } from "lucide-react";
+import { fetchApi, handleApiError } from "@/services/api";
 
 type FormData = {
   name: string;
@@ -13,6 +14,11 @@ type FormData = {
   message: string;
 };
 
+type FormErrors = Partial<Record<keyof FormData, string>>;
+
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phonePattern = /^\+?\d{10,15}$/;
+
 export default function ContactForm() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -21,6 +27,10 @@ export default function ContactForm() {
     service: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -33,12 +43,71 @@ export default function ContactForm() {
       ...prev,
       [name]: value,
     }));
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: undefined,
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSuccessMessage("");
+    setErrorMessage("");
 
-    console.log("Form Submitted:", formData);
+    const trimmedData = {
+      ...formData,
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      message: formData.message.trim(),
+    };
+    const errors: FormErrors = {};
+
+    if (!trimmedData.name) {
+      errors.name = "Name is required.";
+    } else if (!/^[\p{L} .'-]+$/u.test(trimmedData.name)) {
+      errors.name = "Name can contain letters, spaces, apostrophes, and hyphens only.";
+    }
+
+    if (!emailPattern.test(trimmedData.email)) {
+      errors.email = "Enter a valid email address.";
+    }
+
+    if (!phonePattern.test(trimmedData.phone.replace(/[\s()-]/g, ""))) {
+      errors.phone = "Enter a valid phone number with 10 to 15 digits.";
+    }
+
+    if (!trimmedData.message) {
+      errors.message = "Message is required.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await fetchApi("/contactus", {
+        method: "POST",
+        body: JSON.stringify(trimmedData),
+      });
+
+      setSuccessMessage("Your message has been sent successfully.");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        service: "",
+        message: "",
+      });
+      setFormErrors({});
+    } catch (err) {
+      handleApiError(err, setErrorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Framer Motion Variants
@@ -203,8 +272,13 @@ export default function ContactForm() {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  minLength={2}
+                  aria-invalid={Boolean(formErrors.name)}
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-white/40 transition-all duration-300 focus:border-blue-400 focus:bg-white/[0.07] focus:outline-none sm:px-5 sm:py-4 sm:text-base"
                 />
+                {formErrors.name && (
+                  <p className="text-xs text-red-400">{formErrors.name}</p>
+                )}
               </div>
 
               {/* EMAIL */}
@@ -220,8 +294,12 @@ export default function ContactForm() {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  aria-invalid={Boolean(formErrors.email)}
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-white/40 transition-all duration-300 focus:border-blue-400 focus:bg-white/[0.07] focus:outline-none sm:px-5 sm:py-4 sm:text-base"
                 />
+                {formErrors.email && (
+                  <p className="text-xs text-red-400">{formErrors.email}</p>
+                )}
               </div>
             </div>
 
@@ -238,8 +316,13 @@ export default function ContactForm() {
                 value={formData.phone}
                 onChange={handleChange}
                 required
+                inputMode="tel"
+                aria-invalid={Boolean(formErrors.phone)}
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-white/40 transition-all duration-300 focus:border-blue-400 focus:bg-white/[0.07] focus:outline-none sm:px-5 sm:py-4 sm:text-base"
               />
+              {formErrors.phone && (
+                <p className="text-xs text-red-400">{formErrors.phone}</p>
+              )}
             </div>
 
             {/* MESSAGE */}
@@ -255,13 +338,31 @@ export default function ContactForm() {
                 value={formData.message}
                 onChange={handleChange}
                 required
+                minLength={10}
+                aria-invalid={Boolean(formErrors.message)}
                 className="w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-white placeholder:text-white/40 transition-all duration-300 focus:border-blue-400 focus:bg-white/[0.07] focus:outline-none sm:px-5 sm:py-4 sm:text-base"
               />
+              {formErrors.message && (
+                <p className="text-xs text-red-400">{formErrors.message}</p>
+              )}
             </div>
+
+            {successMessage && (
+              <p role="status" className="text-sm text-emerald-400">
+                {successMessage}
+              </p>
+            )}
+
+            {errorMessage && (
+              <p role="alert" className="text-sm text-red-400">
+                {errorMessage}
+              </p>
+            )}
 
             {/* BUTTON */}
             <motion.button
               type="submit"
+              disabled={isSubmitting}
               whileHover={{
                 scale: 1.02,
                 y: -2,
@@ -274,14 +375,14 @@ export default function ContactForm() {
                 stiffness: 300,
                 damping: 18,
               }}
-              className="group mx-auto flex w-full sm:w-fit items-center justify-center gap-3  bg-blue-600  rounded-full  px-6 sm:px-8 py-3 text-[13px] sm:text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 active:bg-blue-800 "
+              className="group mx-auto flex w-full items-center justify-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit sm:px-8 sm:text-sm"
             >
               {/* ICON */}
-              <div className="flex items-center justify-center rounded-full bg-white p-2 text-blue-600 rotate-45 transition-all duration-300 ease-out group-hover:rotate-0 group-hover:scale-110">
-                <Send size={14} />
+              <div className="flex items-center justify-center rounded-full bg-white p-2 text-blue-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-0">
+                <Send size={14} className={isSubmitting ? "animate-pulse" : "-rotate-45"} />
               </div>
 
-              <span>Submit Message</span>
+              <span>{isSubmitting ? "Sending..." : "Submit Message"}</span>
             </motion.button>
           </form>
         </motion.div>
