@@ -1,9 +1,9 @@
-import { Landmark, ShieldCheck, Eye, Smartphone } from "lucide-react";
+import { Landmark, ShieldCheck, Eye, Smartphone, Lock } from "lucide-react";
 
 export const STEPS = [
   { step: 1, title: "Withdraw", icon: Landmark },
-  { step: 2, title: "Verify OTP", icon: ShieldCheck },
-  { step: 3, title: "Review", icon: Eye },
+  { step: 2, title: "Review", icon: Eye },
+  { step: 3, title: "Authenticate", icon: Lock },
 ] as const;
 
 export type WithdrawMethod = "bank" | "upi";

@@ -378,8 +378,8 @@ export default function ContactForm() {
               className="group mx-auto flex w-full items-center justify-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit sm:px-8 sm:text-sm"
             >
               {/* ICON */}
-              <div className="flex items-center justify-center rounded-full bg-white p-2 text-blue-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-0">
-                <Send size={14} className={isSubmitting ? "animate-pulse" : "-rotate-45"} />
+              <div className="rotate-45 flex items-center justify-center rounded-full bg-white p-2 text-blue-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-0">
+                <Send size={14} className={isSubmitting ? "animate-pulse" : "rotate-0"} />
               </div>
 
               <span>{isSubmitting ? "Sending..." : "Submit Message"}</span>

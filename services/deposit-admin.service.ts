@@ -8,8 +8,6 @@ export interface DepositRequestSummary {
   status: DepositStatus;
   createdAt: string;
   user: {
-    firstName: string;
-    lastName: string;
     email: string;
     clientId: string | null;
   };

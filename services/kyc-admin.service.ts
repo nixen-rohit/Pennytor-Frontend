@@ -28,7 +28,7 @@ export interface KycApplicationSummary {
   id: string;
   status: KycStatus;
   createdAt: string;
-  user: { firstName: string; lastName: string; email: string; clientId: string | null };
+  user: { email: string; clientId: string | null };
   _count: { files: number };
 }
 
@@ -82,8 +82,9 @@ export class KycAdminService {
     status?: KycStatus,
     page = 1,
     search?: string,
+    pageSize = 20,
   ): Promise<KycApplicationListResponse> {
-    const query = new URLSearchParams({ page: String(page) });
+    const query = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
     if (status) query.set("status", status);
     if (search) query.set("search", search);
     return fetchApi(`/admin/kyc/applications?${query.toString()}`);

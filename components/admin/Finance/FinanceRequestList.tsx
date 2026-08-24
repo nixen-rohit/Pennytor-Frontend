@@ -51,7 +51,7 @@ const statusStyles: Record<DepositStatus, string> = {
   REJECTED: "bg-red-600/20 text-red-400",
 };
 
-const ENTRY_OPTIONS = ["10", "20", "50"];
+const ENTRY_OPTIONS = ["5", "10", "15", "20"];
 
 interface Row {
   id: string;
@@ -62,8 +62,6 @@ interface Row {
   reference: string | null;
   method: string | null;
   user: {
-    firstName: string;
-    lastName: string;
     email: string;
     clientId: string | null;
   } | null;
@@ -96,7 +94,7 @@ export default function FinanceRequestList({
   const [type, setType] = useState<FinanceType | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [entriesPerPage, setEntriesPerPage] = useState("20");
+  const [entriesPerPage, setEntriesPerPage] = useState("5");
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -305,9 +303,6 @@ export default function FinanceRequestList({
                       Amount
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                      Transaction / Destination
-                    </TableHead>
-                    <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
                       Status
                     </TableHead>
                     <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
@@ -330,12 +325,7 @@ export default function FinanceRequestList({
                         </TableCell>
                       )}
                       <TableCell className="py-3">
-                        <p className="font-medium text-slate-200">
-                          {req.user
-                            ? `${req.user.firstName} ${req.user.lastName}`
-                            : "—"}
-                        </p>
-                        <p className="text-xs text-slate-500">{req.user?.email}</p>
+                        <p className="text-sm text-slate-300">{req.user?.email ?? "—"}</p>
                       </TableCell>
                       <TableCell className="py-3 text-xs font-mono text-slate-500">
                         {req.user?.clientId ?? "—"}
@@ -348,10 +338,6 @@ export default function FinanceRequestList({
                         }`}
                       >
                         {req.type === "WITHDRAWAL" ? "-" : "+"}₹{req.amount}
-                      </TableCell>
-                      <TableCell className="py-3 text-slate-300 font-mono text-xs">
-                        {req.reference ?? "—"}
-                        {req.method ? ` (${req.method})` : ""}
                       </TableCell>
                       <TableCell className="py-3">
                         <Badge status={req.status} />

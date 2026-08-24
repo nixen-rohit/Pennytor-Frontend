@@ -9,8 +9,6 @@ export interface WithdrawalRequestSummary {
   status: WithdrawalStatus;
   createdAt: string;
   user: {
-    firstName: string;
-    lastName: string;
     email: string;
     clientId: string | null;
   };

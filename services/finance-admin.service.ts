@@ -20,8 +20,6 @@ export interface FinanceReportItem {
   reviewNote: string | null;
   createdAt: string;
   applicant: {
-    firstName: string;
-    lastName: string;
     email: string;
     clientId: string | null;
   } | null;

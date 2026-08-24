@@ -3,9 +3,11 @@ import {
   CreditCard,
   LucideIcon,
   Mail,
-  ListTodo,
+  CalendarClock,
   LayoutDashboard,
   FileText,
+  Landmark,
+  School,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
 
@@ -72,7 +74,32 @@ export const adminNav: MenuSection[] = [
         label: "KYC Applications",
         href: "/admin/kyc/applications",
         icon: MdOutlineVerified,
-        isNew: true,
+        isNew: false,
+      },
+    ],
+  },
+  {
+    id: "Investments",
+    label: "Investments Request",
+    items: [
+      {
+        id: "SIP",
+        label: "SIP Child",
+        href: "/admin/investments/sip",
+        icon: School,
+      },
+      {
+        id: "Fixed Deposite",
+        label: "Fixed Deposite",
+       href: "/admin/investments/fixed-deposite",
+        icon: CalendarClock,
+      },
+
+      {
+        id: "Investment Fund ",
+        label: "Investment Fund ",
+        href: "/admin/investments/investment-fund",
+        icon: Landmark,
       },
     ],
   },
@@ -102,5 +129,4 @@ export const adminNav: MenuSection[] = [
       },
     ],
   },
-   
 ];

@@ -1,27 +1,24 @@
-import { TriangleAlert } from "lucide-react";
-import { useAuthStore } from "@/store/auth.store";
+import { TriangleAlert, Loader2 } from "lucide-react";
 
-import { BANK_ACCOUNT } from "./types";
 import type { FormState } from "./types";
 import { SlipRow } from "./SlipRow";
 import { currency } from "./format";
+import type { UserBankAccount } from "@/services/withdrawal.service";
 
 interface Props {
   data: FormState;
+  userBankAccount: UserBankAccount | null;
+  bankAccountLoading: boolean;
 }
 
-function maskEmail(email: string): string {
-  const [local, domain] = email.split("@");
-  if (!domain) return email;
-  return `${local.slice(0, 1)}***@${domain}`;
-}
-
-export function ReviewWithdraw({ data }: Props) {
-  const email = useAuthStore((s) => s.user?.email ?? "");
-  const destination =
-    data.method === "upi"
-      ? data.upiId
-      : `${BANK_ACCOUNT.bankName} •••• ${BANK_ACCOUNT.accountNumber.slice(-4)}`;
+export function ReviewWithdraw({ data, userBankAccount, bankAccountLoading }: Props) {
+  const destination = data.method === "upi"
+    ? data.upiId
+    : userBankAccount
+      ? `${userBankAccount.bankName} •••• ${userBankAccount.accountNumber}`
+      : bankAccountLoading
+        ? "Loading..."
+        : "Bank account not found (complete KYC first)";
 
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
@@ -46,9 +43,16 @@ export function ReviewWithdraw({ data }: Props) {
             label="Destination"
             value={destination}
             mono={data.method === "upi"}
-          />
-          <SlipRow label="Amount" value={data.amount ? currency(data.amount) : "-"} />
-          <SlipRow label="Email verified" value={maskEmail(email)} />
+          />          
+          {data.method === "bank" && userBankAccount && (
+            <>
+              <SlipRow label="Account Holder" value={userBankAccount.accountHolderName} />
+              <SlipRow label="Bank" value={userBankAccount.bankName} />
+              <SlipRow label="Branch" value={userBankAccount.branchName} />
+              <SlipRow label="IFSC" value={userBankAccount.ifscCode} mono />
+              <SlipRow label="Account Type" value={userBankAccount.accountType || "Not specified"} />
+            </>
+          )}
         </div>
       </div>
 

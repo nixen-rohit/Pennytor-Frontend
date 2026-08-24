@@ -155,35 +155,6 @@ export function WithdrawDetails({
           </span>
         </p>
       </div>
-
-      <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
-        <label className="mb-2 block text-sm font-medium text-slate-200">
-          Password *
-        </label>
-        <div className="relative flex items-center">
-          <Input
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            value={data.password}
-            onChange={(e) => onChange("password", e.target.value)}
-            className="h-11 bg-black/40 pr-10"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:text-slate-200"
-          >
-            {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-          </button>
-        </div>
-        {errors.password && (
-          <p className="mt-1.5 text-xs text-red-500">{errors.password}</p>
-        )}
-      </div>
     </div>
   );
 }

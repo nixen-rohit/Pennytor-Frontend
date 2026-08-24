@@ -4,6 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { format } from "date-fns";
 import { FileText, Loader2, Search } from "lucide-react";
 import {
@@ -11,6 +26,9 @@ import {
   KycApplicationSummary,
   KycStatus,
 } from "@/services/kyc-admin.service";
+import { Pagination } from "@/components/admin/Finance/Pagination";
+
+const ENTRY_OPTIONS = ["5", "10", "15", "20"];
 
 const STATUS_FILTERS: Array<{ label: string; value?: KycStatus }> = [
   { label: "All" },
@@ -32,12 +50,13 @@ export default function KycApplicationList() {
   const [status, setStatus] = useState<KycStatus | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState("5");
   const [items, setItems] = useState<KycApplicationSummary[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const pageSize = 20;
+  const pageSize = parseInt(entriesPerPage);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +66,7 @@ export default function KycApplicationList() {
           status,
           page,
           search.trim() || undefined,
+          pageSize,
         );
         if (cancelled) return;
         setItems(res.items);
@@ -65,9 +85,11 @@ export default function KycApplicationList() {
     return () => {
       cancelled = true;
     };
-  }, [status, search, page]);
+  }, [status, search, page, pageSize]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, total);
 
   return (
     <div className="min-h-screen p-4 bg-black">
@@ -116,6 +138,41 @@ export default function KycApplicationList() {
 
         <Card className="shadow-sm">
           <CardContent className="p-0">
+            <div className="p-4 md:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-neutral-800">
+              <div className="flex items-center gap-2 text-sm text-slate-400">
+                <span>Show</span>
+                <Select
+                  value={entriesPerPage}
+                  onValueChange={(v) => {
+                    setEntriesPerPage(v);
+                    setPage(1);
+                  }}
+                >
+                  <SelectTrigger className="w-[70px] h-8 bg-black">
+                    <SelectValue placeholder="5" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ENTRY_OPTIONS.map((n) => (
+                      <SelectItem key={n} value={n}>
+                        {n}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span>entries</span>
+              </div>
+              <div className="text-sm text-slate-400">
+                {loading ? (
+                  "Loading..."
+                ) : (
+                  <>
+                    Showing {total === 0 ? 0 : startIndex + 1} to {endIndex} of{" "}
+                    {total} entries
+                  </>
+                )}
+              </div>
+            </div>
+
             {loading ? (
               <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
@@ -129,47 +186,54 @@ export default function KycApplicationList() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-neutral-800 text-left text-xs uppercase tracking-wide text-slate-500">
-                      <th className="px-5 py-3">Applicant</th>
-                      <th className="px-5 py-3">Client ID</th>
-                      <th className="px-5 py-3">Status</th>
-                      <th className="px-5 py-3">Submitted</th>
-                      <th className="px-5 py-3">Documents</th>
-                      <th className="px-5 py-3 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-neutral-900/50 hover:bg-neutral-900/50">
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                        Applicant
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                        Client ID
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                        Status
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                        Submitted
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                        Documents
+                      </TableHead>
+                      <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3 text-right">
+                        Action
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {items.map((app) => (
-                      <tr
+                      <TableRow
                         key={app.id}
-                        className="border-b border-neutral-900 last:border-0 hover:bg-neutral-900/40"
+                        className="border-b border-neutral-800 last:border-b-0 hover:bg-neutral-800/50 transition-colors"
                       >
-                        <td className="px-5 py-3.5">
-                          <p className="font-medium text-slate-100">
-                            {app.user.firstName} {app.user.lastName}
-                          </p>
-                          <p className="text-xs text-slate-400">
-                            {app.user.email}
-                          </p>
-                        </td>
-                        <td className="px-5 py-3.5 text-slate-300">
+                        <TableCell className="py-3">
+                          <p className="text-sm text-slate-300">{app.user.email}</p>
+                        </TableCell>
+                        <TableCell className="py-3 text-slate-300">
                           {app.user.clientId ?? "N/A"}
-                        </td>
-                        <td className="px-5 py-3.5">
+                        </TableCell>
+                        <TableCell className="py-3">
                           <Badge status={app.status} styles={statusStyles} />
-                        </td>
-                        <td className="px-5 py-3.5 text-slate-300">
+                        </TableCell>
+                        <TableCell className="py-3 text-slate-300">
                           {format(
                             new Date(app.createdAt),
                             "dd MMM yyyy, hh:mm a",
                           )}
-                        </td>
-                        <td className="px-5 py-3.5 text-slate-300">
+                        </TableCell>
+                        <TableCell className="py-3 text-slate-300">
                           {app._count.files}/5
-                        </td>
-                        <td className="px-5 py-3.5 text-right">
+                        </TableCell>
+                        <TableCell className="py-3 text-right">
                           <Button
                             asChild
                             size="sm"
@@ -179,41 +243,23 @@ export default function KycApplicationList() {
                               Review
                             </Link>
                           </Button>
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
+            )}
+
+            {!loading && !error && totalPages > 1 && (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             )}
           </CardContent>
         </Card>
-
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-slate-500">
-            {total} application{total === 1 ? "" : "s"}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-slate-300"
-              disabled={page <= 1 || loading}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/20 text-slate-300"
-              disabled={page >= totalPages || loading}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
