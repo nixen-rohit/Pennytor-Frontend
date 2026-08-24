@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "./WalletBalanceCard";
 import { PaymentSlipCard, PaymentSlipData } from "./PaymentSlipCard";
 import { DepositService } from "@/services/deposit.service";
+import { WithdrawalService } from "@/services/withdrawal.service";
 
 export default function FundDashboard() {
   const [balance, setBalance] = useState<number | null>(null);
-  const [latestSlip, setLatestSlip] = useState<PaymentSlipData | null>(null);
+  const [latestDeposit, setLatestDeposit] = useState<PaymentSlipData | null>(null);
+  const [latestWithdrawal, setLatestWithdrawal] = useState<PaymentSlipData | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -18,12 +20,13 @@ export default function FundDashboard() {
         setBalance(Number(res.balance) || 0);
         const latest = res.items[0];
         if (latest) {
-          setLatestSlip({
+          setLatestDeposit({
             txnId: latest.transactionId,
             amount: latest.amount,
             submittedAt: latest.submittedAt,
             createdAt: latest.createdAt,
             status: latest.status,
+            type: "DEPOSIT",
           });
         }
       })
@@ -31,6 +34,32 @@ export default function FundDashboard() {
         if (cancelled) return;
         setBalance(0);
       })
+      .finally(() => {
+        if (!cancelled) setLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void WithdrawalService.myWithdrawals()
+      .then((res) => {
+        if (cancelled) return;
+        const latest = res.items[0];
+        if (latest) {
+          setLatestWithdrawal({
+            txnId: latest.id,
+            amount: latest.amount,
+            submittedAt: latest.submittedAt,
+            createdAt: latest.createdAt,
+            status: latest.status,
+            type: "WITHDRAWAL",
+          });
+        }
+      })
+      .catch(() => {})
       .finally(() => {
         if (!cancelled) setLoaded(true);
       });
@@ -57,7 +86,17 @@ export default function FundDashboard() {
             loading={!loaded}
             className="lg:col-span-2"
           />
-          <PaymentSlipCard slip={latestSlip} />
+          <div className="space-y-4">
+            {latestDeposit && (
+              <PaymentSlipCard slip={latestDeposit} />
+            )}
+            {latestWithdrawal && (
+              <PaymentSlipCard slip={latestWithdrawal} />
+            )}
+            {!latestDeposit && !latestWithdrawal && (
+              <PaymentSlipCard slip={null} />
+            )}
+          </div>
         </div>
       </div>
     </div>

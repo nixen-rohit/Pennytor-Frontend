@@ -14,6 +14,8 @@ import {
   AlertCircle,
   Landmark,
   FileText,
+  Copy as IconCopy,
+  Check as IconCheck,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -197,7 +199,11 @@ export default function DepositRequestDetailPage() {
                     </span>
                   }
                 />
-                <Row label="Transaction ID" value={app.transactionId} />
+                <Row
+                  label="Transaction ID"
+                  value={<span className="font-mono text-slate-300">{app.transactionId}</span>}
+                  copyValue={app.transactionId}
+                />
                 <Row
                   label="Applicant"
                   value={
@@ -431,13 +437,48 @@ function Section({
   );
 }
 
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
+function Row({ label, value, copyValue }: { label: string; value: React.ReactNode; copyValue?: string }) {
   return (
     <div className="flex items-start justify-between gap-4 py-1 border-b border-neutral-900 last:border-0">
       <span className="text-sm text-slate-400 shrink-0">{label}</span>
-      <span className="text-sm text-slate-100 text-right break-all">
-        {value || "—"}
-      </span>
+      <div className="flex items-center gap-2 text-right">
+        <span className="text-sm text-slate-100 break-all">{value || "—"}</span>
+        {copyValue && (
+          <CopyButton value={copyValue} />
+        )}
+      </div>
     </div>
+  );
+}
+
+function CopyButton({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard?.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }, [value]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="flex shrink-0 items-center gap-1 rounded-md border border-neutral-700 px-2 py-1 text-xs text-slate-400 transition hover:border-neutral-600 hover:text-slate-200"
+      title="Copy to clipboard"
+    >
+      {copied ? (
+        <>
+          <IconCheck className="h-3.5 w-3.5 text-emerald-400" />
+          <span className="text-emerald-400">Copied</span>
+        </>
+      ) : (
+        <>
+          <IconCopy className="h-3.5 w-3.5" />
+          Copy
+        </>
+      )}
+    </button>
   );
 }

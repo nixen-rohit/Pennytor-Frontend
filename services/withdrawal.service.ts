@@ -31,6 +31,16 @@ export interface MyWithdrawalsResponse {
   items: MyWithdrawal[];
 }
 
+export interface UserBankAccount {
+  accountHolderName: string;
+  accountNumber: string;  // masked (last 4)
+  ifscCode: string;       // masked (last 4)
+  bankName: string;
+  branchName: string;
+  accountType: string | null;
+  branchAddress: string | null;
+}
+
 function csrfHeaders(): Record<string, string> {
   const token = useAuthStore.getState().csrfToken;
   return token ? { "X-CSRF-Token": token } : {};
@@ -53,6 +63,17 @@ export class WithdrawalService {
       method: "POST",
       headers: csrfHeaders(),
       credentials: "include",
+      cache: "no-store",
+    });
+    await assertOk(response);
+  }
+
+  static async verifyPasswordAndSendOtp(password: string): Promise<void> {
+    const response = await fetch(`${API_URL}/withdrawals/verify-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
+      credentials: "include",
+      body: JSON.stringify({ password }),
       cache: "no-store",
     });
     await assertOk(response);
@@ -81,5 +102,15 @@ export class WithdrawalService {
       cache: "no-store",
     });
     return assertOk(response);
+  }
+
+  static async getUserBankAccount(): Promise<UserBankAccount | null> {
+    const response = await fetch(`${API_URL}/kyc/applications/me`, {
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      cache: "no-store",
+    });
+    const data = await assertOk<{ bank?: UserBankAccount } | null>(response);
+    return data?.bank ?? null;
   }
 }

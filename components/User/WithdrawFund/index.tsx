@@ -19,7 +19,7 @@ import { WithdrawDetails } from "./WithdrawDetails";
 import { OtpVerification } from "./OtpVerification";
 import { ReviewWithdraw } from "./ReviewWithdraw";
 import { Submitted } from "./Submitted";
-import { WithdrawalService } from "@/services/withdrawal.service";
+import { WithdrawalService, type UserBankAccount } from "@/services/withdrawal.service";
 
 export default function WithdrawFundPage() {
   const [step, setStep] = useState(1);
@@ -31,6 +31,8 @@ export default function WithdrawFundPage() {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [userBankAccount, setUserBankAccount] = useState<UserBankAccount | null>(null);
+  const [bankAccountLoading, setBankAccountLoading] = useState(false);
   const submittedRef = useRef<{ id: string; status: string } | null>(null);
 
   useEffect(() => {
@@ -50,6 +52,24 @@ export default function WithdrawFundPage() {
     };
   }, []);
 
+  // Fetch user's bank account from KYC when method is "bank"
+  useEffect(() => {
+    if (form.method === "bank") {
+      setBankAccountLoading(true);
+      WithdrawalService.getUserBankAccount()
+        .then((bank) => {
+          setUserBankAccount(bank);
+          setBankAccountLoading(false);
+        })
+        .catch(() => {
+          setUserBankAccount(null);
+          setBankAccountLoading(false);
+        });
+    } else {
+      setUserBankAccount(null);
+    }
+  }, [form.method]);
+
   const updateField: FormChange = useCallback((key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => {
@@ -68,14 +88,14 @@ export default function WithdrawFundPage() {
       errs.amount = "Enter the amount you want to withdraw.";
     else if (Number(form.amount) > balance)
       errs.amount = `Amount exceeds your available balance of ₹${balance.toLocaleString("en-IN")}.`;
-    if (!form.password)
-      errs.password = "Enter your password to continue.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  const validateStep2 = () => {
+  const validateStep3 = () => {
     const errs: FormErrors = {};
+    if (!form.password)
+      errs.password = "Enter your password.";
     if (form.otp.trim().length !== 6)
       errs.otp = "Enter the 6-digit OTP sent to your email.";
     setErrors(errs);
@@ -87,7 +107,6 @@ export default function WithdrawFundPage() {
     setApiError(null);
     try {
       await WithdrawalService.sendOtp();
-      setStep(2);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : "Failed to send OTP");
     } finally {
@@ -99,10 +118,14 @@ export default function WithdrawFundPage() {
     setApiError(null);
     if (step === 1) {
       if (!validateStep1()) return;
-      void sendOtp();
+      setStep(2);
       return;
     }
-    if (step === 2 && !validateStep2()) return;
+    if (step === 2) {
+      setStep(3);
+      return;
+    }
+    if (step === 3 && !validateStep3()) return;
     setStep((s) => Math.min(s + 1, STEPS.length));
   };
 
@@ -114,6 +137,7 @@ export default function WithdrawFundPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (step !== STEPS.length) return;
+    if (!validateStep3()) return;
     setSubmitting(true);
     setApiError(null);
     try {
@@ -129,7 +153,6 @@ export default function WithdrawFundPage() {
       setSubmitted(true);
     } catch (err) {
       setApiError(err instanceof Error ? err.message : "Failed to submit request");
-      setStep(2);
       setErrors((prev) => ({ ...prev, otp: "Please request a fresh OTP and try again." }));
     } finally {
       setSubmitting(false);
@@ -191,16 +214,26 @@ export default function WithdrawFundPage() {
                   balanceLoaded={balanceLoaded}
                 />
               )}
+
               {step === 2 && (
+                <ReviewWithdraw
+                  data={form}
+                  userBankAccount={userBankAccount}
+                  bankAccountLoading={bankAccountLoading}
+                />
+              )}
+
+              {step === 3 && (
                 <OtpVerification
                   data={form}
                   errors={errors}
                   onChange={updateField}
                   onResend={sendOtp}
                   resendBusy={sendingOtp}
+                  onSendOtp={sendOtp}
+                  sendingOtp={sendingOtp}
                 />
               )}
-              {step === 3 && <ReviewWithdraw data={form} />}
 
               {apiError && (
                 <div className="flex items-start gap-2 rounded-lg border border-red-600/40 bg-red-600/10 px-4 py-3 text-sm text-red-400">
@@ -248,7 +281,7 @@ export default function WithdrawFundPage() {
                       </>
                     ) : (
                       <>
-                        {step === 1 ? "Send OTP" : "Continue"}
+                        {step === 1 ? "Continue" : step === 2 ? "Authenticate" : "Continue"}
                         <ChevronRight className="h-4 w-4" />
                       </>
                     )}

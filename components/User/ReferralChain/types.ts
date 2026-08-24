@@ -1,5 +1,3 @@
-import { Users, TreePine } from "lucide-react";
-
  
 export interface ReferralUser {
   id: string;
