@@ -20,6 +20,10 @@ import {
   WithdrawalStatus,
   MyWithdrawal,
 } from "@/services/withdrawal.service";
+import {
+  InvestmentFundService,
+  type MyInvestment,
+} from "@/services/investment-fund.service";
 
 type RecordStatus = TransactionRecord["currentStatus"];
 
@@ -47,6 +51,7 @@ function depositToRecords(
     transactionId: d.transactionId,
     transactionAmount: Number(d.amount) || 0,
     requestType: "CR",
+    requestKind: "CR" as const,
     currentStatus: mapStatus(d.status),
     requestDate: new Date(d.submittedAt ?? d.createdAt),
   }));
@@ -64,8 +69,34 @@ function withdrawalToRecords(
     transactionId: w.id.slice(0, 8).toUpperCase(),
     transactionAmount: Number(w.amount) || 0,
     requestType: "DR",
+    requestKind: "DR" as const,
     currentStatus: mapStatus(w.status),
     requestDate: new Date(w.submittedAt ?? w.createdAt),
+  }));
+}
+
+function investmentToRecords(
+  items: MyInvestment[],
+  userName: string,
+  userType: string,
+): TransactionRecord[] {
+  return items.map((d) => ({
+    id: `IF-${d.id}`,
+    userName,
+    userType,
+    transactionId: d.id.slice(0, 8).toUpperCase(),
+    transactionAmount: Number(d.amount) || 0,
+    requestType: d.planLabel.startsWith("Investment Fund")
+      ? d.planLabel
+      : `Investment Fund Scheme(${d.planLabel})`,
+    requestKind: "IF" as const,
+    currentStatus:
+      d.status === "VERIFIED"
+        ? ("APPROVED" as const)
+        : d.status === "REJECTED"
+          ? ("REJECTED" as const)
+          : ("PENDING" as const),
+    requestDate: new Date(d.submittedAt ?? d.createdAt),
   }));
 }
 
@@ -90,13 +121,15 @@ export default function Transaction() {
     setLoading(true);
     setError(null);
     try {
-      const [dep, wdr] = await Promise.all([
+      const [dep, wdr, inv] = await Promise.all([
         DepositService.myDeposits(),
         WithdrawalService.myWithdrawals(),
+        InvestmentFundService.myApplications().catch(() => ({ items: [] as MyInvestment[] })),
       ]);
       const records = [
         ...depositToRecords(dep.items, userName, userType),
         ...withdrawalToRecords(wdr.items, userName, userType),
+        ...investmentToRecords(inv.items ?? [], userName, userType),
       ].sort((a, b) => b.requestDate.getTime() - a.requestDate.getTime());
       setTransactions(records);
     } catch (err) {
@@ -110,7 +143,8 @@ export default function Transaction() {
   }, [userName, userType]);
 
   useEffect(() => {
-    void load();
+    const id = setTimeout(() => void load(), 0);
+    return () => clearTimeout(id);
   }, [load]);
 
   const activeFilterCount =
@@ -127,7 +161,7 @@ export default function Transaction() {
         String(txn.transactionAmount).includes(query);
 
       const matchesRequestType =
-        requestTypeFilter === "all" || txn.requestType === requestTypeFilter;
+        requestTypeFilter === "all" || txn.requestKind === requestTypeFilter;
       const matchesStatus =
         statusFilter === "all" || txn.currentStatus === statusFilter;
 

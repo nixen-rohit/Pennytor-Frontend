@@ -196,7 +196,7 @@ export default function KycApplicationList() {
                         Client ID
                       </TableHead>
                       <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                        Status
+                        KYC Status
                       </TableHead>
                       <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
                         Submitted

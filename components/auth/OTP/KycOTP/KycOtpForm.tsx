@@ -9,13 +9,6 @@ import {
   REGEXP_ONLY_DIGITS,
 } from "@/components/ui/input-otp";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
   Form,
   FormControl,
   FormField,
@@ -24,17 +17,6 @@ import {
 } from "@/components/ui/form";
 import type { UseFormReturn } from "react-hook-form";
 import type { RegisteredOtpFormValues } from "@/lib/validations";
-
-interface KycOtpFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  form: UseFormReturn<RegisteredOtpFormValues>;
-  onSubmit: (data: RegisteredOtpFormValues) => void;
-  formLoading: boolean;
-  errorMsg: string;
-  onResend: () => void;
-  resendCooldown: number;
-}
 
 export default function KycOtpForm({
   open,
@@ -45,11 +27,21 @@ export default function KycOtpForm({
   errorMsg,
   onResend,
   resendCooldown,
-}: KycOtpFormProps) {
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  form: UseFormReturn<RegisteredOtpFormValues>;
+  onSubmit: (data: RegisteredOtpFormValues) => void;
+  formLoading: boolean;
+  errorMsg: string;
+  onResend: () => void;
+  resendCooldown: number;
+}) {
+  if (!open) return null;
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md rounded-3xl border-0 bg-white px-8 py-10 shadow-2xl">
-        <DialogHeader className="flex flex-col items-center text-center">
+    <div className="relative z-10 mx-auto w-full max-w-md">
+      <div className="relative rounded-3xl border-0 bg-white/95 px-6 py-8 shadow-2xl md:px-8 md:py-10">
+        <div className="flex flex-col items-center text-center mb-8">
           {/* Icon */}
           <div className="relative mb-6">
             <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-black">
@@ -61,15 +53,15 @@ export default function KycOtpForm({
             />
           </div>
 
-          <DialogTitle className="text-3xl font-bold tracking-tight text-slate-900">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
             Verify your KYC
-          </DialogTitle>
-          <DialogDescription className="mt-4 text-sm leading-7 text-slate-500">
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-slate-500">
             To keep a trusted and safe community, we&apos;ve sent a 6-digit
             code to your registered email address. Enter it below to confirm
             and submit your KYC details.
-          </DialogDescription>
-        </DialogHeader>
+          </p>
+        </div>
 
         <Form {...form}>
           <form
@@ -151,7 +143,7 @@ export default function KycOtpForm({
         </Form>
 
         {/* Resend */}
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-center text-sm text-slate-500 pt-2">
           Did not receive the code?{" "}
           {resendCooldown > 0 ? (
             <span className="font-medium text-slate-400">
@@ -167,7 +159,7 @@ export default function KycOtpForm({
             </button>
           )}
         </p>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }

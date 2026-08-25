@@ -55,8 +55,8 @@ export function TransactionFilterDialog({
               </SelectTrigger>
               <SelectContent>
                 {requestTypeOptions.map((opt) => (
-                  <SelectItem key={opt} value={opt}>
-                    {opt === "all" ? "All" : opt}
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -97,7 +97,7 @@ export default function LoginForm({
                       className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9"
                     >
                       {showPassword ? (
-                        <EyeOff className="h-4 w-4 text-zinc-400" />
+                        <EyeOff className="h-4 w-4 text-zinc-400 " />
                       ) : (
                         <Eye className="h-4 w-4 text-zinc-400" />
                       )}

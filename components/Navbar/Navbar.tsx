@@ -66,16 +66,14 @@ export default function Navbar() {
             <DesktopNav navItems={NAV} className="hidden lg:flex" />
 
             {/* ── Right Actions ── */}
-            <div className="flex items-center gap-1 shrink-0">
-              
-
+            <div className="flex items-center gap-1 shrink-0"> 
               
 
               {/* CTA */}
 
               <Link
                 href={CTA.href}
-                className=" inline-flex items-center justify-center rounded-full text-white bg-foreground px-6 py-3 text-sm font-semibold  hover:bg-secondary cursor-pointer transition-all duration-300  hover:bg-mainground  hover:-translate-y-0.5"
+                className=" inline-flex items-center justify-center rounded-full text-white bg-foreground px-6 py-3 text-sm font-semibold    cursor-pointer transition-all duration-300  hover:bg-mainground  hover:-translate-y-0.5"
               >
                 {CTA.label}
               </Link>

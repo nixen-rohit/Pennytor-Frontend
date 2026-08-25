@@ -1,16 +1,6 @@
 "use client"
-import { InvestmentFund } from "@/components/InvestmentFund";
+import InvestmentFund from "@/components/InvestmentFund/InvestmentFund";
 
 export default function Page() {
-  return (
-    <InvestmentFund
-      onContact={() => {
-        // Open contact modal / navigate to contact
-      }}
-      onApply={(plan) => {
-        // Start application flow
-        console.log(plan);
-      }}
-    />
-  );
+  return <InvestmentFund />;
 }

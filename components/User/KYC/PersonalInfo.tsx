@@ -85,7 +85,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full justify-start text-left font-normal"
+                className="w-full justify-start text-left font-normal border-white/20"
               >
                 <CalendarIcon className="mr-2 h-4 w-4 text-slate-400 shrink-0" />
 
@@ -98,6 +98,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                className="bg-black"
                 selected={data.dob ?? undefined}
                 onSelect={(date) => date && onChange("dob", date)}
                 captionLayout="dropdown"

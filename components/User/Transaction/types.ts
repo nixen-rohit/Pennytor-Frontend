@@ -1,5 +1,7 @@
-export type RequestType = "DR" | "CR";
 export type CurrentStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+
+/** Machine key used for filtering — IF = Investment Fund scheme rows. */
+export type RequestKind = "DR" | "CR" | "IF";
 
 export interface TransactionRecord {
   id: string;
@@ -7,7 +9,9 @@ export interface TransactionRecord {
   userType: string;
   transactionId: string;
   transactionAmount: number;
-  requestType: RequestType;
+  /** Display label, e.g. "CR", "DR", "Investment Fund Scheme(B)". */
+  requestType: string;
+  requestKind: RequestKind;
   currentStatus: CurrentStatus;
   requestDate: Date;
 }
@@ -20,6 +24,7 @@ export const initialTransactions: TransactionRecord[] = [
     transactionId: "",
     transactionAmount: 680,
     requestType: "DR",
+    requestKind: "DR",
     currentStatus: "PENDING",
     requestDate: new Date("2026-07-27"),
   },
@@ -30,6 +35,7 @@ export const initialTransactions: TransactionRecord[] = [
     transactionId: "",
     transactionAmount: 100000,
     requestType: "CR",
+    requestKind: "CR",
     currentStatus: "APPROVED",
     requestDate: new Date("2026-06-17"),
   },
@@ -37,7 +43,13 @@ export const initialTransactions: TransactionRecord[] = [
 
 export const entriesOptions = ["10", "25", "50", "100"];
 
-export const requestTypeOptions: ("all" | RequestType)[] = ["all", "DR", "CR"];
+export const requestTypeOptions: { value: "all" | RequestKind; label: string }[] =
+  [
+    { value: "all", label: "All" },
+    { value: "DR", label: "DR — Withdrawal" },
+    { value: "CR", label: "CR — Deposit" },
+    { value: "IF", label: "Investment Fund" },
+  ];
 
 export const statusOptions: ("all" | CurrentStatus)[] = [
   "all",

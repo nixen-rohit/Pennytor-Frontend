@@ -43,7 +43,7 @@ export function NomineeDetails({ data, errors, onChange }: Props) {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-full justify-start text-left font-normal"
+                className="w-full justify-start text-left font-normal "
               >
                 <CalendarIcon className="mr-2 h-4 w-4 text-slate-400 shrink-0" />
 
@@ -56,6 +56,7 @@ export function NomineeDetails({ data, errors, onChange }: Props) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
+                className="bg-black"
                 selected={data.nomineeDob ?? undefined}
                 onSelect={(date) => date && onChange("nomineeDob", date)}
                 captionLayout="dropdown"
