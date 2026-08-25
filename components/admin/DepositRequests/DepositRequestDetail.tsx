@@ -149,7 +149,12 @@ export default function DepositRequestDetailPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Requests
           </Button>
-          <Badge status={app.status} />
+         <div className="text-center h-10 w-auto border border-white/20  rounded-md flex   items-center justify-center">
+            <h2 className="p-2 text-white ">Deposit Status : </h2>
+            <div className="p-2">
+              <Badge status={app.status} />
+            </div>
+          </div>
         </div>
 
         <Card className="shadow-sm">

@@ -3,50 +3,19 @@
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "./WalletBalanceCard";
 import { PaymentSlipCard, PaymentSlipData } from "./PaymentSlipCard";
-import { DepositService } from "@/services/deposit.service";
 import { WithdrawalService } from "@/services/withdrawal.service";
 
 export default function FundDashboard() {
   const [balance, setBalance] = useState<number | null>(null);
-  const [latestDeposit, setLatestDeposit] = useState<PaymentSlipData | null>(null);
   const [latestWithdrawal, setLatestWithdrawal] = useState<PaymentSlipData | null>(null);
   const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    void DepositService.myDeposits()
-      .then((res) => {
-        if (cancelled) return;
-        setBalance(Number(res.balance) || 0);
-        const latest = res.items[0];
-        if (latest) {
-          setLatestDeposit({
-            txnId: latest.transactionId,
-            amount: latest.amount,
-            submittedAt: latest.submittedAt,
-            createdAt: latest.createdAt,
-            status: latest.status,
-            type: "DEPOSIT",
-          });
-        }
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setBalance(0);
-      })
-      .finally(() => {
-        if (!cancelled) setLoaded(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
     void WithdrawalService.myWithdrawals()
       .then((res) => {
         if (cancelled) return;
+        setBalance(Number(res.balance) || 0);
         const latest = res.items[0];
         if (latest) {
           setLatestWithdrawal({
@@ -55,7 +24,6 @@ export default function FundDashboard() {
             submittedAt: latest.submittedAt,
             createdAt: latest.createdAt,
             status: latest.status,
-            type: "WITHDRAWAL",
           });
         }
       })
@@ -87,13 +55,10 @@ export default function FundDashboard() {
             className="lg:col-span-2"
           />
           <div className="space-y-4">
-            {latestDeposit && (
-              <PaymentSlipCard slip={latestDeposit} />
-            )}
             {latestWithdrawal && (
               <PaymentSlipCard slip={latestWithdrawal} />
             )}
-            {!latestDeposit && !latestWithdrawal && (
+            {!latestWithdrawal && (
               <PaymentSlipCard slip={null} />
             )}
           </div>

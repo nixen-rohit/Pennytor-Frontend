@@ -11,6 +11,16 @@ export interface DepositRequestRef {
   id: string;
   status: DepositStatus;
   amount: string;
+  createdAt: string;
+}
+
+export interface DepositDetail {
+  id: string;
+  status: DepositStatus;
+  amount: string;
+  createdAt: string;
+  transactionId: string;
+  reviewNote: string | null;
 }
 
 export interface MyDeposit {
@@ -60,6 +70,14 @@ export class DepositService {
       headers: csrfHeaders(),
       credentials: "include",
       body: form,
+      cache: "no-store",
+    });
+    return assertOk(response);
+  }
+
+  static async getDeposit(id: string): Promise<DepositDetail> {
+    const response = await fetch(`${API_URL}/deposits/${id}`, {
+      credentials: "include",
       cache: "no-store",
     });
     return assertOk(response);

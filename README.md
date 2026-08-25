@@ -2,6 +2,7 @@
 
 A modern fintech/investment platform built with **Next.js 16**, **React 19**, and **TypeScript**.
 
+#
 ## Tech Stacks
 
 ### Core

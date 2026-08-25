@@ -16,6 +16,7 @@ interface SubMenuItem {
   icon: LucideIcon;
   badge?: string;
   isNew?: boolean;
+  isSoon?: boolean;
   External?: boolean;
   children?: SubMenuItem[];
 }
@@ -27,6 +28,7 @@ interface MenuItem {
   icon: React.ComponentType<any>;
   badge?: string;
   isNew?: boolean;
+  isSoon?: boolean;
   External?: boolean;
   children?: SubMenuItem[];
 }
@@ -209,6 +211,11 @@ export default function Sidebar({ menuData }: SidebarProps) {
               {item.isNew && (
                 <span className="px-1.5 py-0.5 text-xs  bg-green-900/30 text-green-400 rounded-full">
                   New
+                </span>
+              )}
+              {item.isSoon && (
+                <span className="px-1.5 py-0.5 text-xs  bg-blue-900/30 text-blue-400 rounded-full">
+                  Soon
                 </span>
               )}
               {item.badge &&

@@ -1,9 +1,5 @@
-import React from 'react'
+import InvestmentsFundRequestList from "@/components/admin/InvestmentsFundRequest";
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function Page() {
+  return <InvestmentsFundRequestList />;
 }
-
-export default page

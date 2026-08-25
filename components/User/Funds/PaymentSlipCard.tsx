@@ -1,20 +1,16 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Receipt, Landmark, ArrowDownLeft, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-import type { DepositStatus } from "@/services/deposit.service";
 import type { WithdrawalStatus } from "@/services/withdrawal.service";
 import { SlipRow } from "./SlipRow";
-
-export type FundRequestType = "DEPOSIT" | "WITHDRAWAL";
 
 export interface PaymentSlipData {
   txnId: string;
   amount: string;
   submittedAt: string | null;
   createdAt: string;
-  status: DepositStatus | WithdrawalStatus;
-  type: FundRequestType;
+  status: WithdrawalStatus;
 }
 
 const statusStyles: Record<string, string> = {
@@ -47,32 +43,31 @@ function formatDateTime(iso: string | null): string {
 
 export function PaymentSlipCard({ slip }: { slip?: PaymentSlipData | null }) {
   const status = slip?.status ?? "PENDING";
-  const isDeposit = slip?.type === "DEPOSIT";
 
-  const title = isDeposit ? "Payment Slip" : "Withdrawal Slip";
-  const subtitle = isDeposit ? "Latest fund request" : "Latest withdrawal request";
-  const paidToLabel = isDeposit ? "Paid to" : "Debited from";
-  const requestTypeValue = isDeposit ? "Credit (CR)" : "Debit (DR)";
-  const icon = isDeposit ? <Receipt className="h-4 w-4 text-slate-300" /> : <ArrowUpRight className="h-4 w-4 text-slate-300" />;
-  const iconBg = isDeposit ? "bg-neutral-800" : "bg-red-600/20";
-  const beneficiary = isDeposit ? "Pennytor Financial Services" : "Your registered account";
+  const title = "Withdrawal Slip";
+  const subtitle = "Latest withdrawal request";
+  const paidToLabel = "Debited from";
+  const requestTypeValue = "Debit (DR)";
+  const icon = <ArrowUpRight className="h-4 w-4 text-slate-300" />;
+  const iconBg = "bg-red-600/20";
+  const beneficiary = "Your registered account";
 
   const rows = slip
     ? [
-        { label: paidToLabel, value: beneficiary },
+        { label: "Debited from", value: beneficiary },
         { label: "Amount", value: `₹${slip.amount}`, mono: true },
-        { label: isDeposit ? "Transaction id" : "Request id", value: slip.txnId, mono: true },
+        { label: "Request id", value: slip.txnId, mono: true },
         {
           label: "Date and time",
           value: formatDateTime(slip.submittedAt ?? slip.createdAt),
         },
-        { label: "Request type", value: requestTypeValue },
+        { label: "Request type", value: "Debit (DR)" },
       ]
     : [
-        { label: paidToLabel, value: beneficiary },
-        { label: "Transaction id", value: "————", mono: true },
+        { label: "Debited from", value: beneficiary },
+        { label: "Request id", value: "————", mono: true },
         { label: "Date and time", value: "—" },
-        { label: "Request type", value: requestTypeValue },
+        { label: "Request type", value: "Debit (DR)" },
       ];
 
   return (
@@ -80,12 +75,12 @@ export function PaymentSlipCard({ slip }: { slip?: PaymentSlipData | null }) {
       <CardContent className="space-y-4 p-6">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${iconBg}`}>
-              {icon}
+            <span className={`flex h-9 w-9 items-center justify-center rounded-lg bg-red-600/20`}>
+              <ArrowUpRight className="h-4 w-4 text-slate-300" />
             </span>
             <div>
-              <p className="text-sm font-medium text-slate-200">{title}</p>
-              <p className="text-[11px] text-slate-500">{subtitle}</p>
+              <p className="text-sm font-medium text-slate-200">Withdrawal Slip</p>
+              <p className="text-[11px] text-slate-500">Latest withdrawal request</p>
             </div>
           </div>
           <Badge
@@ -108,10 +103,7 @@ export function PaymentSlipCard({ slip }: { slip?: PaymentSlipData | null }) {
         </div>
 
         <div className="flex items-start gap-2 text-[11px] text-slate-400">
-          <Landmark className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          {isDeposit
-            ? "Verified by the admin team within 30 minutes of submission; the amount is credited to your wallet once approved."
-            : "Verified by the admin team within 30 minutes of submission; the amount is debited from your wallet once approved."}
+          Verified by the admin team within 30 minutes of submission; the amount is debited from your wallet once approved.
         </div>
       </CardContent>
     </Card>

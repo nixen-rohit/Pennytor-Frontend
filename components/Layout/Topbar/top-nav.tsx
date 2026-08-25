@@ -53,7 +53,11 @@ const defaultConfig: TopbarConfig = {
   ],
 };
 
-export default function TopNav({ config = defaultConfig }: { config?: TopbarConfig }) {
+export default function TopNav({
+  config = defaultConfig,
+}: {
+  config?: TopbarConfig;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
@@ -138,12 +142,8 @@ export default function TopNav({ config = defaultConfig }: { config?: TopbarConf
         </nav>
       </div>
 
-       
-
       {/* Right side - Actions and Profile */}
       <div className="flex items-center space-x-5">
-         
-
         {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -179,7 +179,7 @@ export default function TopNav({ config = defaultConfig }: { config?: TopbarConf
                 )}
                 {item.type === "logout" ? (
                   <DropdownMenuItem
-                    className="text-red-600/70 hover:bg-red-600 hover:text-white cursor-pointer text-sm"
+                    className="data-[highlighted]:bg-red-600/70 text-red-500/80 cursor-pointer text-sm"
                     onClick={handleLogout}
                   >
                     <item.icon className="mr-2 h-4 w-4" />
@@ -188,7 +188,7 @@ export default function TopNav({ config = defaultConfig }: { config?: TopbarConf
                 ) : (
                   <DropdownMenuItem
                     asChild
-                    className=" hover:bg-neutral-800 text-white "
+                    className="data-[highlighted]:bg-neutral-800"
                   >
                     <Link href={item.href || "#"}>
                       <item.icon className="mr-2 h-4 w-4" />

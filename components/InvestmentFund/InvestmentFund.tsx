@@ -1,10 +1,14 @@
-import * as React from "react";
-import { ArrowRight, Phone, TrendingUp, ShieldCheck } from "lucide-react";
-
+"use client";
+import { useEffect, useState } from "react";
+import { ArrowRight, Phone, TrendingUp, ShieldCheck, BadgeCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/auth.store";
+import { InvestmentFundService } from "@/services/investment-fund.service";
 
 type InvestmentFundPlan = {
+  id: number;
   serialNumber: string;
   amount: string;
   lockInPeriod: string;
@@ -13,52 +17,91 @@ type InvestmentFundPlan = {
 
 const INVESTMENT_FUND_PLANS: InvestmentFundPlan[] = [
   {
-    serialNumber: "1.",
+    id: 1,
+    serialNumber: "A",
     amount: "Rs.5,00,000/- to Rs.25,00,000/-",
     lockInPeriod: "3 Years",
     roi: "3%",
   },
   {
-    serialNumber: "2.",
+    id: 2,
+    serialNumber: "B",
     amount: "Rs.25,00,000/- to Rs.50,00,000/-",
     lockInPeriod: "3 Years",
     roi: "3.5%",
   },
   {
-    serialNumber: "3.",
+    id: 3,
+    serialNumber: "C",
     amount: "Rs.50,00,000/- to Rs.1,00,00,000/-",
     lockInPeriod: "3 Years",
     roi: "4%",
   },
   {
-    serialNumber: "4.",
+    id: 4,
+    serialNumber: "D",
     amount: "Rs.1,00,00,000/- to Rs.5,00,00,000/-",
     lockInPeriod: "3 Years",
     roi: "4.5%",
   },
   {
-    serialNumber: "5.",
+    id: 5,
+    serialNumber: "E",
     amount: "Rs.5,00,00,000/- and Above",
     lockInPeriod: "3 Years",
     roi: "5%",
   },
 ];
 
-type InvestmentFundProps = {
-  onContact?: () => void;
-  onApply?: (plan: InvestmentFundPlan) => void;
-  className?: string;
-};
+const InvestmentFund = () => {
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  // Scheme letters (A–E) the user already holds a PENDING/VERIFIED
+  // application for — their Apply buttons are disabled.
+  const [activeSchemes, setActiveSchemes] = useState<Set<string>>(new Set());
 
-export function InvestmentFund({
-  onContact,
-  onApply,
-  className = "",
-}: InvestmentFundProps) {
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    InvestmentFundService.myApplications()
+      .then((res) => {
+        if (cancelled) return;
+        setActiveSchemes(
+          new Set(
+            (res.items ?? [])
+              .filter((i) => i.status === "PENDING" || i.status === "VERIFIED")
+              .map((i) => i.scheme),
+          ),
+        );
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
+  const isActive = (id: number) =>
+    activeSchemes.has(String.fromCharCode(64 + id)); // 1 -> A ... 5 -> E
+
+  const onApply = (id: number) => {
+    if (isAuthenticated) {
+      // User is logged in (dashboard) → go directly to apply page
+      router.push(`/investment/all-schemes/investment-fund/apply/${id}`);
+    } else {
+      // User is not logged in (main site) → redirect to login with redirect URL
+      const redirectUrl = encodeURIComponent(`/investment/all-schemes/investment-fund/apply/${id}`);
+      router.push(`/login?redirect=${redirectUrl}`);
+    }
+  };
+
+  const onContact = () => {
+    return router.push("/contact");
+  };
+
   return (
     <section
       aria-labelledby="investment-fund-heading"
-      className={`w-full bg-[#08090f] px-4 py-12 text-white sm:px-6 lg:px-8 ${className}`}
+      className={`w-full bg-[#08090f] px-4 py-12 text-white sm:px-6 lg:px-8 `}
     >
       <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
@@ -86,31 +129,10 @@ export function InvestmentFund({
                 Investment <span className="text-amber-400">Fund Scheme</span>
               </h2>
 
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-zinc-400 sm:text-base">
+              <p className="mt-4 max-w-7xl text-sm leading-6 text-zinc-400 sm:text-base ">
                 Explore investment plans based on your investment amount, with a
                 fixed 3-year lock-in period and monthly ROI.
               </p>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onContact}
-                className="h-11 border-white/15 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
-              >
-                <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
-                Contact
-              </Button>
-
-              <Button
-                type="button"
-                onClick={() => onApply?.(INVESTMENT_FUND_PLANS[0])}
-                className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
-              >
-                Apply Now
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-              </Button>
             </div>
           </div>
         </div>
@@ -189,18 +211,30 @@ export function InvestmentFund({
                       </td>
 
                       <td className="border-b border-white/10 px-5 py-6">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={() => onApply?.(plan)}
-                          className={
-                            "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
-                          }
-                        >
-                          Apply
-                          <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                        </Button>
+                        {isActive(plan.id) ? (
+                          <Button
+                            type="button"
+                            size="sm"
+                            disabled
+                            className="font-semibold border-green-500/20 bg-green-500/10 text-green-400"
+                          >
+                            <BadgeCheck className="mr-1.5 h-3.5 w-3.5" />
+                            Already Active
+                          </Button>
+                        ) : (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => onApply(plan.id)}
+                            className={
+                              "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                            }
+                          >
+                            Apply
+                            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -273,17 +307,29 @@ export function InvestmentFund({
                 </div>
 
                 <div className="p-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => onApply?.(plan)}
-                    className={
-                      "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
-                    }
-                  >
-                    Apply for Plan {plan.serialNumber}
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  {isActive(plan.id) ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled
+                      className="w-full font-semibold border-green-500/20 bg-green-500/10 text-green-400"
+                    >
+                      <BadgeCheck className="mr-2 h-4 w-4" />
+                      Already Active
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => onApply(plan.id)}
+                      className={
+                        "font-semibold border-white/15 bg-white/5 text-white  hover:bg-amber-400 hover:text-black"
+                      }
+                    >
+                      Apply for Plan {plan.serialNumber}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -328,6 +374,6 @@ export function InvestmentFund({
       </div>
     </section>
   );
-}
+};
 
 export default InvestmentFund;

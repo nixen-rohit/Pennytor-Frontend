@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { DepositAdminService } from "@/services/deposit-admin.service";
 import { WithdrawalAdminService } from "@/services/withdrawal-admin.service";
+import { InvestmentFundAdminService } from "@/services/investment-fund-admin.service";
 import {
   FinanceAdminService,
   FinanceReportFilters,
@@ -125,6 +126,27 @@ export function useFinanceReportList(filters: FinanceReportFilters = {}) {
     ...result,
     items: result.data?.items ?? [],
     pagination: result.data?.pagination,
+  };
+}
+
+/** Investment fund page — applications submitted by users (server-side). */
+export function useInvestmentFundRequests(
+  status?: string,
+  page = 1,
+  search?: string,
+  pageSize = 20,
+) {
+  const key = keyFor([FINANCE_KEYS.investmentFund, status ?? "ALL", page, search ?? "", pageSize]);
+  const loader = useCallback(
+    () => InvestmentFundAdminService.list(status as never, page, search || undefined, pageSize),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [key],
+  );
+  const result = useQuery(key, loader);
+  return {
+    ...result,
+    items: result.data?.items ?? [],
+    total: result.data?.total ?? 0,
   };
 }
 

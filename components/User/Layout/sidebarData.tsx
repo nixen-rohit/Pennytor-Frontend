@@ -17,6 +17,7 @@ import {
   ChartNoAxesCombined,
   School,
   Bell,
+  CornerDownRight,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
 
@@ -27,6 +28,7 @@ interface SubMenuItem {
   icon: LucideIcon;
   badge?: string;
   isNew?: boolean;
+  isSoon?: boolean;
   External?: boolean;
   children?: SubMenuItem[];
 }
@@ -38,6 +40,7 @@ interface MenuItem {
   icon: React.ComponentType<any>;
   badge?: string;
   isNew?: boolean;
+  isSoon?: boolean;
   External?: boolean;
   children?: SubMenuItem[];
 }
@@ -59,7 +62,7 @@ export const menuData: MenuSection[] = [
         href: "/dashboard",
         icon: Home,
       },
-       {
+      {
         id: "notifications",
         label: "Notifications",
         href: "/notifications",
@@ -73,35 +76,80 @@ export const menuData: MenuSection[] = [
     label: "Investment",
     items: [
       {
-        id: "all-schemes",
-        label: "All Schemes",
-        href: "/",
-        icon: ClipboardList,
-        badge: "4",
+        id: "gullak",
+        label: "Gullak ",
+        href: "#",
+        isSoon: true,
+        icon: PiggyBank,
         children: [
           {
             id: "gullak",
-            label: "Gullak Schemes",
+            label: "Details",
+            icon: CornerDownRight,
             href: "/investment/all-schemes/gullak-scheme",
-            icon: PiggyBank,
           },
+        ],
+      },
+      {
+        id: "sip",
+        label: "SIP Child",
+        href: "#",
+
+        icon: School,
+
+        isNew: true,
+        children: [
           {
             id: "sip",
-            label: "SIP Schemes",
+            label: "Details",
             href: "/investment/all-schemes/sip-investment",
-            icon: School,
+            icon: CornerDownRight,
           },
+        ],
+      },
+
+      {
+        id: "fixed-deposite",
+        label: "Fixed Deposite",
+        href: "#",
+
+        icon: CalendarClock,
+        isNew: true,
+        children: [
           {
             id: "fixed-deposite",
-            label: "Fixed Deposite",
+            label: "Details",
             href: "/investment/all-schemes/fixed-deposite",
-            icon: CalendarClock,
+            icon: CornerDownRight,
+          },
+        ],
+      },
+
+      {
+        id: "investment-fund-scheme",
+        label: "Investment Fund ",
+        href: "#",
+
+        icon: Landmark,
+        isNew: true,
+        children: [
+          {
+            id: "investment-fund-scheme-details",
+            label: "Details",
+            href: "/investment/all-schemes/investment-fund",
+            icon: CornerDownRight,
           },
           {
-            id: "investment-fund-scheme",
-            label: "Investment Fund Scheme",
-            href: "/investment/all-schemes/investment-fund",
-            icon: Landmark,
+            id: "investment-fund-scheme-progress",
+            label: "Progress",
+            href: "/investment/all-schemes/investment-fund/progress",
+            icon: CornerDownRight,
+          },
+          {
+            id: "investment-fund-scheme-report",
+            label: "Report",
+            href: "/investment/all-schemes/investment-fund/reports",
+            icon: CornerDownRight,
           },
         ],
       },
@@ -111,19 +159,20 @@ export const menuData: MenuSection[] = [
         label: "Stocks",
         href: "/investment/stocks",
         icon: Mail,
-        isNew: true,
+        isSoon: true,
       },
       {
         id: "Insurance",
         label: "Insurance",
         href: "/investment/insurance",
         icon: MessageCircleQuestionMark,
-        isNew: true,
+        isSoon: true,
       },
       {
         id: "Loan",
         label: "Loan",
         href: "/investment/loan",
+        isSoon: true,
         icon: MessageSquareWarning,
       },
     ],

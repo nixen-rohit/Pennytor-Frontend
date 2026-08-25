@@ -11,6 +11,7 @@ export const FINANCE_KEYS = {
   withdrawals: "finance-withdrawals",
   reports: "finance-reports",
   summary: "finance-summary",
+  investmentFund: "finance-investment-fund",
 } as const;
 
 type VersionMap = Record<string, number>;

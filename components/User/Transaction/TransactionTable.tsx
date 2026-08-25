@@ -15,11 +15,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowDownLeft, ArrowUpRight, Receipt } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Receipt, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 
 import { entriesOptions } from "./types";
-import type { CurrentStatus, RequestType, TransactionRecord } from "./types";
+import type {
+  CurrentStatus,
+  RequestKind,
+  TransactionRecord,
+} from "./types";
 
 interface Props {
   transactions: TransactionRecord[];
@@ -143,7 +147,10 @@ export function TransactionTable({
                       ₹{txn.transactionAmount.toLocaleString()}
                     </TableCell>
                     <TableCell className="py-3">
-                      <RequestTypeBadge type={txn.requestType} />
+                      <RequestTypeBadge
+                        label={txn.requestType}
+                        kind={txn.requestKind}
+                      />
                     </TableCell>
                     <TableCell className="py-3">
                       <StatusBadge status={txn.currentStatus} />
@@ -164,16 +171,31 @@ export function TransactionTable({
   );
 }
 
-function RequestTypeBadge({ type }: { type: RequestType }) {
-  const isDr = type === "DR";
+function RequestTypeBadge({
+  label,
+  kind,
+}: {
+  label: string;
+  kind: RequestKind;
+}) {
+  const style =
+    kind === "DR"
+      ? "bg-red-600/20 text-red-400"
+      : kind === "CR"
+        ? "bg-green-600/20 text-green-400"
+        : "bg-violet-500/20 text-violet-400";
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-        isDr ? "bg-red-600/20 text-red-400" : "bg-green-600/20 text-green-400"
-      }`}
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${style}`}
     >
-      {isDr ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownLeft className="h-3 w-3" />}
-      {type}
+      {kind === "DR" ? (
+        <ArrowUpRight className="h-3 w-3 shrink-0" />
+      ) : kind === "CR" ? (
+        <ArrowDownLeft className="h-3 w-3 shrink-0" />
+      ) : (
+        <TrendingUp className="h-3 w-3 shrink-0" />
+      )}
+      {label}
     </span>
   );
 }

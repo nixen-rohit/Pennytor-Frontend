@@ -68,7 +68,9 @@ export default function KycApplicationDetail() {
     try {
       setApp(await KycAdminService.getApplication(applicationId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load application");
+      setError(
+        err instanceof Error ? err.message : "Failed to load application",
+      );
     } finally {
       setLoading(false);
     }
@@ -109,8 +111,7 @@ export default function KycApplicationDetail() {
     }
   };
 
-  const fileOf = (type: KycFileType) =>
-    app?.files.find((f) => f.type === type);
+  const fileOf = (type: KycFileType) => app?.files.find((f) => f.type === type);
 
   if (loading) {
     return (
@@ -162,7 +163,12 @@ export default function KycApplicationDetail() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Applications
           </Button>
-          <Badge status={app.status} />
+          <div className="text-center h-10 w-auto border border-white/20  rounded-md flex   items-center justify-center">
+            <h2 className="p-2 text-white ">KYC Status : </h2>
+            <div className="p-2">
+              <Badge status={app.status} />
+            </div>
+          </div>
         </div>
 
         <Card className="shadow-sm">
@@ -173,10 +179,7 @@ export default function KycApplicationDetail() {
                   KYC Application
                 </h1>
                 <div className="mt-3 grid gap-2 grid-cols-2 sm:grid-cols-4 max-w-xl">
-                  <InfoBlock
-                    label="Client ID"
-                    value={app.clientId ?? "N/A"}
-                  />
+                  <InfoBlock label="Client ID" value={app.clientId ?? "N/A"} />
                   <InfoBlock label="Application ID" value={app.id} />
                   <InfoBlock
                     label="Submitted"
@@ -209,9 +212,18 @@ export default function KycApplicationDetail() {
               <Section title="Personal Information" icon={User}>
                 <Row label="Full Name" value={app.personal.fullName} />
                 <Row label="Phone" value={app.personal.phone} />
-                <Row label="Date of Birth" value={formatDate(app.personal.dob)} />
-                <Row label="Gender" value={app.personal.gender || "Not provided"} />
-                <Row label="Marital Status" value={app.personal.maritalStatus || "Not provided"} />
+                <Row
+                  label="Date of Birth"
+                  value={formatDate(app.personal.dob)}
+                />
+                <Row
+                  label="Gender"
+                  value={app.personal.gender || "Not provided"}
+                />
+                <Row
+                  label="Marital Status"
+                  value={app.personal.maritalStatus || "Not provided"}
+                />
               </Section>
 
               <Section title="Documents" icon={FileText}>
@@ -219,7 +231,8 @@ export default function KycApplicationDetail() {
                   label="Selfie"
                   file={fileOf("SELFIE")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)} deleting={deletingFileId === fileOf("SELFIE")?.id}
+                  onDeleteFile={(f) => deleteFile(f)}
+                  deleting={deletingFileId === fileOf("SELFIE")?.id}
                   render={(f) => (
                     <PrivateFileImage
                       applicationId={app.id}
@@ -230,12 +243,16 @@ export default function KycApplicationDetail() {
                     />
                   )}
                 />
-                <Row label="Aadhaar Number" value={app.documents.aadhaarNumber} />
+                <Row
+                  label="Aadhaar Number"
+                  value={app.documents.aadhaarNumber}
+                />
                 <DocRow
                   label="Aadhaar Card Front"
                   file={fileOf("AADHAAR_FRONT")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)} deleting={deletingFileId === fileOf("AADHAAR_FRONT")?.id}
+                  onDeleteFile={(f) => deleteFile(f)}
+                  deleting={deletingFileId === fileOf("AADHAAR_FRONT")?.id}
                   render={(f) => (
                     <PrivateFileImage
                       applicationId={app.id}
@@ -249,7 +266,8 @@ export default function KycApplicationDetail() {
                   label="Aadhaar Card Back"
                   file={fileOf("AADHAAR_BACK")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)} deleting={deletingFileId === fileOf("AADHAAR_BACK")?.id}
+                  onDeleteFile={(f) => deleteFile(f)}
+                  deleting={deletingFileId === fileOf("AADHAAR_BACK")?.id}
                   render={(f) => (
                     <PrivateFileImage
                       applicationId={app.id}
@@ -264,7 +282,8 @@ export default function KycApplicationDetail() {
                   label="PAN Card"
                   file={fileOf("PAN")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)} deleting={deletingFileId === fileOf("PAN")?.id}
+                  onDeleteFile={(f) => deleteFile(f)}
+                  deleting={deletingFileId === fileOf("PAN")?.id}
                   render={(f) => (
                     <PrivateFileImage
                       applicationId={app.id}
@@ -278,7 +297,8 @@ export default function KycApplicationDetail() {
                   label="Signature"
                   file={fileOf("SIGNATURE")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)} deleting={deletingFileId === fileOf("SIGNATURE")?.id}
+                  onDeleteFile={(f) => deleteFile(f)}
+                  deleting={deletingFileId === fileOf("SIGNATURE")?.id}
                   render={(f) => (
                     <PrivateFileImage
                       applicationId={app.id}
@@ -291,19 +311,34 @@ export default function KycApplicationDetail() {
               </Section>
 
               <Section title="Bank Details" icon={Landmark}>
-                <Row label="Account Holder" value={app.bank.accountHolderName} />
+                <Row
+                  label="Account Holder"
+                  value={app.bank.accountHolderName}
+                />
                 <Row label="Account Number" value={app.bank.accountNumber} />
                 <Row label="IFSC Code" value={app.bank.ifscCode} />
                 <Row label="Bank Name" value={app.bank.bankName} />
                 <Row label="Branch Name" value={app.bank.branchName} />
-                <Row label="Account Type" value={app.bank.accountType || "Not provided"} />
-                <Row label="Branch Address" value={app.bank.branchAddress || "Not provided"} />
+                <Row
+                  label="Account Type"
+                  value={app.bank.accountType || "Not provided"}
+                />
+                <Row
+                  label="Branch Address"
+                  value={app.bank.branchAddress || "Not provided"}
+                />
               </Section>
 
               <Section title="Nominee Details" icon={Users}>
                 <Row label="Nominee Name" value={app.nominee.nomineeName} />
-                <Row label="Date of Birth" value={formatDate(app.nominee.nomineeDob)} />
-                <Row label="Phone" value={app.nominee.nomineePhone || "Not provided"} />
+                <Row
+                  label="Date of Birth"
+                  value={formatDate(app.nominee.nomineeDob)}
+                />
+                <Row
+                  label="Phone"
+                  value={app.nominee.nomineePhone || "Not provided"}
+                />
                 <Row label="Aadhaar" value={app.nominee.nomineeAadhaar} />
               </Section>
             </div>
@@ -332,7 +367,7 @@ export default function KycApplicationDetail() {
                     ? "Final decision locked. The user can resubmit to reopen this application."
                     : "Verify identity documents before deciding."}
                 </p>
-                 
+
                 <Button
                   type="button"
                   variant={app.status === "REJECTED" ? "default" : "outline"}
@@ -341,7 +376,11 @@ export default function KycApplicationDetail() {
                       ? "bg-red-600 text-white ring-2 ring-red-400/50 cursor-not-allowed"
                       : "border-red-600/40 text-red-400 hover:bg-red-600/10"
                   }
-                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
+                  disabled={
+                    deciding !== null ||
+                    app.status === "VERIFIED" ||
+                    app.status === "REJECTED"
+                  }
                   onClick={() => {
                     setNote("");
                     setRejecting(true);
@@ -358,7 +397,11 @@ export default function KycApplicationDetail() {
                       ? "bg-green-600 text-white ring-2 ring-green-400/50 cursor-not-allowed"
                       : "bg-green-600 hover:bg-green-700 text-white"
                   }
-                  disabled={deciding !== null || app.status === "VERIFIED" || app.status === "REJECTED"}
+                  disabled={
+                    deciding !== null ||
+                    app.status === "VERIFIED" ||
+                    app.status === "REJECTED"
+                  }
                   onClick={() => decide("VERIFIED")}
                 >
                   <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -553,7 +596,9 @@ function DeleteFileButton({
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-sm border-neutral-800">
-        <DialogTitle className="text-slate-50">Delete this document?</DialogTitle>
+        <DialogTitle className="text-slate-50">
+          Delete this document?
+        </DialogTitle>
         <p className="text-sm text-slate-400">
           The private file will be removed from the server and its metadata
           deleted. This is audited.
@@ -576,7 +621,9 @@ function DeleteFileButton({
               onDelete();
             }}
           >
-            {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            {deleting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : null}
             Delete
           </Button>
         </div>
