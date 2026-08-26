@@ -116,7 +116,7 @@ const InvestmentFund = () => {
           />
 
           <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-3xl">
+            <div className="max-w-6xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
                 <TrendingUp className="h-4 w-4" aria-hidden="true" />
                 Investment Plan
@@ -129,7 +129,7 @@ const InvestmentFund = () => {
                 Investment <span className="text-amber-400">Fund Scheme</span>
               </h2>
 
-              <p className="mt-4 max-w-7xl text-sm leading-6 text-zinc-400 sm:text-base ">
+              <p className="mt-4 max-w-5xl text-sm leading-6 text-zinc-400 sm:text-base ">
                 Explore investment plans based on your investment amount, with a
                 fixed 3-year lock-in period and monthly ROI.
               </p>

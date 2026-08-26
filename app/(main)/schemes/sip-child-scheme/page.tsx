@@ -1,5 +1,6 @@
 "use client";
-import { SIPForChild } from "@/components/SIPForChild";
+ 
+import SIPForChild from "@/components/SIPForChild/SIPForChild";
 
 const page = () => {
   return <SIPForChild />;

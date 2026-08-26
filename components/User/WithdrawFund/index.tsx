@@ -54,7 +54,11 @@ export default function WithdrawFundPage() {
 
   // Fetch user's bank account from KYC when method is "bank"
   useEffect(() => {
-    if (form.method === "bank") {
+    const id = setTimeout(() => {
+      if (form.method !== "bank") {
+        setUserBankAccount(null);
+        return;
+      }
       setBankAccountLoading(true);
       WithdrawalService.getUserBankAccount()
         .then((bank) => {
@@ -65,9 +69,8 @@ export default function WithdrawFundPage() {
           setUserBankAccount(null);
           setBankAccountLoading(false);
         });
-    } else {
-      setUserBankAccount(null);
-    }
+    }, 0);
+    return () => clearTimeout(id);
   }, [form.method]);
 
   const updateField: FormChange = useCallback((key, value) => {
@@ -106,9 +109,15 @@ export default function WithdrawFundPage() {
     setSendingOtp(true);
     setApiError(null);
     try {
-      await WithdrawalService.sendOtp();
+      // Verifies the password server-side FIRST, then emails the OTP.
+      await WithdrawalService.verifyPasswordAndSendOtp(form.password);
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Failed to send OTP");
+      const message =
+        err instanceof Error ? err.message : "Failed to verify password";
+      setApiError(message);
+      // Re-throw so OtpVerification stays on the password step and shows
+      // the inline error instead of moving to the OTP input.
+      throw err;
     } finally {
       setSendingOtp(false);
     }

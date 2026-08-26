@@ -79,9 +79,6 @@ export function TransactionTable({
             <TableHeader>
               <TableRow className="bg-neutral-900/50 hover:bg-neutral-900/50">
                 <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                  User Name
-                </TableHead>
-                <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
                   User Type
                 </TableHead>
                 <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
@@ -104,7 +101,7 @@ export function TransactionTable({
             <TableBody>
               {transactions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-64 text-center">
+                  <TableCell colSpan={6} className="h-64 text-center">
                     <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                       <div className="p-3 rounded-full bg-neutral-800">
                         <Receipt className="h-8 w-8 text-slate-400" />
@@ -132,9 +129,6 @@ export function TransactionTable({
                     key={txn.id}
                     className="border-b border-neutral-800 last:border-b-0 hover:bg-neutral-800/50 transition-colors"
                   >
-                    <TableCell className="py-3 font-medium text-slate-200">
-                      {txn.userName}
-                    </TableCell>
                     <TableCell className="py-3">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400">
                         {txn.userType}

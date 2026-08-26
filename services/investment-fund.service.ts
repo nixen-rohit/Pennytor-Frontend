@@ -86,16 +86,6 @@ export class InvestmentFundService {
     return data.schemes;
   }
 
-  static async sendOtp(): Promise<void> {
-    const response = await fetch(`${API_URL}/investment-fund/otp`, {
-      method: "POST",
-      headers: csrfHeaders(),
-      credentials: "include",
-      cache: "no-store",
-    });
-    await assertOk(response);
-  }
-
   static async verifyPasswordAndSendOtp(
     password: string,
     scheme: string,

@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Loader2 } from "lucide-react";
-import { useAuthStore } from "@/store/auth.store";
 
 import { TransactionRecord } from "./types";
 import { TransactionToolbar } from "./TransactionToolbar";
@@ -41,12 +40,10 @@ function mapStatus(status: DepositStatus | WithdrawalStatus): RecordStatus {
 
 function depositToRecords(
   items: MyDeposit[],
-  userName: string,
   userType: string,
 ): TransactionRecord[] {
   return items.map((d) => ({
     id: `CR-${d.id}`,
-    userName,
     userType,
     transactionId: d.transactionId,
     transactionAmount: Number(d.amount) || 0,
@@ -59,12 +56,10 @@ function depositToRecords(
 
 function withdrawalToRecords(
   items: MyWithdrawal[],
-  userName: string,
   userType: string,
 ): TransactionRecord[] {
   return items.map((w) => ({
     id: `DR-${w.id}`,
-    userName,
     userType,
     transactionId: w.id.slice(0, 8).toUpperCase(),
     transactionAmount: Number(w.amount) || 0,
@@ -77,12 +72,10 @@ function withdrawalToRecords(
 
 function investmentToRecords(
   items: MyInvestment[],
-  userName: string,
   userType: string,
 ): TransactionRecord[] {
   return items.map((d) => ({
     id: `IF-${d.id}`,
-    userName,
     userType,
     transactionId: d.id.slice(0, 8).toUpperCase(),
     transactionAmount: Number(d.amount) || 0,
@@ -101,10 +94,6 @@ function investmentToRecords(
 }
 
 export default function Transaction() {
-  const user = useAuthStore((s) => s.user);
-  const userName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ").toUpperCase() ||
-    "—";
   const userType = "Pennytor";
 
   const [transactions, setTransactions] = useState<TransactionRecord[]>([]);
@@ -127,9 +116,9 @@ export default function Transaction() {
         InvestmentFundService.myApplications().catch(() => ({ items: [] as MyInvestment[] })),
       ]);
       const records = [
-        ...depositToRecords(dep.items, userName, userType),
-        ...withdrawalToRecords(wdr.items, userName, userType),
-        ...investmentToRecords(inv.items ?? [], userName, userType),
+        ...depositToRecords(dep.items, userType),
+        ...withdrawalToRecords(wdr.items, userType),
+        ...investmentToRecords(inv.items ?? [], userType),
       ].sort((a, b) => b.requestDate.getTime() - a.requestDate.getTime());
       setTransactions(records);
     } catch (err) {
@@ -140,7 +129,7 @@ export default function Transaction() {
     } finally {
       setLoading(false);
     }
-  }, [userName, userType]);
+  }, [userType]);
 
   useEffect(() => {
     const id = setTimeout(() => void load(), 0);
@@ -155,9 +144,9 @@ export default function Transaction() {
     return transactions.filter((txn) => {
       const query = searchTerm.toLowerCase();
       const matchesSearch =
-        txn.userName.toLowerCase().includes(query) ||
         txn.userType.toLowerCase().includes(query) ||
         txn.transactionId.toLowerCase().includes(query) ||
+        txn.requestType.toLowerCase().includes(query) ||
         String(txn.transactionAmount).includes(query);
 
       const matchesRequestType =
