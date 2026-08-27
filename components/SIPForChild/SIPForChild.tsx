@@ -8,6 +8,7 @@ import {
   ChartNoAxesCombined,
   CalendarClock,
   IndianRupee,
+  ArrowRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -447,7 +448,7 @@ export function SIPForChild() {
                   type="button"
                   onClick={() => setActiveTab(item.id)}
                   aria-pressed={isActive}
-                  className={`flex-1 rounded-xl px-2.5 py-2.5 text-xs font-semibold transition-all duration-200 sm:px-4 sm:py-3 sm:text-sm ${
+                  className={`flex-1 font-bold rounded-xl px-2.5 py-2.5 text-xs transition-all duration-200 sm:px-4 sm:py-3 sm:text-sm ${
                     isActive
                       ? "bg-orange-400 text-black shadow-lg shadow-orange-400/10"
                       : "text-zinc-400 hover:bg-white/5 hover:text-white"
@@ -461,7 +462,7 @@ export function SIPForChild() {
         </div>
 
         {/* ===================== ACTIVE PLAN HEADER ===================== */}
-        <div className="mt-6">
+        <div className="mt-6 ">
           <p className="text-sm font-medium text-orange-400">Selected Plan</p>
           <h3 className="mt-1 flex flex-wrap items-baseline gap-x-2 text-xl font-bold text-white sm:text-2xl lg:text-3xl">
             <span>{data.planName}</span>
@@ -540,16 +541,35 @@ export function SIPForChild() {
         {/* ===================== INVESTMENT SUMMARY ===================== */}
         <Card className="mt-6 border-white/10 bg-[#111113] text-white shadow-xl">
           <CardHeader className="px-4 sm:px-6">
-            <CardTitle className="text-xl sm:text-2xl">
-              Investment Summary
-            </CardTitle>
-            <p className="text-sm leading-6 text-zinc-500">
-              A simple breakdown of your SIP investment, estimated fund value,
-              and SWP plan.
-            </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-xl sm:text-2xl">
+                  Investment Summary
+                </CardTitle>
+
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-zinc-500">
+                  A simple breakdown of your SIP investment, estimated fund
+                  value, and SWP plan.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => {}}
+                className="w-full shrink-0 bg-orange-400 font-bold text-black shadow-lg shadow-orange-400/10 hover:bg-orange-500 hover:text-black sm:w-36"
+              >
+                Apply Now
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </Button>
+            </div>
           </CardHeader>
+
           <CardContent className="px-4 sm:px-6">
-            <SummaryTable rows={summaryRows} />
+            <div className="w-full overflow-x-auto">
+              <SummaryTable rows={summaryRows} />
+            </div>
           </CardContent>
         </Card>
 
