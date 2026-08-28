@@ -20,6 +20,7 @@ import {
   CornerDownRight,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
+import { ListTodo } from 'lucide-react';
 
 interface SubMenuItem {
   id: string;
@@ -69,6 +70,12 @@ export const menuData: MenuSection[] = [
         badge: "4",
         icon: Bell,
       },
+      {
+        id: "to-do",
+        label: "Task List",
+        href: "/task-list",        
+        icon: ListTodo,
+      },
     ],
   },
   {
@@ -92,7 +99,7 @@ export const menuData: MenuSection[] = [
       },
       {
         id: "sip",
-        label: "SIP Child",
+        label: "SIP For Child",
         href: "#",
 
         icon: School,
@@ -100,9 +107,21 @@ export const menuData: MenuSection[] = [
         isNew: true,
         children: [
           {
-            id: "sip",
+            id: "sip-details",
             label: "Details",
-            href: "/investment/all-schemes/sip-investment",
+            href: "/investment/all-schemes/sip-for-child",
+            icon: CornerDownRight,
+          },
+          {
+            id: "sip-progress",
+            label: "Progress",
+            href: "/investment/all-schemes/sip-for-child/progress",
+            icon: CornerDownRight,
+          },
+          {
+            id: "sip-report",
+            label: "Report",
+            href: "/investment/all-schemes/sip-for-child/reports",
             icon: CornerDownRight,
           },
         ],

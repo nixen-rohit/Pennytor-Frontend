@@ -58,16 +58,6 @@ async function assertOk<T>(response: Response): Promise<T> {
 }
 
 export class WithdrawalService {
-  static async sendOtp(): Promise<void> {
-    const response = await fetch(`${API_URL}/withdrawals/otp`, {
-      method: "POST",
-      headers: csrfHeaders(),
-      credentials: "include",
-      cache: "no-store",
-    });
-    await assertOk(response);
-  }
-
   static async verifyPasswordAndSendOtp(password: string): Promise<void> {
     const response = await fetch(`${API_URL}/withdrawals/verify-password`, {
       method: "POST",

@@ -1,8 +1,10 @@
-"use client";
-import { SIPForChild } from "@/components/SIPForChild";
+import SIPForChild from '@/components/SIPForChild/SIPForChild';
+import React from 'react'
 
 const page = () => {
-  return <SIPForChild />;
-};
+  return (
+    <SIPForChild />
+  )
+}
 
-export default page;
+export default page
