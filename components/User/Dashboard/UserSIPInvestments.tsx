@@ -116,7 +116,7 @@ function SIPInvestmentCard({ inv }: { inv: MySIPInvestment }) {
 
   const progress =
     inv.cycle
-      ? Math.min(100, Math.round((inv.cycle.monthsElapsed / inv.lockInMonths) * 100))
+      ? Math.min(100, Math.round((inv.cycle.monthsElapsed / inv.totalMonths) * 100))
       : 0
 
   return (
@@ -177,20 +177,22 @@ function SIPInvestmentCard({ inv }: { inv: MySIPInvestment }) {
         <>
           {/* Stats row */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-lg overflow-hidden border border-white/10 bg-white/10">
-            <Stat label="Monthly Return" value={inr(inv.monthlyRoi)} accent />
+            <Stat label="Months Paid" value={`${inv.monthsPaid} / ${inv.totalMonths}`} accent />
             <Stat
-              label={`ROI @ ${inv.roiPercent}% monthly`}
+              label={`Monthly Premium`}
               value={inv.planLabel}
             />
             <Stat
-              label="Next Payout"
+              label="Next Payment Due"
               value={
-                inv.cycle.nextPayoutAt
-                  ? format(new Date(inv.cycle.nextPayoutAt), "dd MMM yyyy")
-                  : "Completed"
+                inv.cycle.nextPaymentDue
+                  ? format(new Date(inv.cycle.nextPaymentDue), "dd MMM yyyy")
+                  : inv.monthsPaid >= inv.totalMonths
+                    ? "Completed"
+                    : "N/A"
               }
             />
-            <Stat label="Total Received" value={inr(inv.totalRoiPaid)} />
+            <Stat label="Months Missed" value={`${inv.monthsMissed} / 3`} />
           </div>
 
           {/* Cycle progress */}
@@ -198,11 +200,11 @@ function SIPInvestmentCard({ inv }: { inv: MySIPInvestment }) {
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <CalendarClock className="h-3.5 w-3.5" />
-                Cycle: month {inv.cycle.monthsElapsed} of {inv.lockInMonths}
+                Progress: {inv.monthsPaid} of {inv.totalMonths} months
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Clock3 className="h-3.5 w-3.5" />
-                Ends {format(new Date(inv.cycle.lockEndsAt), "MMM yyyy")}
+                {inv.totalMonths - inv.monthsPaid} months remaining
               </span>
             </div>
             <div className="h-2 rounded-full bg-white/10 overflow-hidden">
@@ -212,8 +214,8 @@ function SIPInvestmentCard({ inv }: { inv: MySIPInvestment }) {
               />
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Return is credited every month around the same date you were
-              approved ({inv.cycle.startAt && format(new Date(inv.cycle.startAt), "dd MMM")}).
+              Premium payments are due monthly starting from{" "}
+              {inv.cycle.startAt && format(new Date(inv.cycle.startAt), "dd MMM")}.
             </p>
           </div>
         </>

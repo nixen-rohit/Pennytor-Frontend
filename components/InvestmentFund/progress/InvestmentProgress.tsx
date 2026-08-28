@@ -335,6 +335,53 @@ function ProgressCard({ inv }: { inv: MyInvestment }) {
                 your scheme was approved.
               </p>
             </div>
+
+            {/* ROI Payment Calendar */}
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-zinc-300">
+                ROI Payment Calendar
+              </p>
+              <div className="grid grid-cols-10 gap-1.5 sm:grid-cols-12 lg:grid-cols-20">
+                {Array.from({ length: inv.lockInMonths }, (_, i) => {
+                  const monthNum = i + 1;
+                  const isPaid = monthNum <= inv.cycle.monthsElapsed;
+                  const isCurrent =
+                    monthNum === inv.cycle.monthsElapsed + 1 &&
+                    inv.cycle.monthsRemaining > 0;
+                  const isUpcoming = monthNum > inv.cycle.monthsElapsed + 1;
+
+                  return (
+                    <div
+                      key={monthNum}
+                      className={`flex h-8 w-8 items-center justify-center rounded-md text-xs font-medium transition-colors ${
+                        isPaid
+                          ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                          : isCurrent
+                            ? "bg-amber-500/20 text-amber-400 border border-amber-500/30 ring-2 ring-amber-400/20"
+                            : "bg-zinc-900 text-zinc-600 border border-zinc-800"
+                      }`}
+                      title={`Month ${monthNum}${isPaid ? " - ROI Credited" : isCurrent ? " - Next Payout" : ""}`}
+                    >
+                      {monthNum}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-4 text-xs text-zinc-500">
+                <span className="flex items-center gap-1.5">
+                  <div className="h-3 w-3 rounded bg-green-500/20 border border-green-500/30" />
+                  ROI Credited
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <div className="h-3 w-3 rounded bg-amber-500/20 border border-amber-500/30" />
+                  Next Payout
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <div className="h-3 w-3 rounded bg-zinc-900 border border-zinc-800" />
+                  Upcoming
+                </span>
+              </div>
+            </div>
           </>
         )}
       </CardContent>

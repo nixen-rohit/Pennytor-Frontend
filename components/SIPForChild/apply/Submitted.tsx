@@ -1,144 +1,109 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Check, Loader2, TrendingUp, GraduationCap } from "lucide-react";
+import { CheckCircle2, TrendingUp, AlertCircle, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { formatINR } from "./types";
+import { formatCurrency, type FormState } from "./types";
 
 interface Props {
-  data: {
-    planId: string | null;
-    amount: string;
-  };
+  data: FormState;
   requestId: string;
   status: string;
   onReset: () => void;
-  ineligible: { planId: string; lockInPeriod: string } | null;
+  ineligible?: { scheme: string } | null;
 }
 
 export function Submitted({ data, requestId, status, onReset, ineligible }: Props) {
+  // Show ineligible message if user tries to apply for same scheme again
   if (ineligible) {
     return (
       <div className="min-h-screen p-4">
-        <div className="mx-auto flex min-h-[560px] max-w-md flex-col items-center justify-center px-6 text-center">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-500/10 ring-1 ring-yellow-400/30">
-            <GraduationCap className="h-8 w-8 text-yellow-400" />
+        <div className="mx-auto max-w-md space-y-6">
+          <div className="text-center space-y-4">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-400/20">
+              <AlertCircle className="h-10 w-10 text-amber-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-slate-50">
+              Already Applied
+            </h1>
+            <p className="text-sm text-slate-400">
+              You already have an active <span className="font-medium text-amber-400">Scheme {ineligible.scheme}</span> application.
+            </p>
           </div>
-          <h1 className="text-xl font-semibold text-slate-50">
-            Scheme {ineligible.planId} is already active
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
-            You already have an active application for Plan {ineligible.planId}.
-            You have to wait until the scheme ends before applying again.
-          </p>
-          <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
-            <Button
-              asChild
-              className="flex-1 bg-orange-600 text-white hover:bg-orange-700"
-            >
-              <Link href="/investment/all-schemes/sip-for-child/progress">
-                View Progress
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="flex-1 border-white/20"
-            >
-              <Link href="/investment/all-schemes/sip-for-child">
-                Back to Schemes
-              </Link>
-            </Button>
+
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400/20">
+                <Clock className="h-5 w-5 text-amber-400" />
+              </span>
+              <div>
+                <p className="text-sm font-medium text-slate-300">Active Application</p>
+                <p className="text-sm text-amber-400 font-medium">Waiting for admin review</p>
+              </div>
+            </div>
           </div>
+
+          <Button
+            onClick={onReset}
+            className="w-full bg-amber-600 text-white hover:bg-amber-700"
+          >
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Back to Schemes
+          </Button>
         </div>
       </div>
     );
   }
 
-  const isPending = status === "PENDING";
-
   return (
     <div className="min-h-screen p-4">
-      <div className="mx-auto max-w-5xl space-y-5">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
+      <div className="mx-auto max-w-md space-y-6">
+        <div className="text-center space-y-4">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-400/20">
+            <CheckCircle2 className="h-10 w-10 text-emerald-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-50">
             Application Submitted
           </h1>
+          <p className="text-sm text-slate-400">
+            Your SIP for Child application has been sent for review.
+          </p>
         </div>
 
-        <Card className="shadow-sm">
-          <CardContent className="p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 shrink-0 text-orange-400" />
-              <h2 className="text-sm font-semibold text-slate-300">
-                SIP For Child - Plan {data.planId}
-              </h2>
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-400/20">
+              <TrendingUp className="h-5 w-5 text-amber-400" />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-slate-300">Scheme {data.scheme}</p>
+              <p className="text-sm text-slate-400">SIP for Child</p>
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              {isPending ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin text-yellow-400" />
-                  <span className="inline-flex rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3 py-1 text-sm font-medium text-yellow-400">
-                    Pending Approval
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Check className="h-5 w-5 text-green-400" />
-                  <span className="inline-flex rounded-full border border-green-500/20 bg-green-500/10 px-3 py-1 text-sm font-medium text-green-400">
-                    Approved
-                  </span>
-                </>
-              )}
+          <div className="divide-y divide-neutral-800">
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-slate-400">Status</span>
+              <span className="text-sm font-medium text-yellow-400">{status}</span>
             </div>
-
-            <div className="mt-6 space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-                  <p className="text-xs text-zinc-500">Request ID</p>
-                  <p className="mt-1 font-mono text-sm text-white">{requestId}</p>
-                </div>
-
-                <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-                  <p className="text-xs text-zinc-500">Investment Amount</p>
-                  <p className="mt-1 text-lg font-bold text-white">
-                    ₹{formatINR(Number(data.amount || 0))}/-
-                  </p>
-                </div>
-              </div>
-
-              {isPending && (
-                <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/[0.04] p-4">
-                  <p className="text-sm text-yellow-300">
-                    Your application is under review. The amount has been debited from your wallet
-                    and will be locked into the scheme once approved by the admin team.
-                    You will receive an email notification once the status changes.
-                  </p>
-                </div>
-              )}
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-slate-400">Reference ID</span>
+              <span className="text-sm font-mono text-slate-300">{requestId}</span>
             </div>
+          </div>
+        </div>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Button
-                asChild
-                className="flex-1 bg-orange-600 text-white hover:bg-orange-700"
-              >
-                <Link href="/investment/all-schemes/sip-for-child/progress">
-                  View Progress
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={onReset}
-                className="flex-1 border-white/20"
-              >
-                Apply for Another Plan
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <p className="text-center text-sm text-slate-400">
+          After admin approval, you will receive an email to pay your first monthly premium. 
+          Once paid, your SIP will start counting months.
+        </p>
+
+        <Button
+          onClick={onReset}
+          className="w-full bg-amber-600 text-white hover:bg-amber-700"
+        >
+          <TrendingUp className="mr-2 h-4 w-4" />
+          Make Another Application
+        </Button>
       </div>
     </div>
   );

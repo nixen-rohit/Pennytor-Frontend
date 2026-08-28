@@ -1,6 +1,6 @@
-export type SIPPlanId = "5000" | "2500";
+export type SIPPlanId = "PLAN_5000" | "PLAN_2500";
 
-export interface SIPForChildSchemeData {
+export interface SIPSchemeData {
   id: SIPPlanId;
   name: string;
   monthlyInvestment: number;
@@ -12,9 +12,9 @@ export interface SIPForChildSchemeData {
   finalAmount: number;
 }
 
-export const SIP_SCHEMES: SIPForChildSchemeData[] = [
+export const SIP_SCHEMES: SIPSchemeData[] = [
   {
-    id: "5000",
+    id: "PLAN_5000",
     name: "SIP ₹5,000/month",
     monthlyInvestment: 5000,
     investmentYears: 10,
@@ -25,7 +25,7 @@ export const SIP_SCHEMES: SIPForChildSchemeData[] = [
     finalAmount: 1117000,
   },
   {
-    id: "2500",
+    id: "PLAN_2500",
     name: "SIP ₹2,500/month",
     monthlyInvestment: 2500,
     investmentYears: 10,
@@ -37,7 +37,7 @@ export const SIP_SCHEMES: SIPForChildSchemeData[] = [
   },
 ];
 
-export function getSchemeById(id: SIPPlanId): SIPForChildSchemeData | undefined {
+export function getSchemeById(id: SIPPlanId): SIPSchemeData | undefined {
   return SIP_SCHEMES.find((s) => s.id === id);
 }
 
@@ -49,12 +49,6 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export function formatINR(amount: number): string {
-  return new Intl.NumberFormat("en-IN", {
-    maximumFractionDigits: 0,
-  }).format(Math.round(amount));
-}
-
 export const STEPS = [
   { step: 1, title: "Scheme Details" },
   { step: 2, title: "Payment" },
@@ -62,14 +56,14 @@ export const STEPS = [
 ] as const;
 
 export interface FormState {
-  planId: SIPPlanId | null;
+  scheme: SIPPlanId | null;
   amount: string;
   password: string;
   otp: string;
 }
 
 export const initialFormState: FormState = {
-  planId: null,
+  scheme: null,
   amount: "",
   password: "",
   otp: "",

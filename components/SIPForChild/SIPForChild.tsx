@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type SIPExample = {
   id: number;
+  planId: "PLAN_5000" | "PLAN_2500";
   planName: string;
   monthlyInvestment: number;
   investmentYears: number;
@@ -34,6 +35,7 @@ type SIPExample = {
 const SIP_EXAMPLES: SIPExample[] = [
   {
     id: 1,
+    planId: "PLAN_5000",
     planName: "SIP PLAN A",
     monthlyInvestment: 5000,
     investmentYears: 10,
@@ -45,6 +47,7 @@ const SIP_EXAMPLES: SIPExample[] = [
   },
   {
     id: 2,
+    planId: "PLAN_2500",
     planName: "SIP PLAN B",
     monthlyInvestment: 2500,
     investmentYears: 10,
@@ -437,7 +440,7 @@ export function SIPForChild() {
           </div>
         </div>
 
-        {/* ===================== SIP TABS ===================== */}
+        {/* ===================== SIP TABS & APPLY BUTTONS ===================== */}
         <div className="mt-6">
           <div className="mx-auto flex w-full max-w-xl rounded-2xl border border-white/10 bg-[#111113] p-1.5">
             {SIP_EXAMPLES.map((item) => {
@@ -553,16 +556,22 @@ export function SIPForChild() {
                 </p>
               </div>
 
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => {}}
-                className="w-full shrink-0 bg-orange-400 font-bold text-black shadow-lg shadow-orange-400/10 hover:bg-orange-500 hover:text-black sm:w-36"
-              >
-                Apply Now
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-              </Button>
+              {/* Single Apply Button for Selected Scheme */}
+              <div>
+                <Button
+                  type="button"
+                  onClick={() =>
+                    window.open(
+                      `/investment/all-schemes/sip-for-child/apply/${activeTab === 1 ? "PLAN_5000" : "PLAN_2500"}`,
+                      "_self"
+                    )
+                  }
+                  className="bg-orange-600 text-white hover:bg-orange-700 px-8 py-3 text-sm font-semibold transition-all duration-200 rounded-xl shadow-lg shadow-orange-400/10"
+                >
+                  Apply for{" "}
+                  {SIP_EXAMPLES.find((item) => item.id === activeTab)?.planName}
+                </Button>
+              </div>
             </div>
           </CardHeader>
 

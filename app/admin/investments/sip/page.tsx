@@ -1,9 +1,5 @@
-import React from 'react'
+import SIPForChildRequestList from "@/components/admin/SIPForChildRequest";
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function Page() {
+  return <SIPForChildRequestList />;
 }
-
-export default page

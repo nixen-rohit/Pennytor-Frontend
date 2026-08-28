@@ -1,119 +1,88 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { IndianRupee, TrendingUp } from "lucide-react";
-import { formatINR, type FormState, type FormErrors } from "./types";
+import { Loader2, TriangleAlert, IndianRupee } from "lucide-react";
+import { formatCurrency, type SIPSchemeData } from "./types";
+import type { FormChange, FormErrors, FormState } from "./types";
 
 interface Props {
   data: FormState;
   errors: FormErrors;
-  onChange: (key: keyof FormState, value: string) => void;
-  scheme: ReturnType<typeof getSchemeById>;
+  onChange: FormChange;
+  scheme: SIPSchemeData;
   balance: number;
   balanceLoaded: boolean;
 }
 
-export function PaymentAmount({ data, errors, onChange, scheme, balance, balanceLoaded }: Props) {
-  if (!scheme) return null;
-
-  const totalMonths = scheme.investmentYears * 12;
-  const totalInvested = scheme.monthlyInvestment * totalMonths;
+export function PaymentAmount({
+  data,
+  errors,
+  onChange,
+  scheme,
+  balance,
+  balanceLoaded,
+}: Props) {
+  const withinBalance = scheme.monthlyInvestment <= balance;
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <IndianRupee className="h-5 w-5 shrink-0 text-orange-400" />
-            <h3 className="text-sm font-semibold text-white">Payment Details</h3>
-          </div>
+    <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+      <SectionHeading title="Monthly Premium" />
+
+      <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
+        <label className="mb-2 block text-sm font-medium text-slate-200">
+          Monthly Premium Amount
+        </label>
+
+        <div className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-3">
+          <span className="text-slate-400">₹</span>
+          <span className="font-mono text-lg text-slate-50">
+            {formatCurrency(scheme.monthlyInvestment)}
+          </span>
+          <span className="text-sm text-slate-400">/- per month</span>
         </div>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-zinc-500">Monthly SIP</p>
-            <p className="mt-1 text-xl font-bold text-white">
-              <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(scheme.monthlyInvestment)}/-
-            </p>
-          </div>
+        <p className="mt-3 text-xs text-slate-400">
+          This is your fixed monthly premium for the{" "}
+          <span className="font-medium text-amber-300">{scheme.name}</span> plan.
+        </p>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-zinc-500">Total Investment</p>
-            <p className="mt-1 text-xl font-bold text-white">
-              <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalInvested)}/-
+        {!withinBalance && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+            <TriangleAlert className="h-4 w-4 text-red-400 shrink-0" />
+            <p className="text-sm text-red-300">
+              Insufficient wallet balance. You need at least {formatCurrency(scheme.monthlyInvestment)} to pay this premium.
             </p>
-            <p className="mt-1 text-xs text-zinc-500">{totalMonths} months</p>
           </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between rounded-lg border border-neutral-800 bg-neutral-900 px-4 py-3">
+          <span className="text-sm text-slate-400">Available Balance</span>
+          <span className="font-medium text-green-500">
+            {balanceLoaded
+              ? formatCurrency(balance)
+              : (
+                  <span className="inline-flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    loading...
+                  </span>
+                )}
+          </span>
         </div>
 
-        <div className="mt-4 rounded-lg border border-emerald-400/20 bg-emerald-400/[0.04] p-4">
-          <p className="text-xs text-zinc-500">Wallet Balance</p>
-          <p className="mt-1 text-xl font-bold text-emerald-400">
-            <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(balance)}/-
+        <div className="mt-4 rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
+          <p className="text-xs text-blue-300">
+            <span className="font-semibold">Note:</span> This amount will be deducted from your wallet when you pay your premium. 
+            No amount is deducted now — this is just the application submission.
           </p>
         </div>
       </div>
+    </div>
+  );
+}
 
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-        <h4 className="text-sm font-semibold text-white">Investment Amount</h4>
-
-        <div className="mt-4">
-          <Label htmlFor="amount" className="block text-sm font-medium text-white">
-            Amount to Invest (Total)
-          </Label>
-          <div className="mt-2 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
-              <IndianRupee className="h-5 w-5" />
-            </span>
-            <Input
-              id="amount"
-              type="number"
-              min={totalInvested}
-              step={1000}
-              value={data.amount}
-              onChange={(e) => onChange("amount", e.target.value)}
-              className="pl-10"
-              placeholder="Enter total investment amount"
-              aria-invalid={!!errors.amount}
-              aria-describedby={errors.amount ? "amount-error" : undefined}
-              disabled={!balanceLoaded}
-            />
-          </div>
-          {errors.amount && (
-            <p id="amount-error" className="mt-1.5 text-sm text-red-400" role="alert">
-              {errors.amount}
-            </p>
-          )}
-          <p className="mt-2 text-xs text-zinc-500">
-            Minimum investment: <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(totalInvested)}/-
-          </p>
-          <p className="mt-1 text-xs text-zinc-500">
-            This amount will be debited from your wallet upon submission.
-          </p>
-        </div>
-      </div>
-
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
-        <h4 className="text-sm font-semibold text-white flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-emerald-400" />
-          Projected Returns
-        </h4>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-zinc-500">Projected Fund Value</p>
-            <p className="mt-1 text-xl font-bold text-white">
-              <IndianRupee className="inline-block h-[1em] w-[1em]" />{formatINR(scheme.fundValue)}/-
-            </p>
-          </div>
-
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-4">
-            <p className="text-xs text-zinc-500">Assumed Annual Return</p>
-            <p className="mt-1 text-xl font-bold text-orange-400">{scheme.annualReturn}% p.a.</p>
-          </div>
-        </div>
-      </div>
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <div className="border-b pb-2">
+      <h3 className="text-base font-semibold text-slate-50">{title}</h3>
     </div>
   );
 }

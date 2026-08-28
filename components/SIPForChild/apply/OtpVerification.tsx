@@ -1,20 +1,36 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { Loader2, Mail, ShieldCheck, Lock, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Mail, Lock, ShieldCheck } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+  REGEXP_ONLY_DIGITS,
+} from "@/components/ui/input-otp";
+import { useAuthStore } from "@/store/auth.store";
+
+import type { FormChange, FormErrors, FormState } from "./types";
 
 interface Props {
-  data: { password: string; otp: string };
-  errors: { password?: string; otp?: string };
-  onChange: (key: "password" | "otp", value: string) => void;
-  onResend: () => void;
-  onSendOtp: () => Promise<void>;
+  data: FormState;
+  errors: FormErrors;
+  onChange: FormChange;
+  onResend: () => Promise<void>;
   resendBusy: boolean;
+  onSendOtp: () => Promise<void>;
   sendingOtp: boolean;
+}
+
+const RESEND_COOLDOWN = 30;
+
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return email;
+  const head = local.slice(0, 1);
+  return `${head}***@${domain}`;
 }
 
 export function OtpVerification({
@@ -22,135 +38,185 @@ export function OtpVerification({
   errors,
   onChange,
   onResend,
-  onSendOtp,
   resendBusy,
+  onSendOtp,
   sendingOtp,
 }: Props) {
-  const handleSendOtp = async () => {
-    if (!data.password) {
-      onChange("password", "");
-      return;
+  const email = useAuthStore((s) => s.user?.email ?? "");
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN);
+  const [sending, setSending] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordVerified, setPasswordVerified] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  const handleResend = async () => {
+    setSending(true);
+    try {
+      await onResend();
+      setCooldown(RESEND_COOLDOWN);
+    } finally {
+      setSending(false);
     }
-    await onSendOtp();
+  };
+
+  const handleVerifyPassword = async () => {
+    setVerifyError(null);
+    try {
+      await onSendOtp();
+      setPasswordVerified(true);
+      setCooldown(RESEND_COOLDOWN);
+    } catch (err) {
+      setVerifyError(err instanceof Error ? err.message : "Password is incorrect");
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="border-white/10 bg-white/[0.03]">
-        <CardContent className="p-5">
-          <div className="flex items-center gap-2">
-            <Lock className="h-5 w-5 shrink-0 text-orange-400" />
-            <h3 className="text-sm font-semibold text-white">Password Verification</h3>
-          </div>
+    <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
+      <SectionHeading title="Authenticate" />
 
-          <div className="mt-4">
-            <Label htmlFor="password" className="block text-sm font-medium text-white">
-              Password
-            </Label>
-            <div className="mt-2 relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">
-                <Lock className="h-5 w-5" />
-              </span>
-              <Input
-                id="password"
-                type="password"
-                value={data.password}
-                onChange={(e) => onChange("password", e.target.value)}
-                className="pl-10"
-                placeholder="Enter your password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
-                disabled={sendingOtp}
-              />
-            </div>
-            {errors.password && (
-              <p id="password-error" className="mt-1.5 text-sm text-red-400" role="alert">
-                {errors.password}
-              </p>
-            )}
+      {!passwordVerified ? (
+        // Step 1: Enter password
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
+          <label className="mb-2 block text-sm font-medium text-slate-200">
+            Password *
+          </label>
+          <div className="relative flex items-center">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={data.password}
+              onChange={(e) => onChange("password", e.target.value)}
+              className="h-11 bg-black/40 pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:text-slate-200"
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
           </div>
+          {errors.password && (
+            <p className="mt-1.5 text-xs text-red-500">{errors.password}</p>
+          )}
+          {verifyError && (
+            <p className="mt-1.5 text-xs text-red-500">{verifyError}</p>
+          )}
 
           <Button
             type="button"
-            variant="outline"
-            onClick={handleSendOtp}
-            disabled={!data.password || sendingOtp}
-            className="mt-4 w-full flex items-center justify-center gap-2 border-white/15 bg-white/5 text-white hover:bg-orange-400 hover:text-black disabled:opacity-50"
+            onClick={handleVerifyPassword}
+            disabled={sendingOtp || !data.password}
+            className="w-full mt-4 bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
           >
             {sendingOtp ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Sending OTP…
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Verifying & Sending OTP...
               </>
             ) : (
               <>
-                <Mail className="h-4 w-4" />
-                Send OTP to Email
+                <Lock className="h-4 w-4 mr-2" />
+                Verify Password & Send OTP
               </>
             )}
           </Button>
-        </CardContent>
-      </Card>
 
-      <Card className="border-white/10 bg-white/[0.03]">
-        <CardContent className="p-5">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-400" />
-            <h3 className="text-sm font-semibold text-white">OTP Verification</h3>
+          {!data.password && (
+            <p className="text-center text-xs text-yellow-500 mt-2">
+              Please enter your password first
+            </p>
+          )}
+        </div>
+      ) : (
+        // Step 2: OTP sent - show OTP input
+        <div className="rounded-xl border border-neutral-800 bg-neutral-950 p-5">
+          <div className="mb-4 flex items-center gap-3 text-green-400">
+            <CheckCircle2 className="h-5 w-5" />
+            <span className="text-sm font-medium">Password verified. OTP sent to your email.</span>
           </div>
 
-          <p className="mt-2 text-sm text-zinc-500">
-            A 6-digit OTP has been sent to your registered email address.
-          </p>
+          <div className="mb-5 flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600/20">
+              <Mail className="h-5 w-5 text-indigo-400" />
+            </span>
+            <div>
+              <p className="text-sm font-medium text-slate-100">
+                Enter the OTP sent to your email
+              </p>
+              <p className="text-xs text-slate-400">
+                We sent a 6-digit code to{" "}
+                <span className="font-medium text-slate-200">
+                  {maskEmail(email)}
+                </span>
+              </p>
+            </div>
+          </div>
 
-          <div className="mt-4">
-            <Label htmlFor="otp" className="block text-sm font-medium text-white">
-              Enter OTP
-            </Label>
+          <div className="flex justify-center py-2">
             <InputOTP
-              className="mt-2"
+              maxLength={6}
+              pattern={REGEXP_ONLY_DIGITS}
               value={data.otp}
-              onChange={(value) => onChange("otp", value)}
-              onComplete={(value) => onChange("otp", value)}
-              disabled={sendingOtp}
+              onChange={(v) => onChange("otp", v)}
             >
-              <InputOTPGroup className="flex gap-2">
-                <InputOTPSlot index={0} className="w-12 h-12 text-center text-lg" />
-                <InputOTPSlot index={1} className="w-12 h-12 text-center text-lg" />
-                <InputOTPSlot index={2} className="w-12 h-12 text-center text-lg" />
-                <InputOTPSlot index={3} className="w-12 h-12 text-center text-lg" />
-                <InputOTPSlot index={4} className="w-12 h-12 text-center text-lg" />
-                <InputOTPSlot index={5} className="w-12 h-12 text-center text-lg" />
+              <InputOTPGroup>
+                {[0, 1, 2, 3, 4, 5].map((index) => (
+                  <InputOTPSlot
+                    key={index}
+                    index={index}
+                    className="h-15 w-13 border-neutral-700 bg-black/40 text-lg"
+                  />
+                ))}
               </InputOTPGroup>
             </InputOTP>
-            {errors.otp && (
-              <p className="mt-1.5 text-sm text-red-400" role="alert">
-                {errors.otp}
-              </p>
-            )}
           </div>
 
-          <div className="mt-4 flex items-center justify-between">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={onResend}
-              disabled={resendBusy}
-              className="text-zinc-400 hover:text-white disabled:opacity-50"
-            >
-              {resendBusy ? (
-                <>
-                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-                  Resending…
-                </>
-              ) : (
-                "Resend OTP"
-              )}
-            </Button>
+          {errors.otp && (
+            <p className="mt-2 text-center text-xs text-red-500">{errors.otp}</p>
+          )}
+
+          <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+              OTP expires in 5 minutes
+            </span>
+            {cooldown > 0 ? (
+              <span>Resend in {cooldown}s</span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handleResend()}
+                disabled={sending || resendBusy}
+                className="flex items-center gap-1.5 font-medium text-indigo-400 hover:text-indigo-300 disabled:opacity-50"
+              >
+                {(sending || resendBusy) && (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                )}
+                Resend OTP
+              </button>
+            )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SectionHeading({ title }: { title: string }) {
+  return (
+    <div className="border-b pb-2">
+      <h3 className="text-base font-semibold text-slate-50">{title}</h3>
     </div>
   );
 }

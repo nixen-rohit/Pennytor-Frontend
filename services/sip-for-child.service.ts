@@ -1,7 +1,7 @@
 import { API_URL, ApiError } from "./api";
 import { useAuthStore } from "@/store/auth.store";
 
-export type SIPPlanId = "5000" | "2500";
+export type SIPPlanId = "PLAN_5000" | "PLAN_2500";
 
 export interface SIPForChildScheme {
   id: SIPPlanId;
@@ -16,7 +16,7 @@ export interface SIPForChildScheme {
 }
 
 export interface SIPApplicationRequest {
-  planId: SIPPlanId;
+  scheme: SIPPlanId;
   password: string;
   otp: string;
 }
@@ -33,18 +33,17 @@ export interface SIPSchemesResponse {
 
 export type SIPStatus = "PENDING" | "VERIFIED" | "REJECTED";
 
-export interface MySIPCycle {
-  startAt: string;
-  lockEndsAt: string;
-  nextPayoutAt: string | null;
-  lastRoiPaidAt: string;
-  monthsElapsed: number;
-  monthsRemaining: number;
+export interface MySIPPremium {
+  id: string;
+  monthNumber: number;
+  amount: string;
+  status: string;
+  paidAt: string | null;
 }
 
 export interface MySIPInvestment {
   id: string;
-  planId: SIPPlanId;
+  scheme: SIPPlanId;
   planLabel: string;
   monthlyInvestment: string;
   totalInvested: string;
@@ -52,6 +51,12 @@ export interface MySIPInvestment {
   roiPercent: number;
   monthlyRoi: string;
   lockInMonths: number;
+  totalMonths: number;
+  monthsPaid: number;
+  monthsMissed: number;
+  nextPaymentDue: string | null;
+  startedAt: string | null;
+  lastPaidAt: string | null;
   status: SIPStatus;
   debited: boolean;
   refunded: boolean;
@@ -59,7 +64,25 @@ export interface MySIPInvestment {
   submittedAt: string | null;
   createdAt: string;
   totalRoiPaid: string;
-  cycle: MySIPCycle | null;
+  premiums: MySIPPremium[];
+  cycle: {
+    startAt: string;
+    monthsElapsed: number;
+    monthsRemaining: number;
+    nextPaymentDue: string | null;
+    lastPaidAt: string | null;
+  } | null;
+}
+
+export interface SIPReportEntry {
+  id: string;
+  kind: "SIP_INVESTMENT" | "SIP_PREMIUM" | "SIP_APPLICATION" | "REFUND" | "SWP_WITHDRAWAL";
+  planLabel: string;
+  direction: "DEBIT" | "CREDIT" | "INFO";
+  amount: string;
+  status: string | null;
+  occurredAt: string;
+  monthNumber?: number;
 }
 
 function csrfHeaders(): Record<string, string> {
@@ -90,13 +113,14 @@ export class SIPForChildService {
 
   static async verifyPasswordAndSendOtp(
     password: string,
-    planId: string,
+    scheme: string,
+    amount?: string,
   ): Promise<void> {
     const response = await fetch(`${API_URL}/sip-for-child/verify-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...csrfHeaders() },
       credentials: "include",
-      body: JSON.stringify({ password, planId }),
+      body: JSON.stringify({ password, scheme, ...(amount ? { amount } : {}) }),
       cache: "no-store",
     });
     await assertOk(response);
@@ -110,6 +134,24 @@ export class SIPForChildService {
       body: JSON.stringify(data),
       cache: "no-store",
     });
+    return assertOk(response);
+  }
+
+  static async payPremium(
+    applicationId: string,
+    password: string,
+    otp: string,
+  ): Promise<{ success: boolean; monthNumber: number; nextMonth: number | null; advanced: boolean }> {
+    const response = await fetch(
+      `${API_URL}/sip-for-child/${applicationId}/pay-premium`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...csrfHeaders() },
+        credentials: "include",
+        body: JSON.stringify({ password, otp }),
+        cache: "no-store",
+      },
+    );
     return assertOk(response);
   }
 
@@ -128,14 +170,4 @@ export class SIPForChildService {
     });
     return assertOk(response);
   }
-}
-
-export interface SIPReportEntry {
-  id: string;
-  kind: "SIP_INVESTMENT" | "REFUND" | "SWP_WITHDRAWAL";
-  planLabel: string;
-  direction: "DEBIT" | "CREDIT";
-  amount: string;
-  status: "PENDING" | "VERIFIED" | "REJECTED" | null;
-  occurredAt: string;
 }

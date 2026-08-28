@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  TrendingUp,
   TriangleAlert,
   Lock,
-  GraduationCap,
 } from "lucide-react";
 
-import { STEPS, initialFormState, formatINR, getSchemeById } from "./types";
-import type { FormChange, FormErrors, FormState, SIPForChildSchemeData } from "./types";
+import { STEPS, initialFormState, formatCurrency, getSchemeById, SIP_SCHEMES } from "./types";
+import type { FormChange, FormErrors, FormState, SIPSchemeData } from "./types";
 import { StepDots } from "./StepDots";
 import { SchemeDetails } from "./SchemeDetails";
 import { PaymentAmount } from "./PaymentAmount";
@@ -23,50 +23,59 @@ import { OtpVerification } from "./OtpVerification";
 import { Submitted } from "./Submitted";
 import { SIPForChildService } from "@/services/sip-for-child.service";
 
-
 interface Props {
-  initialPlanId?: string;
+  initialSchemeId?: string;
 }
 
-export default function SIPForChildApplyPage({ initialPlanId }: Props) {
+export default function SIPForChildApplyPage({ initialSchemeId }: Props) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>({
     ...initialFormState,
-    planId: initialPlanId ? (initialPlanId as "5000" | "2500") : null,
+    scheme: initialSchemeId
+      ? (initialSchemeId as any)
+      : null,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
-  const [ineligible, setIneligible] = useState<{ planId: string; lockInPeriod: string } | null>(null);
+  const [ineligible, setIneligible] = useState<{ scheme: string } | null>(null);
   const [balance, setBalance] = useState<number>(0);
   const [balanceLoaded, setBalanceLoaded] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [scheme, setScheme] = useState<SIPSchemeData | null>(null);
+  const [schemeLoading, setSchemeLoading] = useState(true);
   const [alreadyActive, setAlreadyActive] = useState<string | null>(null);
-  const [submittedId, setSubmittedId] = useState<string | null>(null);
-  const [submittedStatus, setSubmittedStatus] = useState<string | null>(null);
+  const submittedRef = useRef<{ id: string; status: string } | null>(null);
 
-  // Derived scheme from form.planId (synchronous, no effect needed)
-  const scheme = form.planId ? getSchemeById(form.planId) ?? null : null;
+  // Load scheme details + active-application gate on mount
+  useEffect(() => {
+    if (form.scheme) {
+      const schemeData = getSchemeById(form.scheme);
+      if (schemeData) {
+        setScheme(schemeData);
+      }
+    }
+    setSchemeLoading(false);
+  }, [form.scheme]);
 
-  // Check active applications
   useEffect(() => {
     let cancelled = false;
-    if (!form.planId) return;
     SIPForChildService.myApplications()
       .then((res) => {
-        if (cancelled) return;
-        const planId = form.planId!;
+        if (cancelled || !form.scheme) return;
         const hit = (res.items ?? []).find(
           (i) =>
-            i.planId === planId &&
+            i.scheme === form.scheme &&
             (i.status === "PENDING" || i.status === "VERIFIED"),
         );
-        if (hit) setAlreadyActive(planId);
+        if (hit) setAlreadyActive(form.scheme);
       })
       .catch(() => undefined);
-    return () => { cancelled = true; };
-  }, [form.planId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [form.scheme]);
 
   // Fetch balance
   useEffect(() => {
@@ -85,7 +94,9 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
       .catch(() => {
         if (!cancelled) setBalanceLoaded(true);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const updateField: FormChange = useCallback((key, value) => {
@@ -100,24 +111,18 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
 
   const validateStep1 = () => {
     const errs: FormErrors = {};
-    if (!form.planId)
-      errs.amount = "Select a plan first.";
+    if (!form.scheme)
+      errs.amount = "Select a scheme first.";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
   const validateStep2 = () => {
     const errs: FormErrors = {};
-    const amountNum = form.amount ? Number(form.amount) : 0;
-    const totalInvested = scheme ? scheme.monthlyInvestment * scheme.investmentYears * 12 : 0;
-
-    if (!form.amount || amountNum <= 0)
-      errs.amount = "Enter the amount you want to invest.";
-    else if (amountNum < totalInvested)
-      errs.amount = `Minimum investment is ${formatINR(totalInvested)}.`;
-    else if (amountNum > balance)
-      errs.amount = `Amount exceeds your available balance of ${formatINR(balance)}.`;
-
+    // No amount validation needed - it's fixed per scheme
+    if (scheme && scheme.monthlyInvestment > balance) {
+      errs.amount = `Insufficient wallet balance. You need at least ${formatCurrency(scheme.monthlyInvestment)}.`;
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -138,7 +143,7 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
     try {
       await SIPForChildService.verifyPasswordAndSendOtp(
         form.password,
-        form.planId!,
+        form.scheme!,
       );
     } catch (err) {
       setApiError(err instanceof Error ? err.message : "Failed to send OTP");
@@ -177,26 +182,20 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
     setApiError(null);
     try {
       const res = await SIPForChildService.createApplication({
-        planId: form.planId!,
-        amount: form.amount,
+        scheme: form.scheme!,
         password: form.password,
         otp: form.otp,
       });
-      setSubmittedId(res.id);
-      setSubmittedStatus(res.status);
+      submittedRef.current = { id: res.id, status: res.status };
       setSubmitted(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to submit application";
-
-      if (message.includes("already have an active") && message.includes("scheme application")) {
-        const planMatch = message.match(/active\s+(\w+)\s+scheme/);
-        const lockInMatch = message.match(/after\s+(.+)\s+when/);
-        const planId = planMatch ? planMatch[1] : form.planId || '';
-        const lockInPeriod = lockInMatch ? lockInMatch[1] : '10 Years';
-        setIneligible({ planId, lockInPeriod });
+      
+      if (message.includes("already have an active")) {
+        setIneligible({ scheme: form.scheme || "" });
         return;
       }
-
+      
       setApiError(err instanceof Error ? err.message : "Failed to submit application");
       setErrors((prev) => ({ ...prev, otp: "Please request a fresh OTP and try again." }));
     } finally {
@@ -207,8 +206,7 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
   const resetForm = () => {
     setSubmitted(false);
     setIneligible(null);
-    setSubmittedId(null);
-    setSubmittedStatus(null);
+    submittedRef.current = null;
     setStep(1);
     setForm(initialFormState);
     setErrors({});
@@ -223,16 +221,16 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
             <Lock className="h-8 w-8 text-yellow-400" />
           </div>
           <h1 className="text-xl font-semibold text-slate-50">
-            Plan {alreadyActive} is already active
+            Scheme {alreadyActive} is already active
           </h1>
           <p className="mt-3 text-sm leading-6 text-slate-400">
-            You already have an active application for Plan {alreadyActive}.
+            You already have an active application for this scheme.
             You have to wait until the scheme ends before applying again.
           </p>
           <div className="mt-8 flex w-full flex-col gap-3 sm:flex-row">
             <Button
               asChild
-              className="flex-1 bg-orange-600 text-white hover:bg-orange-700"
+              className="flex-1 bg-amber-600 text-white hover:bg-amber-700"
             >
               <Link href="/investment/all-schemes/sip-for-child/progress">
                 View Progress
@@ -253,12 +251,12 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
     );
   }
 
-  if (submitted && submittedId && submittedStatus) {
+  if (submitted && submittedRef.current) {
     return (
       <Submitted
         data={form}
-        requestId={submittedId}
-        status={submittedStatus}
+        requestId={submittedRef.current.id}
+        status={submittedRef.current.status}
         onReset={resetForm}
         ineligible={ineligible}
       />
@@ -273,7 +271,7 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
 
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
-            SIP For Child Application
+            SIP for Child Application
           </h1>
         </div>
 
@@ -281,9 +279,9 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
         <Card className="shadow-sm">
           <CardContent className="p-4">
             <div className="mb-4 flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 shrink-0 text-orange-400" />
+              <TrendingUp className="h-5 w-5 shrink-0 text-amber-400" />
               <h2 className="text-sm font-semibold text-slate-300">
-                Apply for Plan {form.planId}
+                Apply for {scheme?.name || "SIP"}
               </h2>
             </div>
             <StepDots currentStep={step} />
@@ -295,11 +293,12 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
             <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               {schemeLoading ? (
                 <div className="flex items-center justify-center py-16">
-                  <Loader2 className="h-8 w-8 animate-spin text-orange-400" />
+                  <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
                 </div>
               ) : scheme && step === 1 && (
                 <SchemeDetails scheme={scheme} />
               )}
+ 
 
               {step === 2 && scheme && (
                 <PaymentAmount
@@ -347,26 +346,26 @@ export default function SIPForChildApplyPage({ initialPlanId }: Props) {
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className="flex items-center gap-1.5 bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-60"
                   >
                     {submitting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Check className="h-4 w-4" />
                     )}
-                    {submitting ? "Submitting…" : "Submit Application"}
+                    {submitting ? "Submitting..." : "Submit Application"}
                   </Button>
                 ) : (
                   <Button
                     type="button"
                     onClick={goNext}
                     disabled={sendingOtp}
-                    className="flex items-center gap-1.5 bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60"
+                    className="flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-60"
                   >
                     {sendingOtp ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Sending OTP&hellip;
+                        Sending OTP...
                       </>
                     ) : (
                       <>
