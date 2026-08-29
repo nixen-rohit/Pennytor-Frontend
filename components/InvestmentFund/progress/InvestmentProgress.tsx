@@ -27,6 +27,8 @@ const inr = (value: string | number) =>
     maximumFractionDigits: 2,
   })}`;
 
+const planLabel = (scheme: string) => `Scheme ${scheme}`;
+
 export default function InvestmentProgress() {
   const [items, setItems] = useState<MyInvestment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -134,16 +136,16 @@ export default function InvestmentProgress() {
           <EmptyState />
         ) : (
           <Tabs value={activeTab} onValueChange={setTabOverride}>
-            <TabsList className="grid w-full grid-cols-5 lg:w-[800px]">
+            <TabsList className="mb-6 bg-[#111217] border border-white/10">
               {plans.map((p) => {
                 const hasActive = p.apps.some((a) => a.status === "VERIFIED");
                 return (
                   <TabsTrigger
                     key={p.scheme}
                     value={p.scheme}
-                    className="flex items-center gap-3"
+                    className="data-[state=active]:bg-amber-400 data-[state=active]:text-black"
                   >
-                    Plan {p.scheme}
+                    {planLabel(p.scheme)}
                   </TabsTrigger>
                 );
               })}

@@ -92,6 +92,33 @@ export function PayPremium({ application, onPaid, onCancel }: Props) {
   ) {
     nextUnpaidMonth++;
   }
+
+  // Guard: all months paid or application not active
+  const allPaid = nextUnpaidMonth > application.totalMonths;
+  if (allPaid || application.status !== "VERIFIED") {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <CheckCircle2 className="h-16 w-16 text-emerald-400 mb-4" />
+        <h2 className="text-xl font-bold text-slate-50 mb-2">
+          {allPaid ? "All Premiums Paid" : "Application Not Active"}
+        </h2>
+        <p className="text-sm text-zinc-400 mb-6">
+          {allPaid
+            ? "You've completed all monthly premiums for this SIP."
+            : "This application is no longer active."}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="border-white/10 bg-transparent text-zinc-300 hover:bg-white/5"
+        >
+          Go Back
+        </Button>
+      </div>
+    );
+  }
+
   const isAdvancePayment = nextUnpaidMonth > application.monthsPaid + 1;
 
   const now = useMemo(() => new Date(), []);
@@ -215,6 +242,7 @@ export function PayPremium({ application, onPaid, onCancel }: Props) {
             application={application}
             nextUnpaidMonth={nextUnpaidMonth}
             monthlyAmount={monthlyAmount}
+            isAdvance={isAdvancePayment}
             now={now}
             onContinue={() => setStep(2)}
             onCancel={onCancel}
@@ -267,6 +295,7 @@ function Step1PaymentDetails({
   application,
   nextUnpaidMonth,
   monthlyAmount,
+  isAdvance,
   now,
   onContinue,
   onCancel,
@@ -274,6 +303,7 @@ function Step1PaymentDetails({
   application: MySIPInvestment;
   nextUnpaidMonth: number;
   monthlyAmount: number;
+  isAdvance: boolean;
   now: Date;
   onContinue: () => void;
   onCancel: () => void;
@@ -282,10 +312,12 @@ function Step1PaymentDetails({
     <div className="space-y-5 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
-          Payment Details
+          {isAdvance ? "Advance Payment" : "Payment Details"}
         </h1>
         <p className="mt-2 text-sm text-zinc-400">
-          Review your premium payment details before proceeding.
+          {isAdvance
+            ? `Pay ahead for Month ${nextUnpaidMonth} — stay on track with your SIP.`
+            : "Review your premium payment details before proceeding."}
         </p>
       </div>
 
@@ -295,23 +327,35 @@ function Step1PaymentDetails({
           {/* Month & amount header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/15">
-                <CreditCard className="h-7 w-7 text-amber-400" />
+              <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${isAdvance ? "bg-emerald-500/15" : "bg-amber-500/15"}`}>
+                <CreditCard className={`h-7 w-7 ${isAdvance ? "text-emerald-400" : "text-amber-400"}`} />
               </div>
               <div>
-                <p className="text-sm text-zinc-400">Monthly Premium</p>
+                <p className="text-sm text-zinc-400">
+                  {isAdvance ? "Advance Premium" : "Monthly Premium"}
+                </p>
                 <p className="text-3xl font-bold text-green-400">
                   {formatINR(monthlyAmount)}/-
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-zinc-400">Month</p>
+              <p className="text-sm text-zinc-400">
+                {isAdvance ? "Paying Month" : "Month"}
+              </p>
               <p className="text-2xl font-bold text-amber-400">
                 {nextUnpaidMonth}/{application.totalMonths}
               </p>
             </div>
           </div>
+
+          {isAdvance && (
+            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2">
+              <p className="text-xs font-medium text-emerald-300">
+                You already paid Month {application.monthsPaid}. This payment covers Month {nextUnpaidMonth} — keeping your SIP ahead of schedule.
+              </p>
+            </div>
+          )}
 
           <div className="h-px bg-white/10" />
 
@@ -355,7 +399,7 @@ function Step1PaymentDetails({
             <div className="flex items-center justify-between text-sm">
               <span className="text-zinc-400">Total After Payment</span>
               <span className="font-bold text-emerald-400">
-                {application.monthsPaid + 1}/{application.totalMonths} months
+                {nextUnpaidMonth}/{application.totalMonths} months
               </span>
             </div>
           </div>

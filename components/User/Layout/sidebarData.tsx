@@ -141,6 +141,18 @@ export const menuData: MenuSection[] = [
             href: "/investment/all-schemes/fixed-deposite",
             icon: CornerDownRight,
           },
+          {
+            id: "fixed-deposite-progress",
+            label: "Progress",
+            href: "/investment/all-schemes/fixed-deposite/progress",
+            icon: CornerDownRight,
+          },
+          {
+            id: "fixed-deposite-reports",
+            label: "Reports",
+            href: "/investment/all-schemes/fixed-deposite/reports",
+            icon: CornerDownRight,
+          },
         ],
       },
 

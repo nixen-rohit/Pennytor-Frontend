@@ -174,7 +174,7 @@ function ReportRow({ entry }: { entry: SIPReportEntry }) {
         {entry.planLabel}
       </TableCell>
       <TableCell className="py-4 text-sm text-zinc-200">
-        {entry.monthNumber ? `Month ${entry.monthNumber}` : "—"}
+        {entry.monthNumber ? `Month ${entry.monthNumber}` : "N/A"}
       </TableCell>
       <TableCell
         className={`whitespace-nowrap py-4 text-right font-mono font-semibold ${
@@ -186,7 +186,7 @@ function ReportRow({ entry }: { entry: SIPReportEntry }) {
         }`}
       >
         {isCredit ? "+" : isDebit ? "-" : ""}
-        {entry.direction === "INFO" ? "—" : inr(entry.amount)}
+        {entry.direction === "INFO" ? "N/A" : inr(entry.amount)}
       </TableCell>
     </TableRow>
   );
