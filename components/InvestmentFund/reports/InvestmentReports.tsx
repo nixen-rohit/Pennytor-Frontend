@@ -1,45 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ArrowLeft,
-  Loader2,
-  RefreshCw,
-  ReceiptText,
-} from "lucide-react";
-import { format } from "date-fns";
+import { Loader2, RefreshCw, ReceiptText } from "lucide-react";
 import {
   InvestmentFundService,
   type InvestmentReportEntry,
 } from "@/services/investment-fund.service";
-
-const inr = (value: string | number) =>
-  `₹${Number(value || 0).toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-
-const KIND_LABELS: Record<InvestmentReportEntry["kind"], string> = {
-  INVESTMENT: "Scheme Payment",
-  REFUND: "Refund",
-  ROI: "Monthly ROI",
-};
-
-const STATUS_BADGES: Record<string, string> = {
-  PENDING: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-  VERIFIED: "bg-green-500/15 text-green-400 border-green-500/20",
-};
+import { ReportRow } from "./ReportRow";
 
 export default function InvestmentReports() {
   const [items, setItems] = useState<InvestmentReportEntry[]>([]);
@@ -68,19 +44,15 @@ export default function InvestmentReports() {
   return (
     <div className="min-h-screen bg-[#08090f] px-4 py-10 text-white sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-             
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                Investment Reports
-              </h1>
-              <p className="text-sm text-zinc-400">
-                Every rupee that moved — scheme payments, refunds and monthly
-                ROI credits.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Investment Reports
+            </h1>
+            <p className="text-sm text-zinc-400">
+              Every rupee that moved — scheme payments, refunds and monthly ROI
+              credits.
+            </p>
           </div>
           <Button
             type="button"
@@ -148,53 +120,5 @@ export default function InvestmentReports() {
         </Card>
       </div>
     </div>
-  );
-}
-
-function ReportRow({ entry }: { entry: InvestmentReportEntry }) {
-  const isCredit = entry.direction === "CREDIT";
-  return (
-    <TableRow className="border-white/10 hover:bg-white/[0.03]">
-      <TableCell className="whitespace-nowrap py-4 text-sm text-zinc-300">
-        {format(new Date(entry.occurredAt), "dd MMM yyyy, hh:mm a")}
-      </TableCell>
-      <TableCell className="py-4">
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-            entry.kind === "ROI"
-              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-              : entry.kind === "REFUND"
-                ? "border-sky-500/20 bg-sky-500/10 text-sky-400"
-                : "border-indigo-500/20 bg-indigo-500/10 text-indigo-300"
-          }`}
-        >
-          {KIND_LABELS[entry.kind]}
-        </span>
-      </TableCell>
-      <TableCell className="py-4 text-sm text-zinc-200">
-        {entry.planLabel}
-      </TableCell>
-      <TableCell className="py-4">
-        {entry.status ? (
-          <span
-            className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${
-              STATUS_BADGES[entry.status] ?? "bg-red-500/15 text-red-400 border-red-500/20"
-            }`}
-          >
-            {entry.status === "VERIFIED" ? "APPROVED" : entry.status}
-          </span>
-        ) : (
-          <span className="text-xs text-zinc-500">—</span>
-        )}
-      </TableCell>
-      <TableCell
-        className={`whitespace-nowrap py-4 text-right font-mono font-semibold ${
-          isCredit ? "text-green-500" : "text-red-400"
-        }`}
-      >
-        {isCredit ? "+" : "-"}
-        {inr(entry.amount)}
-      </TableCell>
-    </TableRow>
   );
 }

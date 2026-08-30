@@ -7,27 +7,16 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ChevronLeft,
-  Loader2,
-  RefreshCw,
-  ReceiptText,
-} from "lucide-react";
-import { format } from "date-fns";
+import { ChevronLeft, Loader2, RefreshCw, ReceiptText } from "lucide-react";
 import {
   FixedDepositService,
   type FDReportEntry,
 } from "@/services/fixed-deposit.service";
-
-const typeBadge: Record<string, { label: string; cls: string }> = {
-  FD_DEPOSIT: { label: "Deposit", cls: "bg-amber-500/20 text-amber-400" },
-  FD_PAYOUT: { label: "EMI Credit", cls: "bg-emerald-500/20 text-emerald-400" },
-};
+import { ReportRow } from "./ReportRow";
 
 export default function FDReports() {
   const [reports, setReports] = useState<FDReportEntry[]>([]);
@@ -65,10 +54,11 @@ export default function FDReports() {
           Back to Plans
         </Link>
 
-        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Fixed Deposit Reports</h1>
+            <h1 className="text-2xl font-bold text-white">
+              Fixed Deposit Reports
+            </h1>
             <p className="mt-1 text-sm text-zinc-400">
               Transaction history for your Fixed Deposit activities.
             </p>
@@ -80,12 +70,13 @@ export default function FDReports() {
             disabled={refreshing}
             className="border-white/10 bg-white/5 text-white hover:bg-white/10"
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
 
-        {/* Content */}
         <Card className="border-white/10 bg-[#111217]">
           <CardContent className="p-0">
             {loading ? (
@@ -116,7 +107,7 @@ export default function FDReports() {
                         Plan
                       </TableHead>
                       <TableHead className="text-xs font-semibold text-zinc-400 uppercase tracking-wider py-3">
-                        EMI 
+                        EMI
                       </TableHead>
                       <TableHead className="text-xs font-semibold text-zinc-400 uppercase tracking-wider py-3 text-right">
                         Amount
@@ -125,49 +116,7 @@ export default function FDReports() {
                   </TableHeader>
                   <TableBody>
                     {reports.map((r) => (
-                      <TableRow
-                        key={r.id}
-                        className="border-b border-white/5 hover:bg-white/[0.02] transition-colors"
-                      >
-                        <TableCell className="py-3 text-sm text-zinc-300">
-                          {(() => {
-                            const d = new Date(r.occurredAt);
-                            return isNaN(d.getTime()) ? "—" : format(d, "dd MMM yyyy, hh:mm a");
-                          })()}
-                        </TableCell>
-                        <TableCell className="py-3">
-                          <span
-                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                              typeBadge[r.kind]?.cls || "bg-zinc-500/20 text-zinc-400"
-                            }`}
-                          >
-                            {typeBadge[r.kind]?.label || r.kind}
-                          </span>
-                        </TableCell>
-                        <TableCell className="py-3 text-sm text-zinc-300">
-                          {(() => {
-                            const n = parseInt(r.planId.replace("FD_", ""), 10);
-                            return `₹${n.toLocaleString("en-IN")}`;
-                          })()}
-                        </TableCell>
-                        <TableCell className="py-3 text-sm text-zinc-300">
-                          {r.emiNumber ? `#${r.emiNumber}` : "N/A"}
-                        </TableCell>
-                        <TableCell className="py-3 text-right">
-                          <span
-                            className={`text-sm font-semibold ${
-                              r.direction === "CREDIT"
-                                ? "text-emerald-400"
-                                : r.direction === "DEBIT"
-                                  ? "text-red-400"
-                                  : "text-zinc-400"
-                            }`}
-                          >
-                            {r.direction === "CREDIT" ? "+" : r.direction === "DEBIT" ? "-" : ""}
-                            ₹{Number(r.amount).toLocaleString("en-IN")}
-                          </span>
-                        </TableCell>
-                      </TableRow>
+                      <ReportRow key={r.id} entry={r} />
                     ))}
                   </TableBody>
                 </Table>

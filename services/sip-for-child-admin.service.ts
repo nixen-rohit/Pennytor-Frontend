@@ -1,7 +1,7 @@
 import { API_URL, ApiError } from "./api";
 import { useAuthStore } from "@/store/auth.store";
 
-export type SIPStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type SIPStatus = "PENDING" | "VERIFIED" | "REJECTED" | "COMPLETED";
 
 export type KycStatus = "VERIFIED" | "PENDING" | "REJECTED";
 

@@ -64,7 +64,7 @@ function Gullak({ onContact, onApply }: GullakProps) {
           />
 
           <div className="relative flex flex-col gap-7 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
+            <div className="max-w-4xl">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-amber-300">
                 <PiggyBank className="h-4 w-4" aria-hidden="true" />
                 Savings Scheme
@@ -77,32 +77,10 @@ function Gullak({ onContact, onApply }: GullakProps) {
                 Gullak <span className="text-amber-400">Scheme</span>
               </h2>
 
-              <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-400 sm:text-base">
+              <p className="mt-4 max-w-4xl text-sm leading-6 text-zinc-400 sm:text-base">
                 Build your savings consistently with a simple daily deposit plan
                 designed around a 5-year period.
               </p>
-            </div>
-
-            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onContact}
-                className="h-11 border-white/15 bg-white/5 px-5 text-white hover:bg-white/10 hover:text-white"
-              >
-                <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
-                Contact
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onApply?.(GULLAK_PLANS[0])}
-                className="h-11 bg-amber-400 px-5 font-semibold text-black hover:bg-amber-300"
-              >
-                Apply Now
-                <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
-              </Button>
             </div>
           </div>
         </div>

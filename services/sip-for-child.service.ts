@@ -31,7 +31,7 @@ export interface SIPSchemesResponse {
   schemes: SIPForChildScheme[];
 }
 
-export type SIPStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type SIPStatus = "PENDING" | "VERIFIED" | "REJECTED" | "COMPLETED";
 
 export interface MySIPPremium {
   id: string;

@@ -1,42 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ArrowLeft,
-  Loader2,
-  RefreshCw,
-  ReceiptText,
-} from "lucide-react";
-import { format } from "date-fns";
+import { Loader2, RefreshCw, ReceiptText } from "lucide-react";
 import {
   SIPForChildService,
   type SIPReportEntry,
 } from "@/services/sip-for-child.service";
-
-const inr = (value: string | number) =>
-  `₹${Number(value || 0).toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-
-const KIND_LABELS: Record<SIPReportEntry["kind"], string> = {
-  SIP_APPLICATION: "Application",
-  SIP_PREMIUM: "Monthly Premium",
-  SIP_INVESTMENT: "SIP Investment",
-  REFUND: "Refund",
-  SWP_WITHDRAWAL: "SWP Withdrawal",
-};
+import { ReportRow } from "./ReportRow";
 
 export default function SIPReports() {
   const [items, setItems] = useState<SIPReportEntry[]>([]);
@@ -65,17 +44,15 @@ export default function SIPReports() {
   return (
     <div className="min-h-screen bg-[#08090f] px-4 py-10 text-white sm:px-6 lg:px-8">
       <div className="mx-auto w-full max-w-5xl space-y-6">
-        {/* Header */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                SIP Reports
-              </h1>
-              <p className="text-sm text-zinc-400">
-                Every rupee that moved — premium payments, refunds and application records.
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              SIP Reports
+            </h1>
+            <p className="text-sm text-zinc-400">
+              Every rupee that moved — premium payments, refunds and application
+              records.
+            </p>
           </div>
           <Button
             type="button"
@@ -143,51 +120,5 @@ export default function SIPReports() {
         </Card>
       </div>
     </div>
-  );
-}
-
-function ReportRow({ entry }: { entry: SIPReportEntry }) {
-  const isCredit = entry.direction === "CREDIT";
-  const isDebit = entry.direction === "DEBIT";
-
-  return (
-    <TableRow className="border-white/10 hover:bg-white/[0.03]">
-      <TableCell className="whitespace-nowrap py-4 text-sm text-zinc-300">
-        {format(new Date(entry.occurredAt), "dd MMM yyyy, hh:mm a")}
-      </TableCell>
-      <TableCell className="py-4">
-        <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-            entry.kind === "SIP_PREMIUM"
-              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-              : entry.kind === "REFUND"
-                ? "border-sky-500/20 bg-sky-500/10 text-sky-400"
-                : entry.kind === "SIP_APPLICATION"
-                  ? "border-indigo-500/20 bg-indigo-500/10 text-indigo-300"
-                  : "border-zinc-500/20 bg-zinc-500/10 text-zinc-400"
-          }`}
-        >
-          {KIND_LABELS[entry.kind]}
-        </span>
-      </TableCell>
-      <TableCell className="py-4 text-sm text-zinc-200">
-        {entry.planLabel}
-      </TableCell>
-      <TableCell className="py-4 text-sm text-zinc-200">
-        {entry.monthNumber ? `Month ${entry.monthNumber}` : "N/A"}
-      </TableCell>
-      <TableCell
-        className={`whitespace-nowrap py-4 text-right font-mono font-semibold ${
-          isCredit
-            ? "text-green-500"
-            : isDebit
-              ? "text-red-400"
-              : "text-zinc-500"
-        }`}
-      >
-        {isCredit ? "+" : isDebit ? "-" : ""}
-        {entry.direction === "INFO" ? "N/A" : inr(entry.amount)}
-      </TableCell>
-    </TableRow>
   );
 }

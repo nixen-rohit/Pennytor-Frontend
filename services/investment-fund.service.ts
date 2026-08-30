@@ -29,7 +29,7 @@ export interface InvestmentSchemesResponse {
   schemes: InvestmentFundScheme[];
 }
 
-export type InvestmentFundStatus = "PENDING" | "VERIFIED" | "REJECTED";
+export type InvestmentFundStatus = "PENDING" | "VERIFIED" | "REJECTED" | "COMPLETED";
 
 export interface MyInvestmentCycle {
   startAt: string;
