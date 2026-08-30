@@ -31,6 +31,12 @@ const inr = (value: string | number) =>
     maximumFractionDigits: 2,
   })}`;
 
+const planLabel = (scheme: string) => {
+  const n = parseInt(scheme.replace("PLAN_", ""), 10);
+  const letter = scheme === "PLAN_5000" ? "A" : "B";
+  return `SIP PLAN ${letter} (₹${n.toLocaleString("en-IN")})`;
+};
+
 export default function SIPProgress() {
   const [items, setItems] = useState<MySIPInvestment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,7 +88,7 @@ export default function SIPProgress() {
   const activeTab = tabOverride ?? defaultTab;
 
   const payingApp = payingAppId
-    ? items.find((i) => i.id === payingAppId) ?? null
+    ? (items.find((i) => i.id === payingAppId) ?? null)
     : null;
 
   if (payingApp) {
@@ -152,14 +158,14 @@ export default function SIPProgress() {
           <EmptyState />
         ) : (
           <Tabs value={activeTab} onValueChange={setTabOverride}>
-            <TabsList className="grid w-full grid-cols-5 lg:w-[800px]">
+            <TabsList className="mb-6 bg-[#111217] border border-white/10">
               {plans.map((p) => (
                 <TabsTrigger
                   key={p.scheme}
                   value={p.scheme}
-                  className="flex items-center gap-3"
+                  className="data-[state=active]:bg-amber-400 data-[state=active]:text-black"
                 >
-                  Plan {p.scheme}
+                  {planLabel(p.scheme)}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -175,7 +181,10 @@ export default function SIPProgress() {
                       inv={inv}
                       onPayNow={() => setPayingAppId(inv.id)}
                     />
-                    <ProgressCard inv={inv} onPayNow={() => setPayingAppId(inv.id)} />
+                    <ProgressCard
+                      inv={inv}
+                      onPayNow={() => setPayingAppId(inv.id)}
+                    />
                   </div>
                 ))}
               </TabsContent>
@@ -207,7 +216,10 @@ function PaymentDueBanner({
       .map((p) => p.monthNumber),
   );
   let nextUnpaidMonth = inv.monthsPaid + 1;
-  while (nextUnpaidMonth <= inv.totalMonths && paidMonths.has(nextUnpaidMonth)) {
+  while (
+    nextUnpaidMonth <= inv.totalMonths &&
+    paidMonths.has(nextUnpaidMonth)
+  ) {
     nextUnpaidMonth++;
   }
   const isAdvance = nextUnpaidMonth > inv.monthsPaid + 1;
@@ -248,7 +260,7 @@ function PaymentDueBanner({
             <div className="space-y-1">
               <h3 className="text-base font-bold text-white">
                 {isAdvance
-                  ? "Current Month Already Paid"
+                  ? "Advance Premium"
                   : inv.monthsPaid === 0
                     ? "First Premium Payment Due"
                     : isOverdue
@@ -257,13 +269,16 @@ function PaymentDueBanner({
               </h3>
               <p className="text-sm text-zinc-400">
                 {isAdvance
-                  ? `Month ${nextUnpaidMonth} of ${inv.totalMonths} — pay now to continue your SIP.`
+                  ? `Month ${inv.monthsPaid} is already paid. Pay Month ${nextUnpaidMonth} of ${inv.totalMonths} now to stay ahead.`
                   : inv.monthsPaid === 0
                     ? "Your application has been approved! Pay your first premium to activate the SIP."
                     : isOverdue
                       ? `Month ${nextUnpaidMonth} payment was due on ${
                           inv.nextPaymentDue
-                            ? format(new Date(inv.nextPaymentDue), "dd MMM yyyy")
+                            ? format(
+                                new Date(inv.nextPaymentDue),
+                                "dd MMM yyyy",
+                              )
                             : "earlier"
                         }. Pay now to avoid missing it.`
                       : `Month ${nextUnpaidMonth} of ${inv.totalMonths} — ${
@@ -325,9 +340,7 @@ function ProgressCard({
     inv.status === "VERIFIED"
       ? {
           label:
-            inv.monthsPaid > 0
-              ? "ACTIVE"
-              : "APPROVED - AWAITING FIRST PAYMENT",
+            inv.monthsPaid > 0 ? "ACTIVE" : "APPROVED - AWAITING FIRST PAYMENT",
           cls: "bg-green-500/10 text-green-400 border-green-500/20",
         }
       : inv.status === "REJECTED"
@@ -376,10 +389,7 @@ function ProgressCard({
                 <span className="flex items-center gap-2 font-medium text-zinc-200">
                   Applied on{" "}
                   <span className="text-yellow-400">
-                    {format(
-                      new Date(inv.submittedAt),
-                      "dd MMM yyyy, hh:mm a",
-                    )}
+                    {format(new Date(inv.submittedAt), "dd MMM yyyy, hh:mm a")}
                   </span>
                 </span>
               ) : null}
@@ -443,11 +453,7 @@ function ProgressCard({
         {inv.status === "VERIFIED" && (
           <>
             <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-              <Cell
-                label="Monthly Premium"
-                value={inr(monthlyAmount)}
-                accent
-              />
+              <Cell label="Monthly Premium" value={inr(monthlyAmount)} accent />
               <Cell
                 label="Months Paid"
                 value={`${inv.monthsPaid} / ${inv.totalMonths}`}
@@ -605,9 +611,7 @@ function EmptyState() {
           asChild
           className="bg-indigo-600 hover:bg-indigo-700 text-white"
         >
-          <Link href="/investment/all-schemes/sip-for-child">
-            Browse Plans
-          </Link>
+          <Link href="/investment/all-schemes/sip-for-child">Browse Plans</Link>
         </Button>
       </CardContent>
     </Card>

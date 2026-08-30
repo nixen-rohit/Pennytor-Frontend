@@ -1,9 +1,5 @@
-import React from 'react'
+import FDRequestList from "@/components/admin/FDRequest";
 
-const page = () => {
-  return (
-    <div>page</div>
-  )
+export default function Page() {
+  return <FDRequestList />;
 }
-
-export default page

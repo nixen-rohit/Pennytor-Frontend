@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   GraduationCap,
   Phone,
@@ -9,10 +9,13 @@ import {
   CalendarClock,
   IndianRupee,
   ArrowRight,
+  BadgeCheck,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SIPForChildService } from "@/services/sip-for-child.service";
+import { useAuthStore } from "@/store/auth.store";
 
 type SIPExample = {
   id: number;
@@ -237,6 +240,30 @@ function JourneyTable({ stages }: { stages: Stage[] }) {
 
 export function SIPForChild() {
   const [activeTab, setActiveTab] = useState<number>(1);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const [activeSchemes, setActiveSchemes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    SIPForChildService.myApplications()
+      .then((res) => {
+        if (cancelled) return;
+        setActiveSchemes(
+          new Set(
+            (res.items ?? [])
+              .filter((i) => i.status === "PENDING" || i.status === "VERIFIED")
+              .map((i) => i.scheme),
+          ),
+        );
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
+  const isSchemeActive = (planId: string) => activeSchemes.has(planId);
 
   const selectedExample =
     SIP_EXAMPLES.find((item) => item.id === activeTab) ?? SIP_EXAMPLES[0];
@@ -558,19 +585,30 @@ export function SIPForChild() {
 
               {/* Single Apply Button for Selected Scheme */}
               <div>
-                <Button
-                  type="button"
-                  onClick={() =>
-                    window.open(
-                      `/investment/all-schemes/sip-for-child/apply/${activeTab === 1 ? "PLAN_5000" : "PLAN_2500"}`,
-                      "_self"
-                    )
-                  }
-                  className="bg-orange-600 text-white hover:bg-orange-700 px-8 py-3 text-sm font-semibold transition-all duration-200 rounded-xl shadow-lg shadow-orange-400/10"
-                >
-                  Apply for{" "}
-                  {SIP_EXAMPLES.find((item) => item.id === activeTab)?.planName}
-                </Button>
+                {isSchemeActive(selectedExample.planId) ? (
+                  <Button
+                    type="button"
+                    disabled
+                    className="bg-green-500/10 border border-green-500/20 text-green-400 px-8 py-3 text-sm font-semibold rounded-xl"
+                  >
+                    <BadgeCheck className="mr-2 h-4 w-4" />
+                    Already Active
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      window.open(
+                        `/investment/all-schemes/sip-for-child/apply/${selectedExample.planId}`,
+                        "_self"
+                      )
+                    }
+                    className="bg-orange-600 text-white hover:bg-orange-700 px-8 py-3 text-sm font-semibold transition-all duration-200 rounded-xl shadow-lg shadow-orange-400/10"
+                  >
+                    Apply for{" "}
+                    {SIP_EXAMPLES.find((item) => item.id === activeTab)?.planName}
+                  </Button>
+                )}
               </div>
             </div>
           </CardHeader>
