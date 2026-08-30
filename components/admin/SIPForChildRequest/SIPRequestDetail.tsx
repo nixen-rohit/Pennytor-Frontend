@@ -111,6 +111,7 @@ export default function SIPRequestDetail() {
     PENDING: { label: "PENDING APPROVAL", cls: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
     VERIFIED: { label: "APPROVED", cls: "bg-green-500/10 text-green-400 border-green-500/20" },
     REJECTED: { label: "REJECTED", cls: "bg-red-500/10 text-red-400 border-red-500/20" },
+    COMPLETED: { label: "COMPLETED", cls: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
   }[data.status];
 
   return (
@@ -204,7 +205,7 @@ export default function SIPRequestDetail() {
               <p className="text-2xl font-bold text-green-400">{data.monthsPaid} / {data.totalMonths}</p>
             </div>
             <div className="rounded-lg border border-neutral-800 bg-neutral-950/50 p-4">
-              <p className="text-xs text-slate-500">Months Missed</p>
+              <p className="text-xs text-red-500">Months Missed</p>
               <p className={`text-2xl font-bold ${data.monthsMissed >= 3 ? 'text-red-400' : 'text-yellow-400'}`}>
                 {data.monthsMissed} / 3
               </p>

@@ -20,7 +20,7 @@ import {
   CornerDownRight,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
-import { ListTodo } from 'lucide-react';
+import { ListTodo } from "lucide-react";
 
 interface SubMenuItem {
   id: string;
@@ -64,16 +64,9 @@ export const menuData: MenuSection[] = [
         icon: Home,
       },
       {
-        id: "notifications",
-        label: "Notifications",
-        href: "/notifications",
-        badge: "4",
-        icon: Bell,
-      },
-      {
         id: "to-do",
         label: "Task List",
-        href: "/task-list",        
+        href: "/task-list",
         icon: ListTodo,
       },
     ],
@@ -94,6 +87,12 @@ export const menuData: MenuSection[] = [
             label: "Details",
             icon: CornerDownRight,
             href: "/investment/all-schemes/gullak-scheme",
+          },
+          {
+            id: "gullak-progress",
+            label: "Progress",
+            icon: CornerDownRight,
+            href: "/investment/all-schemes/gullak-scheme/progress",
           },
         ],
       },
