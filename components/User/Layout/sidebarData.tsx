@@ -3,7 +3,6 @@ import {
   FileText,
   Wallet,
   HandCoins,
-  ClipboardList,
   Mail,
   LucideIcon,
   PiggyBank,
@@ -16,11 +15,10 @@ import {
   UserCheck,
   ChartNoAxesCombined,
   School,
-  Bell,
   CornerDownRight,
+  Gift,
 } from "lucide-react";
 import { MdOutlineVerified } from "react-icons/md";
-import { ListTodo } from "lucide-react";
 
 interface SubMenuItem {
   id: string;
@@ -64,10 +62,10 @@ export const menuData: MenuSection[] = [
         icon: Home,
       },
       {
-        id: "to-do",
-        label: "Task List",
-        href: "/task-list",
-        icon: ListTodo,
+        id: "Reward",
+        label: "Rewards",
+        href: "/rewards",
+        icon: Gift,        
       },
     ],
   },

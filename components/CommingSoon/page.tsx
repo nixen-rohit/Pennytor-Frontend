@@ -8,25 +8,25 @@ export default function ComingSoon() {
       {/* Background decoration */}
       <div className="pointer-events-none absolute inset-0">
         {/* Main glow */}
-        <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/10 blur-3xl sm:h-72 sm:w-72" />
+        <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-500/10 blur-3xl sm:h-72 sm:w-72" />
 
         {/* Secondary glow */}
-        <div className="absolute left-[15%] top-[20%] h-32 w-32 rounded-full bg-blue-500/5 blur-3xl" />
+        <div className="absolute left-[15%] top-[20%] h-32 w-32 rounded-full bg-red-500/5 blur-3xl" />
 
-        <div className="absolute right-[15%] bottom-[15%] h-40 w-40 rounded-full bg-violet-500/5 blur-3xl" />
+        <div className="absolute right-[15%] bottom-[15%] h-40 w-40 rounded-full bg-orange-500/5 blur-3xl" />
 
         {/* Dots */}
-        <div className="absolute left-[12%] top-[20%] h-1.5 w-1.5 rounded-full bg-indigo-400/50 sm:left-[20%] sm:top-[25%]" />
+        <div className="absolute left-[12%] top-[20%] h-1.5 w-1.5 rounded-full bg-yellow-400/50 sm:left-[20%] sm:top-[25%]" />
 
-        <div className="absolute right-[12%] top-[30%] h-1.5 w-1.5 rounded-full bg-blue-400/40 sm:right-[22%] sm:top-[35%]" />
+        <div className="absolute right-[12%] top-[30%] h-1.5 w-1.5 rounded-full bg-red-400/40 sm:right-[22%] sm:top-[35%]" />
 
-        <div className="absolute bottom-[20%] left-[20%] h-1.5 w-1.5 rounded-full bg-violet-400/40 sm:bottom-[25%] sm:left-[30%]" />
+        <div className="absolute bottom-[20%] left-[20%] h-1.5 w-1.5 rounded-full bg-orange-400/40 sm:bottom-[25%] sm:left-[30%]" />
       </div>
 
       <div className="relative z-10 flex w-full max-w-xl flex-col items-center">
         {/* Icon */}
         <div className="relative mb-6 sm:mb-7">
-          <div className="absolute inset-0 rounded-2xl bg-indigo-500/20 blur-xl" />
+          <div className="absolute inset-0 rounded-2xl bg-yellow-500/20 blur-xl" />
 
           <div className="relative flex h-16 w-16 items-center justify-center rounded-xl border border-white/10 bg-[#18181b] shadow-2xl shadow-black/40 sm:h-20 sm:w-20 sm:rounded-2xl">
             <FileText className="h-7 w-7 text-indigo-300 sm:h-9 sm:w-9" />
