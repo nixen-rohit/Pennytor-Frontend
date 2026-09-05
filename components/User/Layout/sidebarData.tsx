@@ -65,7 +65,25 @@ export const menuData: MenuSection[] = [
         id: "Reward",
         label: "Rewards",
         href: "/rewards",
-        icon: Gift,        
+        icon: Gift,
+      },
+    ],
+  },
+  {
+    id: "commission",
+    label: "Commission ",
+    items: [
+      {
+        id: "referral ",
+        label: "Referral ",
+        href: "/commission/referral",
+        icon: GraduationCap,
+      },
+      {
+        id: "referral-chain",
+        label: "Referral Network",
+        href: "/commission/referral-chain",
+        icon: UserStar,
       },
     ],
   },
@@ -73,27 +91,6 @@ export const menuData: MenuSection[] = [
     id: "Investment",
     label: "Investment",
     items: [
-      {
-        id: "gullak",
-        label: "Gullak ",
-        href: "#",
-        isSoon: true,
-        icon: PiggyBank,
-        children: [
-          {
-            id: "gullak",
-            label: "Details",
-            icon: CornerDownRight,
-            href: "/investment/all-schemes/gullak-scheme",
-          },
-          {
-            id: "gullak-progress",
-            label: "Progress",
-            icon: CornerDownRight,
-            href: "/investment/all-schemes/gullak-scheme/progress",
-          },
-        ],
-      },
       {
         id: "sip",
         label: "SIP For Child",
@@ -183,6 +180,28 @@ export const menuData: MenuSection[] = [
       },
 
       {
+        id: "gullak",
+        label: "Gullak ",
+        href: "#",
+        isSoon: true,
+        icon: PiggyBank,
+        children: [
+          {
+            id: "gullak",
+            label: "Details",
+            icon: CornerDownRight,
+            href: "/investment/all-schemes/gullak-scheme",
+          },
+          {
+            id: "gullak-progress",
+            label: "Progress",
+            icon: CornerDownRight,
+            href: "/investment/all-schemes/gullak-scheme/progress",
+          },
+        ],
+      },
+
+      {
         id: "stocks",
         label: "Stocks",
         href: "/investment/stocks",
@@ -205,24 +224,7 @@ export const menuData: MenuSection[] = [
       },
     ],
   },
-  {
-    id: "commission",
-    label: "Commission ",
-    items: [
-      {
-        id: "referral ",
-        label: "Referral ",
-        href: "/commission/referral",
-        icon: GraduationCap,
-      },
-      {
-        id: "referral-chain",
-        label: "Referral Network",
-        href: "/commission/referral-chain",
-        icon: UserStar,
-      },
-    ],
-  },
+
   {
     id: "Accounts",
     label: "Accounts",

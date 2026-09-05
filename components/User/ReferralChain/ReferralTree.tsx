@@ -16,7 +16,7 @@ function TreeNode({
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth < 2);
-  const hasChildren = node.children && node.children.length > 0;
+  const hasChildren = node.referrals && node.referrals.length > 0;
 
   return (
     <div className="select-none">
@@ -50,18 +50,23 @@ function TreeNode({
         <span
           className={`text-sm font-medium ${depth === 0 ? "text-indigo-300" : "text-slate-200"}`}
         >
-          {node.name}
+          {node.firstName} {node.lastName}
         </span>
 
+        {node.userType === "super_user" && (
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-yellow-500/20 text-yellow-400">
+            SUPER
+          </span>
+        )}
+
         <div className="flex items-center gap-1 ml-auto text-xs text-slate-400">
-          <IndianRupee className="h-3 w-3" />
-          <span>{node.earnings.toLocaleString()}</span>
+          <span className="font-mono">{node.ownReferralCode}</span>
         </div>
       </div>
 
       {hasChildren && expanded && (
         <div className="border-l border-neutral-700 ml-[18px] mt-1">
-          {node.children!.map((child) => (
+          {node.referrals!.map((child) => (
             <TreeNode key={child.id} node={child} depth={depth + 1} />
           ))}
         </div>
@@ -75,9 +80,17 @@ export function ReferralTree({ data }: Props) {
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <div className="rounded-xl border border-neutral-800 bg-neutral-900/50 p-4">
         <div className="text-sm text-white mb-3 px-3 ">
-          Check Your Refferal Chain Tree here
+          Check Your Referral Chain Tree here
         </div>
-        <TreeNode node={data.treeData} />
+        {data.treeData && data.treeData.length > 0 ? (
+          data.treeData.map((node) => (
+            <TreeNode key={node.id} node={node} />
+          ))
+        ) : (
+          <div className="text-center py-8 text-slate-500 text-sm">
+            No referral tree data available.
+          </div>
+        )}
       </div>
     </div>
   );

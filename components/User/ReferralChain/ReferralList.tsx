@@ -47,20 +47,20 @@ export function ReferralList({ data }: Props) {
   const hasActiveFilters = activeFilterCount > 0;
 
   const filteredUsers = data.referrals.filter((user) => {
+    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     const matchesSearch =
-      user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fullName.includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
+    // All referrals from the API are considered active
     const matchesActive =
-      filters.active === "all" ||
-      (filters.active === "active" && user.isActive) ||
-      (filters.active === "inactive" && !user.isActive);
+      filters.active === "all" || filters.active === "active";
 
-    const matchesLevel =
-      filters.level === "all" || user.level.toString() === filters.level;
+    // Level filtering is not available from the API (all are direct referrals)
+    const matchesLevel = filters.level === "all";
 
-    const matchesKyc =
-      filters.kyc === "all" || user.kycStatus.toLowerCase() === filters.kyc;
+    // KYC status is not available from the API
+    const matchesKyc = filters.kyc === "all";
 
     return matchesSearch && matchesActive && matchesLevel && matchesKyc;
   });
@@ -157,14 +157,13 @@ export function ReferralList({ data }: Props) {
                     Email
                   </TableHead>
                   <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                    Level
+                    Type
                   </TableHead>
                   <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                    Is Active
+                    Eligible
                   </TableHead>
-
                   <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
-                    Commission
+                    Referral Code
                   </TableHead>
                   <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
                     Joined
@@ -174,7 +173,7 @@ export function ReferralList({ data }: Props) {
               <TableBody>
                 {currentUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-64 text-center">
+                    <TableCell colSpan={6} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                         <div className="p-3 rounded-full bg-neutral-800">
                           <UsersIcon className="h-8 w-8 text-slate-400" />
@@ -203,24 +202,18 @@ export function ReferralList({ data }: Props) {
                       className="border-b border-neutral-800 last:border-b-0 hover:bg-neutral-800/50 transition-colors"
                     >
                       <TableCell className="py-3 font-medium text-slate-200">
-                        {user.fullName}
+                        {user.firstName} {user.lastName}
                       </TableCell>
                       <TableCell className="py-3 text-slate-400">
                         {maskEmail(user.email)}
                       </TableCell>
                       <TableCell className="py-3">
-                        {user.level === 0 ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500/50 text-gray-400">
-                            Level 0
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400">
-                            Level {user.level}
-                          </span>
-                        )}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400">
+                          {user.userType === "super_user" ? "Super User" : "User"}
+                        </span>
                       </TableCell>
                       <TableCell className="py-3">
-                        {user.isActive ? (
+                        {user.referralEligible ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-600/20 text-green-400">
                             Active
                           </span>
@@ -230,12 +223,11 @@ export function ReferralList({ data }: Props) {
                           </span>
                         )}
                       </TableCell>
-
-                      <TableCell className="py-3 text-slate-200">
-                        ₹ {user.commission.toLocaleString()}
+                      <TableCell className="py-3 text-slate-400 font-mono text-xs">
+                        {user.ownReferralCode}
                       </TableCell>
                       <TableCell className="py-3 text-slate-400">
-                        {format(user.createdAt, "MMM dd, yyyy")}
+                        {format(new Date(user.createdAt), "MMM dd, yyyy")}
                       </TableCell>
                     </TableRow>
                   ))

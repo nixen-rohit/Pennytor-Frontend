@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { WalletBalanceCard } from "./WalletBalanceCard";
-import { PaymentSlipCard, PaymentSlipData } from "./PaymentSlipCard";
 import { WithdrawalService } from "@/services/withdrawal.service";
 
 export default function FundDashboard() {
   const [balance, setBalance] = useState<number | null>(null);
-  const [latestWithdrawal, setLatestWithdrawal] = useState<PaymentSlipData | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -16,16 +14,6 @@ export default function FundDashboard() {
       .then((res) => {
         if (cancelled) return;
         setBalance(Number(res.balance) || 0);
-        const latest = res.items[0];
-        if (latest) {
-          setLatestWithdrawal({
-            txnId: latest.id,
-            amount: latest.amount,
-            submittedAt: latest.submittedAt,
-            createdAt: latest.createdAt,
-            status: latest.status,
-          });
-        }
       })
       .catch(() => {})
       .finally(() => {
@@ -48,21 +36,10 @@ export default function FundDashboard() {
           </p>
         </div>
 
-        <div className="grid gap-5 grid-cols-1 lg:grid-cols-3">
-          <WalletBalanceCard
-            balance={balance ?? 0}
-            loading={!loaded}
-            className="lg:col-span-2"
-          />
-          <div className="space-y-4">
-            {latestWithdrawal && (
-              <PaymentSlipCard slip={latestWithdrawal} />
-            )}
-            {!latestWithdrawal && (
-              <PaymentSlipCard slip={null} />
-            )}
-          </div>
-        </div>
+        <WalletBalanceCard
+          balance={balance ?? 0}
+          loading={!loaded}
+        />
       </div>
     </div>
   );

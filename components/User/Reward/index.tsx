@@ -1,39 +1,35 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Lock, Users, TrendingUp } from "lucide-react";
+import { Check, Lock, TrendingUp } from "lucide-react";
 
 interface CommissionLevel {
   level: number;
-  referrals: number;
   description: string;
 }
 
 const levels: CommissionLevel[] = [
   {
     level: 1,
-    referrals: 1,
-    description: "Commission on your direct referrals",
+    description: "Requires an investment in any scheme",
   },
   {
     level: 2,
-    referrals: 3,
-    description: "Minimum 3 direct referrals",
+    description:
+      "At least 3 direct referrals must make an investment in any scheme",
   },
   {
     level: 3,
-    referrals: 6,
-    description: "Minimum 6 direct referrals",
+    description:
+      "At least 6 direct referrals must make an investment in any scheme",
   },
   {
     level: 4,
-    referrals: 9,
-    description: "Minimum 9 direct referrals",
+    description: "At least 9 direct referrals are required",
   },
   {
     level: 5,
-    referrals: 12,
-    description: "Minimum 12 direct referrals",
+    description: "At least 12 direct referrals are required",
   },
 ];
 
@@ -67,10 +63,7 @@ export default function Commission() {
     <main className="h-full px-4  text-white md:px-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div
-          className="mb-12 rounded-[32px] px-6 py-14 text-center"
-           
-        >
+        <div className=" rounded-[32px] px-6 py-10 text-center">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -81,13 +74,8 @@ export default function Commission() {
             </p>
 
             <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-              Commission Program 
+              Commission Program
             </h1>
-
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400 md:text-lg">
-              Grow your direct referrals and unlock higher commission levels as
-              your network expands.
-            </p>
           </motion.div>
         </div>
 
@@ -156,37 +144,22 @@ export default function Commission() {
                     key={currentLevel}
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-6xl font-black text-white"
+                    className="text-4xl font-black text-white"
                   >
-                    {currentLevel || 0}
+                    Level {currentLevel || 0}
                   </motion.div>
 
                   <p className="mt-1 text-sm font-semibold uppercase tracking-widest text-orange-400">
                     Current Level
-                  </p>
-
-                  <p className="mt-2 text-sm text-zinc-500">
-                    {currentReferrals} / 12 Referrals
                   </p>
                 </div>
               </div>
 
               {/* Progress text */}
               <div className="mt-6 text-center">
-                <p
-                  className={`text-xl font-bold ${
-                    isMaxLevel ? "text-emerald-400" : "text-white"
-                  }`}
-                >
-                  {isMaxLevel
-                    ? "Maximum Level Unlocked"
-                    : `Level ${currentLevel} Unlocked`}
-                </p>
-
-                <p className="mt-2 text-sm text-zinc-500">
-                  {!isMaxLevel
-                    ? `${12 - currentReferrals} more referrals to reach Level 5`
-                    : "You have unlocked all commission levels"}
+                <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400 md:text-lg">
+                  Grow your direct referrals and unlock higher commission levels
+                  as your network expands.
                 </p>
               </div>
             </div>
@@ -194,7 +167,7 @@ export default function Commission() {
             {/* Levels */}
             <div>
               <div className="mb-6">
-                <h2 className="text-2xl font-bold">Reward Levels</h2>                 
+                <h2 className="text-2xl font-bold">Reward Levels</h2>
               </div>
 
               <div className="space-y-3">
@@ -248,14 +221,6 @@ export default function Commission() {
                           {item.description}
                         </p>
                       </div>
-
-                      {/* Referral count */}
-                      <div className="text-right">
-                        <p className="text-lg font-bold">{item.referrals}</p>
-                        <p className="text-[10px] uppercase tracking-wider text-zinc-500">
-                          Referrals
-                        </p>
-                      </div>
                     </motion.div>
                   );
                 })}
@@ -270,7 +235,7 @@ export default function Commission() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mt-8 rounded-[32px] border border-white/10 bg-[#111113] p-6 md:p-10"
+          className="mt-8 rounded-[32px] border border-white/10 bg-[#111113] p-6 md:p-10 "
         >
           <div className="mb-8 flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-400/10 text-orange-400">
@@ -286,7 +251,7 @@ export default function Commission() {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 md:grid-cols-2  ">
             {/* Rule 1 */}
             <Rule
               number="01"
@@ -339,29 +304,6 @@ export default function Commission() {
             </div>
           </div>
         </motion.section>
-
-        {/* Bottom stats */}
-        <div className="mt-8 grid gap-4 md:grid-cols-3 pb-16">
-          <Stat
-            icon={<Users size={22} />}
-            value={currentReferrals.toString()}
-            label="Current Referrals"
-          />
-
-          <Stat
-            icon={<TrendingUp size={22} />}
-            value={`Level ${currentLevel}`}
-            label="Current Level"
-          />
-
-          <Stat
-            icon={<Check size={22} />}
-            value={`${progress.toFixed(0)}%`}
-            label="Overall Progress"
-          />
-        </div>
-
-        
       </div>
     </main>
   );
@@ -390,39 +332,8 @@ function Rule({
 
         <div>
           <h3 className="font-semibold text-white">{title}</h3>
-
           <p className="mt-2 text-sm leading-6 text-zinc-400">{text}</p>
         </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ---------------------------------- */
-/* Stat Component                     */
-/* ---------------------------------- */
-
-function Stat({
-  icon,
-  value,
-  label,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-}) {
-  return (
-    <motion.div
-      whileHover={{ y: -3 }}
-      className="flex items-center gap-4 rounded-2xl border border-white/10 bg-[#111113] p-5"
-    >
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-400/10 text-orange-400">
-        {icon}
-      </div>
-
-      <div>
-        <p className="text-xl font-bold">{value}</p>
-        <p className="text-xs text-zinc-500">{label}</p>
       </div>
     </motion.div>
   );
