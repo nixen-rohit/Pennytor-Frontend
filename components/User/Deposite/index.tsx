@@ -1,15 +1,22 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { Check, ChevronLeft, ChevronRight, Wallet, BadgeCheck, Loader2, AlertCircle } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Wallet,
+  BadgeCheck,
+  Loader2,
+  AlertCircle,
+  Clock,
+  XCircle,
+  CheckCircle2,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-import {
-  STEPS,
-  BANK_DETAILS,
-  initialFormState,
-} from "./types";
+import { STEPS, BANK_DETAILS, initialFormState } from "./types";
 import type { FormChange, FormErrors, FormState } from "./types";
 import { currency } from "./format";
 import { StepDots } from "./StepDots";
@@ -18,7 +25,11 @@ import { PaymentConfirmation } from "./PaymentConfirmation";
 import { ReviewSubmit } from "./ReviewSubmit";
 import { SubmitRequest } from "./SubmitRequest";
 import { SlipRow } from "./SlipRow";
-import { DepositService, type DepositStatus } from "@/services/deposit.service";
+import {
+  DepositService,
+  type DepositStatus,
+  type MyDeposit,
+} from "@/services/deposit.service";
 import {
   containsUnsafe,
   sanitizeAmount,
@@ -28,20 +39,104 @@ import {
   TRANSACTION_ID_PATTERN,
 } from "@/utils/validation";
 
-/**
- * AddPaymentPage
- * ---------------------------------------------------------------
- * Flow: Scan & pay -> confirm (txn id + screenshot) -> review -> submit.
- * The request is created server-side with the logged-in session user;
- * "User Name / User Type / Request Type" are display-only configuration.
- * ---------------------------------------------------------------
- */
+const statusConfig: Record<
+  DepositStatus,
+  { icon: React.ReactNode; title: string; subtitle: string; color: string }
+> = {
+  PENDING: {
+    icon: <Clock className="h-14 w-14 text-amber-400" />,
+    title: "Deposit request under review",
+    subtitle:
+      "Your deposit request has been submitted successfully. Please wait while our admin team reviews and verifies your transaction.",
+    color: "text-amber-400",
+  },
+  UNDER_REVIEW: {
+    icon: <Clock className="h-14 w-14 text-blue-400" />,
+    title: "Being reviewed by admin team",
+    subtitle:
+      "Your deposit is currently being reviewed. You will be notified once a decision is made.",
+    color: "text-blue-400",
+  },
+  VERIFIED: {
+    icon: <CheckCircle2 className="h-14 w-14 text-green-400" />,
+    title: "Deposit approved",
+    subtitle:
+      "Your deposit has been approved and the amount has been credited to your wallet.",
+    color: "text-green-400",
+  },
+  REJECTED: {
+    icon: <XCircle className="h-14 w-14 text-red-400" />,
+    title: "Deposit request rejected",
+    subtitle:
+      "Your deposit request was not approved. Please review the reason below and submit a new request.",
+    color: "text-red-400",
+  },
+};
+
+function DepositStatusPage({
+  deposit,
+  onNewRequest,
+}: {
+  deposit: MyDeposit;
+  onNewRequest: () => void;
+}) {
+  const config = statusConfig[deposit.status];
+
+  return (
+    <div className="mx-auto flex min-h-[560px] max-w-md flex-col items-center justify-center px-6 text-center">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center">
+        {config.icon}
+      </div>
+      <h1 className={`text-lg font-medium ${config.color}`}>{config.title}</h1>
+      <p className="mt-2 max-w-xs text-sm text-slate-400">{config.subtitle}</p>
+
+      <div className="mt-6 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-left space-y-1">
+        <SlipRow label="Amount" value={`₹${deposit.amount}`} mono />
+        <SlipRow label="Transaction ID" value={deposit.transactionId} mono />
+        <SlipRow
+          label="Status"
+          value={deposit.status.replace("_", " ")}
+          badge={
+            deposit.status.toLowerCase() as
+              | "pending"
+              | "under_review"
+              | "verified"
+              | "rejected"
+          }
+        />
+        {deposit.reviewNote && (
+          <div className="mt-3 rounded-lg border border-red-500/30 bg-red-500/10 p-3">
+            <p className="text-xs font-semibold text-red-400 uppercase tracking-wide">
+              Rejection Reason
+            </p>
+            <p className="text-sm text-slate-200 mt-1">{deposit.reviewNote}</p>
+          </div>
+        )}
+      </div>
+
+      {(deposit.status === "REJECTED" || deposit.status === "VERIFIED") && (
+        <div className="mt-8 w-full">
+          <button
+            type="button"
+            onClick={onNewRequest}
+            className="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-indigo-400/20 bg-indigo-500 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/10 transition-all hover:bg-indigo-400 hover:shadow-indigo-500/20 sm:mt-7 sm:w-auto"
+          >
+            {deposit.status === "REJECTED"
+              ? "Submit New Deposit Request"
+              : "Make Another Deposit"}
+
+            <Wallet className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AddPaymentPage() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<{
@@ -49,6 +144,30 @@ export default function AddPaymentPage() {
     txnId: string;
     status: DepositStatus;
   } | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [activeDeposit, setActiveDeposit] = useState<MyDeposit | null>(null);
+  const [hasActive, setHasActive] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    DepositService.getMyLatest()
+      .then((res) => {
+        if (cancelled) return;
+        if (res.deposit) {
+          setActiveDeposit(res.deposit);
+          setHasActive(res.hasActive);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const updateField: FormChange = useCallback((key, value) => {
     let safeValue: FormState[keyof FormState] = value;
@@ -119,7 +238,17 @@ export default function AddPaymentPage() {
         txnId: form.txnId,
         status: res.status,
       });
-      setSubmitted(true);
+      setActiveDeposit({
+        id: res.id,
+        amount: res.amount,
+        transactionId: form.txnId,
+        status: res.status,
+        reviewNote: null,
+        submittedAt: null,
+        createdAt: new Date().toISOString(),
+      });
+      setHasActive(true);
+      setShowForm(false);
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : "Failed to submit payment request",
@@ -130,43 +259,38 @@ export default function AddPaymentPage() {
   };
 
   const resetForm = () => {
-    setSubmitted(false);
     setStep(1);
     setForm(initialFormState);
     setErrors({});
     setResult(null);
     setSubmitError(null);
+    setShowForm(true);
   };
 
-  if (submitted) {
+  if (loading) {
     return (
-      <div className="mx-auto flex min-h-[560px] max-w-md flex-col items-center justify-center px-6 text-center">
-        <div className="mb-5 flex h-14 w-14 items-center justify-center ">
-          <BadgeCheck className="h-14 w-14 text-emerald-400" />
+      <div className="min-h-screen p-4">
+        <div className="mx-auto max-w-5xl flex items-center justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
         </div>
-        <h1 className="text-lg font-medium text-slate-50">
-          Payment request submitted
-        </h1>
-        <p className="mt-2 max-w-xs text-sm text-slate-400">
-          We&apos;ve sent {currency(result?.amount ?? form.amount)} for review.
-          You&apos;ll see it move to verified once the admin team confirms your
-          transaction id and screenshot.
-        </p>
-        <div className="mt-6 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-left">
-          <SlipRow label="Transaction id" value={form.txnId} mono />
-          <SlipRow
-            label="Status"
-            value={(result?.status ?? "PENDING").replace("_", " ")}
-            badge="pending"
-          />
+      </div>
+    );
+  }
+
+  if (!showForm && activeDeposit) {
+    return (
+      <div className="min-h-screen p-4">
+        <div className="mx-auto max-w-5xl space-y-5">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-50">
+              My Investments
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Manage your wallet, add funds and track payment slips.
+            </p>
+          </div>
+          <DepositStatusPage deposit={activeDeposit} onNewRequest={resetForm} />
         </div>
-        <button
-          type="button"
-          onClick={resetForm}
-          className="mt-8 text-sm font-medium text-indigo-500 underline underline-offset-4"
-        >
-          Add another payment
-        </button>
       </div>
     );
   }

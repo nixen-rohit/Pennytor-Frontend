@@ -94,6 +94,17 @@ export class WithdrawalService {
     return assertOk(response);
   }
 
+  static async getMyLatest(): Promise<{
+    hasActive: boolean;
+    withdrawal: MyWithdrawal | null;
+  }> {
+    const response = await fetch(`${API_URL}/withdrawals/latest`, {
+      credentials: "include",
+      cache: "no-store",
+    });
+    return assertOk(response);
+  }
+
   static async getUserBankAccount(): Promise<UserBankAccount | null> {
     const response = await fetch(`${API_URL}/kyc/applications/me`, {
       headers: { "Content-Type": "application/json" },

@@ -68,14 +68,14 @@ export function UploadField({
             <p className="text-sm font-medium text-slate-300">
               Drag a screenshot here, or click to choose a file
             </p>
-            <p className="mt-1 text-xs text-slate-400">PNG or JPG, up to 5 MB</p>
+            <p className="mt-1 text-xs text-slate-400">PNG, JPG or WebP, up to 2 MB</p>
           </>
         )}
       </div>
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0];

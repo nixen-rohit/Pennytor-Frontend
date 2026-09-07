@@ -61,8 +61,10 @@ export default function KYCVerification() {
         // Already submitted — back from the OTP page or a returning visit.
         // The details are locked; show them read-only.
         setSubmittedApp(app);
-      } else if (app.status === "REJECTED") {
+      } else if (app.status === "REJECTED" || app.status === "DRAFT") {
+        // Pre-fill form with existing data so user only fixes what's needed.
         setRejectionReason(app.rejectionReason);
+        setForm(mapAppToFormState(app));
       }
     } catch {
       // A failed fetch must never look like a fresh, unsubmitted account.
@@ -71,6 +73,55 @@ export default function KYCVerification() {
       setStatusLoading(false);
     }
   };
+
+  function mapAppToFormState(app: KycApplicationState): FormState {
+    // Backend returns uppercase enum values; convert to frontend expected values
+    const genderMap: Record<string, string> = {
+      MALE: "Male",
+      FEMALE: "Female",
+      OTHER: "Other",
+    };
+    const maritalMap: Record<string, string> = {
+      SINGLE: "Single",
+      MARRIED: "Married",
+      DIVORCED: "Divorced",
+      WIDOWED: "Widowed",
+    };
+    const accountTypeMap: Record<string, string> = {
+      SAVINGS: "Savings Account",
+      CURRENT: "Current Account",
+      SALARY: "Salary Account",
+    };
+
+    return {
+      fullName: app.personal.fullName ?? "",
+      phone: app.personal.phone ?? "",
+      dob: app.personal.dob ? new Date(app.personal.dob) : null,
+      gender: app.personal.gender ? genderMap[app.personal.gender] ?? "" : "",
+      maritalStatus: app.personal.maritalStatus ? maritalMap[app.personal.maritalStatus] ?? "" : "",
+      aadhaarNumber: app.documents.aadhaarNumber ?? "",
+      panNumber: app.documents.panNumber ?? "",
+      accountHolderName: app.bank.accountHolderName ?? "",
+      accountNumber: app.bank.accountNumber ?? "",
+      confirmAccountNumber: app.bank.accountNumber ?? "",
+      ifscCode: app.bank.ifscCode ?? "",
+      bankName: app.bank.bankName ?? "",
+      branchName: app.bank.branchName ?? "",
+      accountType: app.bank.accountType ? accountTypeMap[app.bank.accountType] ?? "" : "",
+      branchAddress: app.bank.branchAddress ?? "",
+      nomineeName: app.nominee.nomineeName ?? "",
+      nomineeDob: app.nominee.nomineeDob ? new Date(app.nominee.nomineeDob) : null,
+      nomineePhone: app.nominee.nomineePhone ?? "",
+      nomineeAadhaar: app.nominee.nomineeAadhaar ?? "",
+      // Files are not pre-filled (they need to be re-uploaded if changed),
+      // but the backend keeps the existing files unless replaced.
+      selfieFile: null,
+      aadhaarFrontFile: null,
+      aadhaarBackFile: null,
+      panFile: null,
+      signatureFile: null,
+    };
+  }
 
   useEffect(() => {
     const timeoutId = setTimeout(() => void loadStatus(), 0);
@@ -229,13 +280,14 @@ export default function KYCVerification() {
         {rejectionReason && (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
             <p className="text-xs font-semibold text-red-400 uppercase tracking-wide">
-              Your previous KYC submission was rejected
+              Your KYC request was rejected
             </p>
-            <p className="mt-1 text-sm text-red-200/90">
-              {rejectionReason}
+            <p className="mt-1 rounded-lg bg-red-400/10 px-3 py-2 text-xs text-red-200/90">
+              Reason: {rejectionReason}
             </p>
-            <p className="mt-1 text-xs text-slate-400">
-              Correct the details above and resubmit to continue.
+            <p className="mt-2 text-sm text-slate-300">
+              Your previous details have been loaded below. Please correct the highlighted
+              issues and resubmit. You only need to re-upload documents that were rejected.
             </p>
           </div>
         )}
@@ -269,24 +321,24 @@ export default function KYCVerification() {
               )}
               {currentStep === 5 && <ReviewStep data={form} />}
 
-              <div className="flex items-center justify-between gap-3 pt-5 border-t border-neutral-800">
+              <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-5 border-t border-neutral-800">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentStep((s) => s - 1)}
                   disabled={isFirst}
-                  className="flex items-center gap-1.5 border-white/20"
+                  className="flex w-full items-center justify-center gap-1.5 border-white/20 sm:w-auto"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
                 </Button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex w-full flex-col-reverse sm:w-auto sm:flex-row sm:items-center gap-3">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleSaveDraft}
-                    className="flex items-center gap-1.5  border-white/20"
+                    className="flex w-full items-center justify-center gap-1.5 border-white/20 sm:w-auto"
                   >
                     <Save className="h-4 w-4" />
                     Save as Draft
@@ -297,7 +349,7 @@ export default function KYCVerification() {
                       type="button"
                       onClick={handlePrepareSubmit}
                       disabled={submitting}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5  border-white/20"
+                      className="flex w-full items-center justify-center gap-1.5 border-white/20 bg-indigo-600 text-white hover:bg-indigo-700 sm:w-auto"
                     >
                       {submitting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -310,7 +362,7 @@ export default function KYCVerification() {
                     <Button
                       type="button"
                       onClick={handleNext}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5  border-white/20"
+                      className="flex w-full items-center justify-center gap-1.5 border-white/20 bg-indigo-600 text-white hover:bg-indigo-700 sm:w-auto"
                     >
                       Continue
                       <ChevronRight className="h-4 w-4" />

@@ -90,4 +90,15 @@ export class DepositService {
     });
     return assertOk(response);
   }
+
+  static async getMyLatest(): Promise<{
+    hasActive: boolean;
+    deposit: MyDeposit | null;
+  }> {
+    const response = await fetch(`${API_URL}/deposits/latest`, {
+      credentials: "include",
+      cache: "no-store",
+    });
+    return assertOk(response);
+  }
 }

@@ -4,6 +4,8 @@ export interface User {
   lastName: string;
   email: string;
   role: "USER" | "ADMIN";
+  userType?: "pennytor_user" | "super_user";
+  referralEligible?: boolean;
   isApproved?: boolean;
   clientId?: string | null;
 }

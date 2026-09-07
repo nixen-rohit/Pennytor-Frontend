@@ -1,55 +1,51 @@
 "use client"
-
+import { useCallback, useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { TrendingUp, TrendingDown, Wallet, BadgePercent, Target } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Loader2, Wallet, TrendingUp } from "lucide-react"
+import { DepositService } from "@/services/deposit.service"
 
-interface StatItem {
-  label: string
-  value: string
-  icon: React.ElementType
-  positive?: boolean
-  negative?: boolean
+const inr = (v: string | number) => `₹${Number(v||0).toLocaleString("en-IN")}`
+
+interface PortfolioState {
+  totalInvested: number
+  activeInvestments: number
 }
 
-const stats: StatItem[] = [
-  { label: "TOTAL PORTFOLIO VALUE", value: "₹100,000.00", icon: Wallet, positive: true },
-  { label: "TODAY'S GAIN", value: "+₹0", icon: TrendingUp },
-  { label: "INVESTED VALUE", value: "₹100,000.00", icon: TrendingDown },
-  { label: "TOTAL RETURNS", value: "₹0.00", icon: BadgePercent },
-  { label: "EXPECTED RETURNS", value: "₹100,160.00", icon: Target },
-]
-
 export default function PortfolioCard() {
+  const [state, setState] = useState< PortfolioState | null>(null)
+  const [loading, setLoading] = useState(true)
+  const load = async () => {
+    setLoading(true)
+    try {
+      const r = await DepositService.myDeposits()
+      const b = Number(r.balance||0)
+      const a = r.items?.filter((d:any)=>d.status==="VERIFIED").length||0
+      setState({totalInvested: b, activeInvestments: a})
+    }catch(e){setState(null)}finally{setLoading(false)}
+  }
+  useEffect(()=>{const i=setTimeout(()=>void load(),0); return()=>clearTimeout(i)},[load])
+  if(loading) return <div className="h-48 flex items-center justify-center"><Loader2 className="h-4 w-4 animate-spin"/></div>
+  if(!state) return <div className="h-48 border border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center"><p className="text-sm text-muted-foreground">Portfolio data not available</p></div>
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-      {stats.map((stat) => {
-        const Icon = stat.icon
-        return (
-          <Card
-            key={stat.label}
-            className="border border-white/10 bg-white/5 backdrop-blur-sm"
-          >
-            <CardContent className="p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                  {stat.label}
-                </span>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p
-                className={cn(
-                  "text-lg font-bold tracking-tight",
-                  stat.positive && "text-green-500",
-                  stat.negative && "text-red-500",
-                )}
-              >
-                {stat.value}
-              </p>
-            </CardContent>
-          </Card>
-        )
-      })}
-    </div>
+    <Card className="border-white/10 bg-white/5 p-6">
+      <div className="flex items-start gap-4">
+        <div className="flex-1">
+          <div className="mb-3">
+            <Wallet className="h-4 w-4 text-[#E85B66] mb-2"/>
+            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">TOTAL INVESTED</span>
+            <p className="text-lg font-bold text-green-500">{inr(state!.totalInvested)}</p>
+          </div>
+          <div>
+            <TrendingUp className="h-4 w-4 text-green-500 mb-2"/>
+            <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">TODAY'S GAIN</span>
+            <p className="text-lg font-bold mt-1">+₹5,000</p>
+          </div>
+        </div>
+        <div className="border-t border-white/10 pt-4">
+          <Button type="button" size="sm" variant="ghost" onClick={()=>window.location.href="/funds/deposite"}>Show More</Button>
+        </div>
+      </div>
+    </Card>
   )
 }
