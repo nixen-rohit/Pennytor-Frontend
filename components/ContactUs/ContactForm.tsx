@@ -312,7 +312,7 @@ export default function ContactForm() {
               <input
                 type="tel"
                 name="phone"
-                placeholder="+91 XXXXX XXXXX"
+                placeholder="+91 98XXX XXXXX"
                 value={formData.phone}
                 onChange={handleChange}
                 required

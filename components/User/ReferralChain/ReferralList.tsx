@@ -213,7 +213,7 @@ export function ReferralList({ data }: Props) {
                         </span>
                       </TableCell>
                       <TableCell className="py-3">
-                        {user.referralEligible ? (
+                        {user.referralCodeStatus === "ACTIVE" ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-600/20 text-green-400">
                             Active
                           </span>
@@ -224,7 +224,7 @@ export function ReferralList({ data }: Props) {
                         )}
                       </TableCell>
                       <TableCell className="py-3 text-slate-400 font-mono text-xs">
-                        {user.ownReferralCode}
+                        {user.referralCode ?? "—"}
                       </TableCell>
                       <TableCell className="py-3 text-slate-400">
                         {format(new Date(user.createdAt), "MMM dd, yyyy")}

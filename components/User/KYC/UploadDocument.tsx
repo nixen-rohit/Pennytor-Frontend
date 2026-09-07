@@ -13,6 +13,8 @@ interface Props {
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
 }
 
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 export function UploadDocument({ data, errors, onChange }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
@@ -35,24 +37,25 @@ export function UploadDocument({ data, errors, onChange }: Props) {
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2">
         <UploadField
           label="Aadhaar Front Image"
-          hint="JPG, PNG · Max 2 MB"
-          accept="image/*"
+          hint="JPG, PNG, WebP · Max 2 MB"
+          accept="image/jpeg,image/png,image/webp"
           icon={FaIdCard}
           error={errors?.aadhaarFrontFile}
           file={data.aadhaarFrontFile}
           onSelect={(f) => onChange("aadhaarFrontFile", f)}
           onRemove={() => onChange("aadhaarFrontFile", null)}
-          
+          allowedTypes={IMAGE_TYPES}
         />
         <UploadField
           label="Aadhaar Back Image"
-          hint="JPG, PNG · Max 2 MB"
-          accept="image/*"
+          hint="JPG, PNG, WebP · Max 2 MB"
+          accept="image/jpeg,image/png,image/webp"
           icon={BsCardHeading}
           error={errors?.aadhaarBackFile}
           file={data.aadhaarBackFile}
           onSelect={(f) => onChange("aadhaarBackFile", f)}
           onRemove={() => onChange("aadhaarBackFile", null)}
+          allowedTypes={IMAGE_TYPES}
         />
       </div>
 
@@ -75,13 +78,14 @@ export function UploadDocument({ data, errors, onChange }: Props) {
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-1">
         <UploadField
           label="PAN Card Image"
-          hint="JPG, PNG · Max 2 MB"
-          accept="image/*"
+          hint="JPG, PNG, WebP · Max 2 MB"
+          accept="image/jpeg,image/png,image/webp"
           icon={FaIdCardClip}
           error={errors?.panFile}
           file={data.panFile}
           onSelect={(f) => onChange("panFile", f)}
           onRemove={() => onChange("panFile", null)}
+          allowedTypes={IMAGE_TYPES}
         />
       </div>
 
@@ -92,13 +96,14 @@ export function UploadDocument({ data, errors, onChange }: Props) {
       <div className="max-w-md">
         <UploadField
           label="Signature Image"
-          hint="JPG, PNG · Max 2 MB · White background"
-          accept="image/*"
+          hint="JPG, PNG, WebP · Max 2 MB · White background"
+          accept="image/jpeg,image/png,image/webp"
           icon={FaSignature}
           error={errors?.signatureFile}
           file={data.signatureFile}
           onSelect={(f) => onChange("signatureFile", f)}
           onRemove={() => onChange("signatureFile", null)}
+          allowedTypes={IMAGE_TYPES}
         />
       </div>
     </div>

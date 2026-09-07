@@ -27,7 +27,8 @@ export const BANK_ACCOUNT = {
   accountHolderName: "ALOK KUMAR RANA",
   bankName: "HDFC Bank",
   branch: "MG Road, Ghaziabad",
-  accountNumber: "50100XXXXXX4521",
+  // TODO: Replace with actual account number from backend API
+  accountNumber: "XXXXXX4521",
   ifsc: "HDFC0004801",
 } as const;
 

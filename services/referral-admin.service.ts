@@ -19,107 +19,181 @@ async function assertOk<T>(response: Response): Promise<T> {
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-export interface AdminReferralStats {
-  totalUsers: number;
-  totalReferrers: number;
-}
-
+/** Single user, returned by GET /admin/referrals/users/:id. */
 export interface AdminReferralUser {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  ownReferralCode: string;
-  userType: string;
-  referralEligible: boolean;
+  role: string;
+  userType: "pennytor_user" | "super_user";
+  status: string;
+  /** New column name (was `ownReferralCode` in the pre-migration schema). */
+  referralCode: string | null;
+  referralCodeStatus: "ACTIVE" | "INACTIVE" | null;
+  referredById: string | null;
   createdAt: string;
-  _count: { referrals: number };
+  _count: { referrals: number; referrerRelationships: number };
 }
 
-export interface AdminReferralUsersResponse {
-  users: AdminReferralUser[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
-
-export interface AdminReferralTreeData {
+/** Tree node, returned by GET /admin/referrals/tree/:id. */
+export interface AdminReferralTreeNode {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  ownReferralCode: string;
-  userType: string;
-  referralEligible: boolean;
+  referralCode: string | null;
+  referralCodeStatus: "ACTIVE" | "INACTIVE" | null;
+  userType: "pennytor_user" | "super_user";
   createdAt: string;
-  referrals: AdminReferralTreeData[];
+  depth: number;
+  children: AdminReferralTreeNode[];
+}
+
+export interface CommissionListItem {
+  id: string;
+  referrerId: string;
+  referredUserId: string;
+  investmentId: string;
+  level: number;
+  investmentAmountSnapshot: string;
+  commissionRateSnapshot: string;
+  qualifyingDirectReferralCount: number;
+  commissionAmount: string;
+  commissionMonth: number;
+  commissionYear: number;
+  status: "CALCULATED" | "PAID" | "FROZEN" | "REVERSED";
+  paidAt: string | null;
+  frozenAt: string | null;
+  reversedAt: string | null;
+  createdAt: string;
+}
+
+export interface CommissionListResponse {
+  items: CommissionListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
 }
 
 // ─── Service ────────────────────────────────────────────────────────────────
 
 export class ReferralAdminService {
   /**
-   * ADMIN: get system-wide referral stats.
+   * ADMIN: get a single user record by id.
    */
-  static async getStats(): Promise<AdminReferralStats> {
-    const response = await fetch(`${API_URL}/admin/referral/stats`, {
-      credentials: "include",
-      cache: "no-store",
-    });
-    return assertOk(response);
+  static async getUser(id: string): Promise<AdminReferralUser> {
+    return assertOk<AdminReferralUser>(
+      await fetch(`${API_URL}/admin/referrals/users/${id}`, {
+        credentials: "include",
+        cache: "no-store",
+      }),
+    );
   }
 
   /**
-   * ADMIN: get the full referral tree.
+   * ADMIN: get the full referral tree for a user (L1..L∞). The backend
+   * caps at 50 levels defensively.
    */
-  static async getTree(): Promise<AdminReferralTreeData[]> {
-    const response = await fetch(`${API_URL}/admin/referral/tree`, {
-      credentials: "include",
-      cache: "no-store",
-    });
-    return assertOk(response);
+  static async getTree(id: string): Promise<AdminReferralTreeNode[]> {
+    return assertOk<AdminReferralTreeNode[]>(
+      await fetch(`${API_URL}/admin/referrals/tree/${id}`, {
+        credentials: "include",
+        cache: "no-store",
+      }),
+    );
   }
 
   /**
-   * ADMIN: get all referral participants (paginated).
-   */
-  static async getUsers(
-    page = 1,
-    pageSize = 20,
-    search?: string,
-    userType?: string,
-  ): Promise<AdminReferralUsersResponse> {
-    const params = new URLSearchParams({
-      page: String(page),
-      pageSize: String(pageSize),
-    });
-    if (search) params.set("search", search);
-    if (userType) params.set("userType", userType);
-
-    const response = await fetch(`${API_URL}/admin/referral/users?${params}`, {
-      credentials: "include",
-      cache: "no-store",
-    });
-    return assertOk(response);
-  }
-
-  /**
-   * ADMIN: toggle a user's referral eligibility.
+   * ADMIN: toggle a user's `referralEligible` soft-flag.
    */
   static async toggleEligibility(
     userId: string,
     eligible: boolean,
-  ): Promise<{ id: string; firstName: string; lastName: string; referralEligible: boolean }> {
-    const response = await fetch(
-      `${API_URL}/admin/referral/${userId}/eligibility`,
-      {
+  ): Promise<{
+    id: string;
+    firstName: string;
+    lastName: string;
+    referralEligible: boolean;
+  }> {
+    return assertOk(
+      await fetch(`${API_URL}/admin/referrals/users/${userId}/eligibility`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...csrfHeaders() },
         credentials: "include",
         body: JSON.stringify({ eligible }),
         cache: "no-store",
-      },
+      }),
     );
-    return assertOk(response);
+  }
+
+  /**
+   * ADMIN: list commissions (paginated, optional status/referrerId filter).
+   */
+  static async listCommissions(
+    page = 1,
+    pageSize = 20,
+    status?: string,
+    referrerId?: string,
+  ): Promise<CommissionListResponse> {
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: String(pageSize),
+    });
+    if (status) params.set("status", status);
+    if (referrerId) params.set("referrerId", referrerId);
+    return assertOk<CommissionListResponse>(
+      await fetch(`${API_URL}/admin/commissions?${params}`, {
+        credentials: "include",
+        cache: "no-store",
+      }),
+    );
+  }
+
+  static async freezeCommission(
+    commissionId: string,
+    actorId: string,
+  ): Promise<{ id: string; status: string }> {
+    return assertOk(
+      await fetch(`${API_URL}/admin/commissions/${commissionId}/freeze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...csrfHeaders() },
+        credentials: "include",
+        body: JSON.stringify({ actorId }),
+        cache: "no-store",
+      }),
+    );
+  }
+
+  static async reverseCommission(
+    commissionId: string,
+    actorId: string,
+    reason: string,
+  ): Promise<{ reversalId: string | null }> {
+    return assertOk(
+      await fetch(`${API_URL}/admin/commissions/${commissionId}/reverse`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...csrfHeaders() },
+        credentials: "include",
+        body: JSON.stringify({ actorId, reason }),
+        cache: "no-store",
+      }),
+    );
+  }
+
+  static async runCycle(
+    month?: number,
+    year?: number,
+    actorId?: string,
+  ): Promise<unknown> {
+    return assertOk(
+      await fetch(`${API_URL}/admin/commissions/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...csrfHeaders() },
+        credentials: "include",
+        body: JSON.stringify({ month, year, actorId }),
+        cache: "no-store",
+      }),
+    );
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, IndianRupee, User } from "lucide-react";
-import { ReferralState, ReferralTreeData } from "@/components/User/ReferralChain/types";
+import { ChevronDown, ChevronRight, User } from "lucide-react";
+import { ReferralState, ReferralTreeNode } from "@/components/User/ReferralChain/types";
 
 interface Props {
   data: ReferralState;
@@ -12,11 +12,11 @@ function TreeNode({
   node,
   depth = 0,
 }: {
-  node: ReferralTreeData;
+  node: ReferralTreeNode;
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth < 2);
-  const hasChildren = node.referrals && node.referrals.length > 0;
+  const hasChildren = node.children && node.children.length > 0;
 
   return (
     <div className="select-none">
@@ -59,14 +59,16 @@ function TreeNode({
           </span>
         )}
 
-        <div className="flex items-center gap-1 ml-auto text-xs text-slate-400">
-          <span className="font-mono">{node.ownReferralCode}</span>
-        </div>
+        {node.referralCode && (
+          <div className="flex items-center gap-1 ml-auto text-xs text-slate-400">
+            <span className="font-mono">{node.referralCode}</span>
+          </div>
+        )}
       </div>
 
       {hasChildren && expanded && (
         <div className="border-l border-neutral-700 ml-[18px] mt-1">
-          {node.referrals!.map((child) => (
+          {node.children!.map((child) => (
             <TreeNode key={child.id} node={child} depth={depth + 1} />
           ))}
         </div>

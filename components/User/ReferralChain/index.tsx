@@ -6,7 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Network, RefreshCw } from "lucide-react";
 
 import { initialReferralState } from "@/components/User/ReferralChain/types";
-import type { ReferralState } from "@/components/User/ReferralChain/types";
+import type {
+  ReferralState,
+  ReferralUser,
+  ReferralTreeNode,
+} from "@/components/User/ReferralChain/types";
 import { ReferralList } from "@/components/User/ReferralChain/ReferralList";
 import { ReferralTree } from "@/components/User/ReferralChain/ReferralTree";
 import { ReferralService } from "@/services/referral.service";
@@ -17,11 +21,34 @@ export {
 export type {
   ReferralState,
   ReferralUser,
-  ReferralStats,
-  ReferralTreeData,
+  ReferralTreeNode,
 } from "@/components/User/ReferralChain/types";
 export { ReferralList } from "@/components/User/ReferralChain/ReferralList";
 export { ReferralTree } from "@/components/User/ReferralChain/ReferralTree";
+
+/**
+ * Flatten the L1 children of the tree into a list — the new backend
+ * has no flat-list endpoint for normal users, but the tree always
+ * carries L1 under each top-level node. This is a client-side
+ * projection of the same data the old `/referral/referrals` endpoint
+ * used to return.
+ */
+function flattenL1(tree: ReferralTreeNode[]): ReferralUser[] {
+  const out: ReferralUser[] = [];
+  for (const node of tree) {
+    out.push({
+      id: node.id,
+      firstName: node.firstName,
+      lastName: node.lastName,
+      email: node.email,
+      referralCode: node.referralCode,
+      referralCodeStatus: node.referralCodeStatus,
+      userType: node.userType,
+      createdAt: node.createdAt,
+    });
+  }
+  return out;
+}
 
 export default function ReferralDashboard() {
   const [data, setData] = useState<ReferralState>(initialReferralState);
@@ -32,21 +59,25 @@ export default function ReferralDashboard() {
     setLoading(true);
     setError(null);
     try {
-      const [stats, code, referralsRes, tree] = await Promise.all([
+      // Spec §26 endpoints. There is no flat list endpoint any more;
+      // we derive the L1 list from the tree.
+      const [stats, eligibility, tree] = await Promise.all([
         ReferralService.getStats(),
-        ReferralService.getMyCode(),
-        ReferralService.getReferrals(1, 100),
+        ReferralService.getEligibility(),
         ReferralService.getTree(),
       ]);
 
       setData({
         stats,
-        myCode: code.referralCode,
-        referrals: referralsRes.referrals,
+        eligibility,
+        myCode: eligibility.referralCode,
         treeData: tree,
+        referrals: flattenL1(tree),
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load referral data");
+      setError(
+        err instanceof Error ? err.message : "Failed to load referral data",
+      );
     } finally {
       setLoading(false);
     }

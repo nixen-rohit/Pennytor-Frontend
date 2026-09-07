@@ -22,11 +22,15 @@ async function assertOk<T>(response: Response): Promise<T> {
 /** Mirror of the backend's ReferralCodeStatus enum. */
 export type ReferralCodeStatus = "ACTIVE" | "INACTIVE" | null;
 
+/** KYC verification status from the backend. */
+export type KycStatus = "VERIFIED" | "PENDING" | "REJECTED" | "NOT_STARTED";
+
 export interface EligibilityResponse {
   canRefer: boolean;
   reason: string | null;
   referralCode: string | null;
   referralCodeStatus: ReferralCodeStatus;
+  kycStatus: KycStatus;
 }
 
 export interface MyStatsResponse {
@@ -40,6 +44,21 @@ export interface MyStatsResponse {
     l4: number;
     l5: number;
   };
+  kycStatus: KycStatus;
+  /**
+   * Verified-direct-referral thresholds for each commission level.
+   * Spec §12: L2 unlocks at 3, L3 at 6, L4 at 9, L5 at 12. L1
+   * unlocks at 0 (the user just needs a verified investment of
+   * their own; this is enforced by `currentUnlockedLevel`, not by
+   * a count threshold).
+   */
+  thresholds: {
+    l2: number;
+    l3: number;
+    l4: number;
+    l5: number;
+  };
+  maxDepth: number;
   totalEarnings: string;
   monthlyEarnings: string;
 }
@@ -56,6 +75,9 @@ export interface ReferralTreeNode {
   depth: number;
   children: ReferralTreeNode[];
 }
+
+/** Flattened L1 user — derived from the tree on the client. */
+export type ReferralUser = Omit<ReferralTreeNode, "children" | "depth">;
 
 export interface CommissionHistoryItem {
   id: string;
@@ -170,3 +192,32 @@ export class ReferralService {
     );
   }
 }
+
+/**
+ * Default state for the user-facing referral network page. Re-typed
+ * here so the `ReferralChain/types.ts` module can re-export it
+ * without circular imports.
+ */
+export const initialReferralState: {
+  stats: MyStatsResponse;
+  referrals: ReferralUser[];
+  treeData: ReferralTreeNode[];
+  myCode: string | null;
+  eligibility: EligibilityResponse | null;
+} = {
+  stats: {
+    directReferrals: 0,
+    verifiedDirectReferrals: 0,
+    currentUnlockedLevel: 0,
+    rates: { l1: 0, l2: 0, l3: 0, l4: 0, l5: 0 },
+    kycStatus: "NOT_STARTED",
+    thresholds: { l2: 3, l3: 6, l4: 9, l5: 12 },
+    maxDepth: 5,
+    totalEarnings: "0",
+    monthlyEarnings: "0",
+  },
+  referrals: [],
+  treeData: [],
+  myCode: null,
+  eligibility: null,
+};

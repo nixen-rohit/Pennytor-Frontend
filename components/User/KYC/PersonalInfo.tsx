@@ -15,6 +15,8 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { sanitizePhone } from "@/utils/validation";
 
+const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
 interface Props {
   data: FormState;
   errors?: FieldErrors;
@@ -71,7 +73,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
           <Input
             type="tel"
             inputMode="tel"
-            placeholder="+91 XXXXX XXXXX"
+            placeholder="+91 98XXX XXXXX"
             value={data.phone}
             onChange={(e) => onChange("phone", sanitizePhone(e.target.value))}
           />
@@ -138,13 +140,14 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
       <div className="max-w-md">
         <UploadField
           label="Selfie"
-          hint="JPG, PNG · Max 2 MB"
-          accept="image/*"
+          hint="JPG, PNG, WebP · Max 2 MB"
+          accept="image/jpeg,image/png,image/webp"
           icon={FaCamera}
           error={errors?.selfieFile}
           file={data.selfieFile}
           onSelect={(f) => onChange("selfieFile", f)}
           onRemove={() => onChange("selfieFile", null)}
+          allowedTypes={IMAGE_TYPES}
         />
       </div>
     </div>
