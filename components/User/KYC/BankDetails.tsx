@@ -76,7 +76,7 @@ export function BankDetails({ data, errors, onChange }: Props) {
           <Input
             className="uppercase"
             maxLength={11}
-            placeholder="HDFC0001234"
+            placeholder="IFSC Code"
             value={data.ifscCode}
             onChange={(e) => onChange("ifscCode", e.target.value)}
           />

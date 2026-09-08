@@ -5,6 +5,19 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ArrowLeft,
   CheckCircle2,
   XCircle,
@@ -16,6 +29,10 @@ import {
   FileText,
   Copy as IconCopy,
   Check as IconCheck,
+  Trash2,
+  ChevronDown,
+  Image,
+  History,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -43,6 +60,9 @@ export default function DepositRequestDetailPage() {
   const [note, setNote] = useState("");
   const [rejecting, setRejecting] = useState(false);
   const [deciding, setDeciding] = useState<DepositStatus | null>(null);
+  const [deleteType, setDeleteType] = useState<"image" | "history" | null>(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const { approve, error: approveError } = useApproveFinanceTransaction("deposit");
   const { reject, error: rejectError } = useRejectFinanceTransaction("deposit");
@@ -94,6 +114,33 @@ export default function DepositRequestDetailPage() {
       setError(err instanceof Error ? err.message : "Failed to update status");
     } finally {
       setDeciding(null);
+    }
+  };
+
+  const handleDeleteClick = (type: "image" | "history") => {
+    setDeleteType(type);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteType) return;
+    setDeleting(true);
+    try {
+      if (deleteType === "image") {
+        await DepositAdminService.deleteFile(requestId);
+      } else {
+        await DepositAdminService.deleteDeposit(requestId);
+        router.push("/admin/finance/deposite-request");
+        return;
+      }
+      await load();
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete");
+    } finally {
+      setDeleting(false);
+      setDeleteConfirmOpen(false);
+      setDeleteType(null);
     }
   };
 
@@ -155,6 +202,35 @@ export default function DepositRequestDetailPage() {
               <Badge status={app.status} />
             </div>
           </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="outline"
+                className="border-red-600/40 text-red-400 hover:bg-red-600/10"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="border-neutral-800 bg-neutral-950">
+              <DropdownMenuItem
+                className="text-slate-300 focus:bg-red-600/20 focus:text-red-400 cursor-pointer"
+                onClick={() => handleDeleteClick("image")}
+              >
+                <Image className="mr-2 h-4 w-4" />
+                Delete Image
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-slate-300 focus:bg-red-600/20 focus:text-red-400 cursor-pointer"
+                onClick={() => handleDeleteClick("history")}
+              >
+                <History className="mr-2 h-4 w-4" />
+                Delete History
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <Card className="shadow-sm">
@@ -386,6 +462,48 @@ export default function DepositRequestDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="border-neutral-800 bg-neutral-950">
+          <DialogHeader>
+            <DialogTitle>
+              {deleteType === "image" ? "Delete this screenshot?" : "Delete this deposit record?"}
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              {deleteType === "image"
+                ? "This will remove the payment screenshot. The deposit record will remain but without an image."
+                : "This action cannot be undone. The entire deposit record and its screenshot will be permanently removed."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="border-white/20 text-slate-300"
+              disabled={deleting}
+              onClick={() => {
+                setDeleteConfirmOpen(false);
+                setDeleteType(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={deleting}
+              onClick={confirmDelete}
+            >
+              {deleting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-2 h-4 w-4" />
+              )}
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

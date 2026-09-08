@@ -95,4 +95,14 @@ export class DepositAdminService {
   static downloadUrl(id: string): string {
     return `${DepositAdminService.fileUrl(id)}/download`;
   }
+
+  /** Delete deposit screenshot only — keeps the record. */
+  static async deleteFile(id: string): Promise<{ message: string }> {
+    return fetchApi(`/admin/deposits/${id}/file`, { method: "DELETE" });
+  }
+
+  /** Delete entire deposit record (history). */
+  static async deleteDeposit(id: string): Promise<{ message: string }> {
+    return fetchApi(`/admin/deposits/${id}`, { method: "DELETE" });
+  }
 }

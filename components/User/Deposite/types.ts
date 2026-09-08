@@ -12,7 +12,7 @@ export const BANK_DETAILS = {
   bankName: "HDFC Bank",
   branchAddress: "MG Road, Ghaziabad, Uttar Pradesh",
   // TODO: Replace with actual account number from backend API
-  accountNumber: "XXXXXX0021",
+  accountNumber: "50200115779112",
   beneficiaryName: "Pennytor Financial Services",
 } as const;
 

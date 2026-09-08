@@ -216,6 +216,8 @@ export default function ContactMessageDetailPage() {
 
             <div className="border-t border-neutral-800 mt-8 pt-6 space-y-4">
               {isDoneStatus(app.status) ? (
+
+              <>
                 <div className="rounded-xl border border-green-600/40 bg-green-600/10 p-5 space-y-2">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-5 w-5 text-green-400" />
@@ -226,7 +228,10 @@ export default function ContactMessageDetailPage() {
                   <p className="text-sm text-slate-200">
                     This message has been resolved and no further action is needed.
                   </p>
-                  <Button
+                 
+                </div>
+
+                 <Button
                     type="button"
                     variant="outline"
                     className="border-red-600/40 text-red-400 hover:bg-red-600/10 mt-4"
@@ -235,7 +240,7 @@ export default function ContactMessageDetailPage() {
                     <XCircle className="mr-2 h-4 w-4" />
                     Delete
                   </Button>
-                </div>
+                </>
               ) : (
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3">
                   <p className="text-sm text-slate-400 sm:mr-auto">
