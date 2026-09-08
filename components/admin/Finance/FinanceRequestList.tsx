@@ -184,7 +184,6 @@ export default function FinanceRequestList({
 
   const startIndex = (feed.currentPage - 1) * limit;
   const endIndex = Math.min(startIndex + limit, feed.total);
-  const activeStatus = status ?? defaultStatus;
 
   return (
     <div className="space-y-4 animate-in fade-in-0 slide-in-from-right-4 duration-300">
@@ -224,7 +223,7 @@ export default function FinanceRequestList({
               setCurrentPage(1);
             }}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
-              activeStatus === f.value
+              status === f.value
                 ? "bg-indigo-600 text-white border-indigo-600"
                 : "border-neutral-700 text-slate-300 hover:border-indigo-500"
             }`}

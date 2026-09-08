@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
-import { Mail, Phone, Send } from "lucide-react";
+import { Mail, Phone, Send, Clock, CheckCircle } from "lucide-react";
 import { fetchApi, handleApiError } from "@/services/api";
 
 type FormData = {
@@ -16,8 +16,15 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const phonePattern = /^\+?\d{10,15}$/;
+const COOLDOWN_KEY = "contact_form_last_submit";
+const timer = Number(process.env.NEXT_PUBLIC_CONTACT_MESSAGE_TIME) || 10;
+const COOLDOWN_MINUTES = timer;
+
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+}
 
 export default function ContactForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -31,6 +38,45 @@ export default function ContactForm() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isCooldown, setIsCooldown] = useState(false);
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
+
+  // Check for existing cooldown on mount
+  useEffect(() => {
+    const storedTime = localStorage.getItem(COOLDOWN_KEY);
+    if (storedTime) {
+      const elapsed = Math.floor((Date.now() - parseInt(storedTime, 10)) / 1000);
+      const remaining = COOLDOWN_MINUTES * 60 - elapsed;
+      if (remaining > 0) {
+        setIsCooldown(true);
+        setCooldownSeconds(remaining);
+      } else {
+        localStorage.removeItem(COOLDOWN_KEY);
+      }
+    }
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!isCooldown || cooldownSeconds <= 0) return;
+
+    const interval = setInterval(() => {
+      setCooldownSeconds((prev) => {
+        const newValue = prev - 1;
+        if (newValue <= 0) {
+          setIsCooldown(false);
+          localStorage.removeItem(COOLDOWN_KEY);
+          return 0;
+        }
+        return newValue;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isCooldown, cooldownSeconds]);
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^\+?\d{10,15}$/;
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -94,7 +140,14 @@ export default function ContactForm() {
         body: JSON.stringify(trimmedData),
       });
 
-      setSuccessMessage("Your message has been sent successfully.");
+      // Set cooldown in localStorage
+      localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+      setIsCooldown(true);
+      setCooldownSeconds(COOLDOWN_MINUTES * 60);
+
+      setSuccessMessage(
+        "Thank you for reaching out! Our team will contact you within 24 hours.",
+      );
       setFormData({
         name: "",
         email: "",
@@ -348,9 +401,12 @@ export default function ContactForm() {
             </div>
 
             {successMessage && (
-              <p role="status" className="text-sm text-emerald-400">
-                {successMessage}
-              </p>
+              <div className="flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4">
+                <CheckCircle className="h-5 w-5 shrink-0 text-emerald-400 mt-0.5" />
+                <p role="status" className="text-sm text-emerald-300">
+                  {successMessage}
+                </p>
+              </div>
             )}
 
             {errorMessage && (
@@ -360,30 +416,26 @@ export default function ContactForm() {
             )}
 
             {/* BUTTON */}
-            <motion.button
-              type="submit"
-              disabled={isSubmitting}
-              whileHover={{
-                scale: 1.02,
-                y: -2,
-              }}
-              whileTap={{
-                scale: 0.97,
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 18,
-              }}
-              className="group mx-auto flex w-full items-center justify-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit sm:px-8 sm:text-sm"
-            >
-              {/* ICON */}
-              <div className="rotate-45 flex items-center justify-center rounded-full bg-white p-2 text-blue-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-0">
-                <Send size={14} className={isSubmitting ? "animate-pulse" : "rotate-0"} />
-              </div>
+            {!isCooldown && (
+              <motion.button
+                type="submit"
+                disabled={isSubmitting}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 18,
+                }}
+                className="group mx-auto flex w-full items-center justify-center gap-3 rounded-full bg-blue-600 px-6 py-3 text-[13px] font-semibold text-white shadow-sm transition-all duration-300 hover:bg-blue-700 active:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-60 sm:w-fit sm:px-8 sm:text-sm"
+              >
+                <div className="rotate-45 flex items-center justify-center rounded-full bg-white p-2 text-blue-600 transition-all duration-300 ease-out group-hover:scale-110 group-hover:rotate-0">
+                  <Send size={14} className={isSubmitting ? "animate-pulse" : "rotate-0"} />
+                </div>
 
-              <span>{isSubmitting ? "Sending..." : "Submit Message"}</span>
-            </motion.button>
+                <span>{isSubmitting ? "Sending..." : "Submit Message"}</span>
+              </motion.button>
+            )}
           </form>
         </motion.div>
       </motion.div>
