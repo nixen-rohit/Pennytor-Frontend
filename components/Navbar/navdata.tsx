@@ -435,6 +435,14 @@ export const support: NavMenu = {
 export const CTA: CTAType = { label: "Sign Up", href: "/login" };
 
 export const NAV: NavItem[] = [
+    {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "About Us",
+    href: "/about-us",
+  },
   {
     label: "Schemes",
     mega: { columns: [{ heading: "Schemes", links: Schemes.items }] },
@@ -455,20 +463,20 @@ export const NAV: NavItem[] = [
       })),
     },
   },
-  {
-    label: "Renew Your Policy",
-    mega: {
-      columns: [{ heading: "Renewal Options", links: renewPolicy.items }],
-    },
-  },
-  {
-    label: "Claim",
-    mega: { columns: [{ heading: "Claims", links: claim.items }] },
-  },
-  {
-    label: "Support",
-    mega: { columns: [{ heading: "Help & Support", links: support.items }] },
-  },
+  // {
+  //   label: "Renew Your Policy",
+  //   mega: {
+  //     columns: [{ heading: "Renewal Options", links: renewPolicy.items }],
+  //   },
+  // },
+  // {
+  //   label: "Claim",
+  //   mega: { columns: [{ heading: "Claims", links: claim.items }] },
+  // },
+  // {
+  //   label: "Support",
+  //   mega: { columns: [{ heading: "Help & Support", links: support.items }] },
+  // },
   {
     label: "Contact Us",
     href: "/contact-us",

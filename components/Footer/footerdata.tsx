@@ -98,7 +98,7 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Company",
     links: [
-      { label: "About Us", href: "/about" },
+      { label: "About Us", href: "/about-us" },
       { label: "Pricing", href: "/pricing" },    
       { label: "Contact Us", href: "/contact-us" },
     ],
