@@ -124,6 +124,32 @@ The backend must be running on `http://localhost:3001`.
 | `npm start` | Start production server |
 | `npm run lint` | Run ESLint |
 
+## Run migrations
+
+```bash
+npx prisma migrate dev --name init    # new DB
+npx prisma migrate deploy             # existing DB
+npx prisma generate                   # regenerate client
+```
+
+
+## For clean New DB 
+
+# 1. Generate Prisma client
+npx prisma generate
+
+# 2. Push schema to your clean DB (creates all tables)
+npx prisma migrate dev --name init
+
+# 3. Seed initial data (admin/super-user users)
+npx prisma db seed
+
+# 4. Start the server:
+npm run start:dev
+
+# 5. Make sure your .env has:
+DATABASE_URL="postgresql://username:password@localhost:5432/your_db_name"
+
 ## Backend
 
 The backend is a **NestJS** API at `http://localhost:3001/api`. See `../backend/readme.md` for details...

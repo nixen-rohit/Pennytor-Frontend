@@ -94,11 +94,24 @@ export default function InvestmentSummary() {
       </CardHeader>
       <CardContent className="p-4 space-y-4">
         {loading && items.length === 0 ? (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div className="flex flex-col items-center gap-2 py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-[#E85B66]" />
+            <p className="text-xs text-muted-foreground">Loading investment summary...</p>
           </div>
         ) : error ? (
-          <p className="py-8 text-center text-sm text-red-400">{error}</p>
+          <div className="flex flex-col items-center gap-3 py-10">
+            <p className="text-sm text-red-400">{error}</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-slate-300"
+              onClick={() => void load()}
+            >
+              <RefreshCw className="mr-2 h-3.5 w-3.5" />
+              Try Again
+            </Button>
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -126,9 +139,15 @@ export default function InvestmentSummary() {
             </div>
 
             {items.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-white/10 py-8">
+              <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-white/10 py-10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+                  <BarChart3 className="h-6 w-6 text-muted-foreground" />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   No investments yet — start with an Investment Fund plan.
+                </p>
+                <p className="text-xs text-muted-foreground text-center max-w-xs">
+                  Choose a plan that fits your goal and earn monthly returns automatically.
                 </p>
                 <Button
                   asChild

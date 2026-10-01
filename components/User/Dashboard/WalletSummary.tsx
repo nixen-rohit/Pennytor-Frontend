@@ -3,20 +3,23 @@
 import { useCallback, useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, ArrowRight, Loader2, RefreshCw } from "lucide-react"
+import { Wallet, ArrowRight, RefreshCw, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { DepositService } from "@/services/deposit.service"
 
 export default function WalletSummary() {
   const [balance, setBalance] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const res = await DepositService.myDeposits()
       setBalance(res.balance ?? "0")
     } catch {
+      setError("Could not load wallet balance")
       setBalance(null)
     } finally {
       setLoading(false)
@@ -38,7 +41,12 @@ export default function WalletSummary() {
               <span className="text-sm text-muted-foreground">Wallet Balance</span>
             </div>
             {loading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <div className="h-9 w-32 animate-pulse rounded bg-white/10" />
+            ) : error ? (
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <span className="text-sm text-red-400">Balance unavailable</span>
+              </div>
             ) : (
               <p className="text-3xl font-bold">
                 ₹{Number(balance ?? 0).toLocaleString("en-IN")}
@@ -53,8 +61,9 @@ export default function WalletSummary() {
               disabled={loading}
               onClick={() => void load()}
               aria-label="Refresh"
+              className="border-white/20"
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </Button>
             <Button asChild className="bg-[#E85B66] hover:bg-[#E85B66]/90 text-white">
               <Link href="/funds/deposite">

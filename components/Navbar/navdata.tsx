@@ -439,10 +439,7 @@ export const NAV: NavItem[] = [
     label: "Home",
     href: "/",
   },
-  {
-    label: "About Us",
-    href: "/about-us",
-  },
+ 
   {
     label: "Schemes",
     mega: { columns: [{ heading: "Schemes", links: Schemes.items }] },
@@ -462,6 +459,11 @@ export const NAV: NavItem[] = [
         })),
       })),
     },
+  },
+
+   {
+    label: "About Us",
+    href: "/about-us",
   },
   // {
   //   label: "Renew Your Policy",

@@ -78,15 +78,34 @@ export default function UserInvestments() {
       </CardHeader>
       <CardContent className="p-4 space-y-4">
         {loading && items.length === 0 ? (
-          <div className="flex items-center justify-center py-10">
+          <div className="flex flex-col items-center gap-2 py-12">
             <Loader2 className="h-6 w-6 animate-spin text-[#E85B66]" />
+            <p className="text-xs text-muted-foreground">Loading your investments...</p>
           </div>
         ) : error ? (
-          <p className="py-8 text-center text-sm text-red-400">{error}</p>
+          <div className="flex flex-col items-center gap-3 py-10">
+            <p className="text-sm text-red-400">{error}</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-white/20 text-slate-300"
+              onClick={() => void load()}
+            >
+              <RefreshCw className="mr-2 h-3.5 w-3.5" />
+              Try Again
+            </Button>
+          </div>
         ) : items.length === 0 ? (
-          <div className="py-8 text-center space-y-3">
+          <div className="flex flex-col items-center gap-3 py-10">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
+              <TrendingUp className="h-6 w-6 text-muted-foreground" />
+            </div>
             <p className="text-sm text-muted-foreground">
               You have no active investments yet.
+            </p>
+            <p className="text-xs text-muted-foreground text-center max-w-xs">
+              Explore Investment Fund schemes and start building your portfolio today.
             </p>
             <Button
               asChild
