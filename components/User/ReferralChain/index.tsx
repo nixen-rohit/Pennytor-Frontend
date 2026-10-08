@@ -45,6 +45,7 @@ function flattenL1(tree: ReferralTreeNode[]): ReferralUser[] {
       referralCodeStatus: node.referralCodeStatus,
       userType: node.userType,
       createdAt: node.createdAt,
+      totalCommission: node.totalCommission,
     });
   }
   return out;

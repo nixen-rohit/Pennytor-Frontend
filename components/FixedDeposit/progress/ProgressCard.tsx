@@ -1,12 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Clock,
-  CheckCircle2,
-  WalletCards,
-  XCircle,
-} from "lucide-react";
+import { Clock, CheckCircle2, WalletCards, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { type FDApplication } from "@/services/fixed-deposit.service";
 
@@ -45,27 +40,31 @@ function InfoCell({
 
 const STATUS_META: Record<
   string,
-  { label: string; cls: string; icon: React.ReactNode }
+  { label: string; cls: string; icon: React.ReactNode; accent?: boolean }
 > = {
   PENDING: {
-    label: "PENDING",
-    cls: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    label: "Applied",
+    cls: "bg-amber-500/10 text-amber-400 border-amber-500/20",
     icon: <Clock className="h-4 w-4" />,
+    accent: true,
   },
   VERIFIED: {
     label: "ACTIVE",
     cls: "bg-green-500/10 text-green-400 border-green-500/20",
     icon: <CheckCircle2 className="h-4 w-4" />,
+    accent: true,
   },
   COMPLETED: {
     label: "COMPLETED",
     cls: "bg-blue-500/10 text-blue-400 border-blue-500/20",
     icon: <CheckCircle2 className="h-4 w-4" />,
+    accent: false,
   },
   REJECTED: {
     label: "REJECTED",
     cls: "bg-red-500/10 text-red-400 border-red-500/20",
     icon: <XCircle className="h-4 w-4" />,
+    accent: false,
   },
 };
 
@@ -88,12 +87,13 @@ export function ProgressCard({ app }: { app: FDApplication }) {
               <p className="text-lg font-bold text-white">
                 {planLabel(app.planId)}
               </p>
-              <p className="text-xs text-zinc-500">
-                Applied{" "}
+
+              <span className="font-medium text-amber-300">Applied On: </span>
+              <span className="text-emerald-300 font-medium">
                 {app.submittedAt
                   ? format(new Date(app.submittedAt), "dd MMM yyyy")
                   : "N/A"}
-              </p>
+              </span>
             </div>
           </div>
           <span
@@ -108,6 +108,7 @@ export function ProgressCard({ app }: { app: FDApplication }) {
         <div className="mb-4 rounded-lg border border-white/5 bg-white/[0.02] p-3">
           {app.status === "PENDING" && (
             <p className="text-sm text-zinc-400">
+              <span className="font-medium text-amber-300">Applied</span>.
               Application submitted. Waiting for admin review. Your wallet will
               be debited on approval.
             </p>
@@ -165,10 +166,27 @@ export function ProgressCard({ app }: { app: FDApplication }) {
 
             {/* Next payout */}
             {app.nextPayoutAt && app.status === "VERIFIED" && (
-              <div className="mb-4 flex items-center gap-2 text-xs text-zinc-400">
+              <div className="mb-4 flex items-center gap-2 text-sm text-zinc-400">
                 <Clock className="h-3.5 w-3.5" />
-                Next payout:{" "}
-                {format(new Date(app.nextPayoutAt), "dd MMM yyyy")}
+                <span className="font-medium text-amber-300">
+                  Next payout :{" "}
+                </span>
+                <span className="text-emerald-300 font-medium">
+                  {format(new Date(app.nextPayoutAt), "dd MMM yyyy")}
+                </span>
+                {app.nextPayoutAt && app.status === "VERIFIED" && (
+                  <div className="mt-1 text-xs text-zinc-500">
+                    {app.emisPaid > 0 && (
+                      <div className="inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-500/10 text-amber-300">
+                        <Clock className="h-3 w-3" />
+                        <span>
+                          {app.emisPaid} EMI{app.emisPaid > 1 ? "s" : ""}{" "}
+                          {app.emisPaid >= totalEmis - 1 ? "past due" : "due"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -202,12 +220,10 @@ export function ProgressCard({ app }: { app: FDApplication }) {
               </div>
               <div className="mt-2 flex items-center gap-4 text-[10px] text-zinc-500">
                 <span className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-sm bg-emerald-500/40" />{" "}
-                  Paid
+                  <span className="h-2 w-2 rounded-sm bg-emerald-500/40" /> Paid
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-sm bg-zinc-800" />{" "}
-                  Upcoming
+                  <span className="h-2 w-2 rounded-sm bg-zinc-800" /> Upcoming
                 </span>
               </div>
             </div>

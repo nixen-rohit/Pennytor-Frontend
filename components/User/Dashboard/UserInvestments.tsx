@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -15,10 +15,8 @@ import {
   Undo2,
 } from "lucide-react"
 import { format } from "date-fns"
-import {
-  InvestmentFundService,
-  type MyInvestment,
-} from "@/services/investment-fund.service"
+import { useDashboardStore } from "@/store/dashboard.store"
+import type { MyInvestment } from "@/services/investment-fund.service"
 
 const inr = (value: string | number) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
@@ -27,28 +25,19 @@ const inr = (value: string | number) =>
   })}`
 
 export default function UserInvestments() {
-  const [items, setItems] = useState<MyInvestment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await InvestmentFundService.myApplications()
-      setItems(res.items ?? [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load investments")
-      setItems([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { summary, loading, error, fetch } = useDashboardStore()
+  const items = (summary?.userInvestments ?? []) as MyInvestment[]
+  const hasOtherActiveScheme =
+    (summary?.fixedDeposits ?? []).some((d: any) => d.status === "VERIFIED") ||
+    (summary?.sipInvestments ?? []).some((s: any) => s.status === "VERIFIED")
 
   useEffect(() => {
-    const id = setTimeout(() => void load(), 0)
-    return () => clearTimeout(id)
-  }, [load])
+    void fetch()
+  }, [fetch])
+
+  if (!loading && !error && items.length === 0 && hasOtherActiveScheme) {
+    return null
+  }
 
   return (
     <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
@@ -65,7 +54,7 @@ export default function UserInvestments() {
             variant="ghost"
             size="sm"
             disabled={loading}
-            onClick={() => void load()}
+            onClick={() => void fetch(true)}
             className="text-muted-foreground hover:text-white"
           >
             {loading ? (
@@ -90,13 +79,13 @@ export default function UserInvestments() {
               variant="outline"
               size="sm"
               className="border-white/20 text-slate-300"
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Try Again
             </Button>
           </div>
-        ) : items.length === 0 ? (
+        ) : items.length === 0 && hasOtherActiveScheme ? null : items.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-10">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10">
               <TrendingUp className="h-6 w-6 text-muted-foreground" />

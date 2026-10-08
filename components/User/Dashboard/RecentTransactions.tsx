@@ -1,17 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Loader2, RefreshCw, Receipt } from "lucide-react"
 import { format } from "date-fns"
-import { DepositService } from "@/services/deposit.service"
-import { WithdrawalService } from "@/services/withdrawal.service"
-import {
-  InvestmentFundService,
-  type MyInvestment,
-} from "@/services/investment-fund.service"
+import { useDashboardStore } from "@/store/dashboard.store"
 
 interface Row {
   id: string
@@ -22,72 +17,18 @@ interface Row {
 }
 
 export default function RecentTransactions() {
-  const [rows, setRows] = useState<Row[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const [dep, wdr, inv] = await Promise.all([
-        DepositService.myDeposits(),
-        WithdrawalService.myWithdrawals(),
-        InvestmentFundService.myApplications().catch(() => ({ items: [] as MyInvestment[] })),
-      ])
-
-      const merged: Row[] = [
-        ...dep.items.map((d) => ({
-          id: `CR-${d.id}`,
-          activity: "Deposit",
-          status:
-            d.status === "VERIFIED"
-              ? ("APPROVED" as const)
-              : d.status === "REJECTED"
-                ? ("REJECTED" as const)
-                : ("PENDING" as const),
-          amount: Number(d.amount) || 0,
-          date: new Date(d.submittedAt ?? d.createdAt),
-        })),
-        ...wdr.items.map((w) => ({
-          id: `DR-${w.id}`,
-          activity: "Withdrawal",
-          status:
-            w.status === "VERIFIED"
-              ? ("APPROVED" as const)
-              : w.status === "REJECTED"
-                ? ("REJECTED" as const)
-                : ("PENDING" as const),
-          amount: Number(w.amount) || 0,
-          date: new Date(w.submittedAt ?? w.createdAt),
-        })),
-        ...(inv.items ?? []).map((i) => ({
-          id: `IF-${i.id}`,
-          activity: i.planLabel,
-          status:
-            i.status === "VERIFIED"
-              ? ("APPROVED" as const)
-              : i.status === "REJECTED"
-                ? ("REJECTED" as const)
-                : ("PENDING" as const),
-          amount: Number(i.amount) || 0,
-          date: new Date(i.submittedAt ?? i.createdAt),
-        })),
-      ].sort((a, b) => b.date.getTime() - a.date.getTime())
-
-      setRows(merged.slice(0, 5))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load transactions")
-      setRows([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { summary, loading, error, fetch } = useDashboardStore()
+  const rows: Row[] = (summary?.recentTransactions ?? []).map((tx) => ({
+    id: tx.id,
+    activity: tx.activity,
+    status: tx.status,
+    amount: tx.amount,
+    date: new Date(tx.date),
+  }))
 
   useEffect(() => {
-    const id = setTimeout(() => void load(), 0)
-    return () => clearTimeout(id)
-  }, [load])
+    void fetch()
+  }, [fetch])
 
   const statusCls: Record<Row["status"], string> = {
     APPROVED: "bg-green-500/10 text-green-500 border-green-500/20",
@@ -105,7 +46,7 @@ export default function RecentTransactions() {
           </div>
           <button
             type="button"
-            onClick={() => void load()}
+            onClick={() => void fetch(true)}
             disabled={loading}
             className="text-muted-foreground hover:text-white disabled:opacity-50"
             aria-label="Refresh"
@@ -127,7 +68,7 @@ export default function RecentTransactions() {
               variant="outline"
               size="sm"
               className="border-white/20 text-slate-300"
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Try Again

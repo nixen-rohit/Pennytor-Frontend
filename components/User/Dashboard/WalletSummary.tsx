@@ -1,35 +1,19 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Wallet, ArrowRight, RefreshCw, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { DepositService } from "@/services/deposit.service"
+import { useDashboardStore } from "@/store/dashboard.store"
 
 export default function WalletSummary() {
-  const [balance, setBalance] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await DepositService.myDeposits()
-      setBalance(res.balance ?? "0")
-    } catch {
-      setError("Could not load wallet balance")
-      setBalance(null)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { summary, loading, error, fetch } = useDashboardStore()
+  const balance = summary?.wallet?.balance ?? null
 
   useEffect(() => {
-    const id = setTimeout(() => void load(), 0)
-    return () => clearTimeout(id)
-  }, [load])
+    void fetch()
+  }, [fetch])
 
   return (
     <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
@@ -59,7 +43,7 @@ export default function WalletSummary() {
               variant="outline"
               size="icon"
               disabled={loading}
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
               aria-label="Refresh"
               className="border-white/20"
             >

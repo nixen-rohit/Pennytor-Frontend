@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useEffect } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   TrendingUp,
   Loader2,
@@ -12,51 +12,28 @@ import {
   BarChart3,
   CalendarClock,
   ChevronRight,
-} from "lucide-react"
-import {
-  InvestmentFundService,
-  type MyInvestment,
-} from "@/services/investment-fund.service"
+} from "lucide-react";
+import { useDashboardStore } from "@/store/dashboard.store";
 
 const inr = (value: string | number) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })}`
+  })}`;
 
 export default function InvestmentSummary() {
-  const [items, setItems] = useState<MyInvestment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await InvestmentFundService.myApplications()
-      setItems(res.items ?? [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load summary")
-      setItems([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { summary, loading, error, fetch } = useDashboardStore();
+  const items = summary?.investmentSummary?.items ?? [];
+  const totals = summary?.investmentSummary ?? {
+    totalInvested: "0",
+    activePlans: 0,
+    monthlyRoi: "0",
+    totalRoi: "0",
+  };
 
   useEffect(() => {
-    const id = setTimeout(() => void load(), 0)
-    return () => clearTimeout(id)
-  }, [load])
-
-  const totals = useMemo(() => {
-    const active = items.filter((i) => i.status === "VERIFIED")
-    return {
-      totalInvested: items.reduce((sum, i) => sum + (Number(i.amount) || 0), 0),
-      activePlans: active.length,
-      monthlyRoi: active.reduce((sum, i) => sum + (Number(i.monthlyRoi) || 0), 0),
-      totalRoi: items.reduce((sum, i) => sum + (Number(i.totalRoiPaid) || 0), 0),
-    }
-  }, [items])
+    void fetch();
+  }, [fetch]);
 
   return (
     <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
@@ -74,7 +51,7 @@ export default function InvestmentSummary() {
               variant="ghost"
               size="sm"
               disabled={loading}
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
               className="text-muted-foreground hover:text-white"
             >
               {loading ? (
@@ -106,7 +83,7 @@ export default function InvestmentSummary() {
               variant="outline"
               size="sm"
               className="border-white/20 text-slate-300"
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Try Again
@@ -164,7 +141,7 @@ export default function InvestmentSummary() {
                 {items.slice(0, 3).map((i) => (
                   <Link
                     key={i.id}
-                    href="/investment/all-schemes/investment-fund/progress"
+                    href={i.href}
                     className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 transition-colors hover:bg-white/[0.06]"
                   >
                     <div className="flex items-center gap-3">
@@ -197,7 +174,7 @@ export default function InvestmentSummary() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function Stat({
@@ -206,10 +183,10 @@ function Stat({
   value,
   accent = false,
 }: {
-  icon: React.ReactNode
-  label: string
-  value: string
-  accent?: boolean
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  accent?: boolean;
 }) {
   return (
     <div className="p-3 rounded-lg bg-white/5 space-y-1">
@@ -221,5 +198,5 @@ function Stat({
         {value}
       </p>
     </div>
-  )
+  );
 }

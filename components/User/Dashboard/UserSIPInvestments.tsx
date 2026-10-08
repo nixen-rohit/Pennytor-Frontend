@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -15,10 +15,8 @@ import {
   GraduationCap,
 } from "lucide-react"
 import { format } from "date-fns"
-import {
-  SIPForChildService,
-  type MySIPInvestment,
-} from "@/services/sip-for-child.service"
+import { useDashboardStore } from "@/store/dashboard.store"
+import type { MySIPInvestment } from "@/services/sip-for-child.service"
 
 const inr = (value: string | number) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
@@ -27,28 +25,12 @@ const inr = (value: string | number) =>
   })}`
 
 export default function UserSIPInvestments() {
-  const [items, setItems] = useState<MySIPInvestment[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await SIPForChildService.myApplications()
-      setItems(res.items ?? [])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load SIP investments")
-      setItems([])
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  const { summary, loading, error, fetch } = useDashboardStore()
+  const items = (summary?.sipInvestments ?? []) as MySIPInvestment[]
 
   useEffect(() => {
-    const id = setTimeout(() => void load(), 0)
-    return () => clearTimeout(id)
-  }, [load])
+    void fetch()
+  }, [fetch])
 
   return (
     <Card className="border border-white/10 bg-white/5 backdrop-blur-sm">
@@ -65,7 +47,7 @@ export default function UserSIPInvestments() {
             variant="ghost"
             size="sm"
             disabled={loading}
-            onClick={() => void load()}
+            onClick={() => void fetch(true)}
             className="text-muted-foreground hover:text-white"
           >
             {loading ? (
@@ -90,7 +72,7 @@ export default function UserSIPInvestments() {
               variant="outline"
               size="sm"
               className="border-white/20 text-slate-300"
-              onClick={() => void load()}
+              onClick={() => void fetch(true)}
             >
               <RefreshCw className="mr-2 h-3.5 w-3.5" />
               Try Again

@@ -28,6 +28,12 @@ import { Pagination } from "@/components/User/ReferralChain/Pagination";
 
 const EMPTY_FILTERS: ReferralFilters = { active: "all", level: "all", kyc: "all" };
 
+const inr = (value: string | number | undefined) =>
+  `₹${Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
 interface Props {
   data: ReferralState;
 }
@@ -168,12 +174,15 @@ export function ReferralList({ data }: Props) {
                   <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
                     Joined
                   </TableHead>
+                  <TableHead className="text-xs font-semibold text-slate-400 uppercase tracking-wider py-3">
+                    Commission
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {currentUsers.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-64 text-center">
+                    <TableCell colSpan={7} className="h-64 text-center">
                       <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                         <div className="p-3 rounded-full bg-neutral-800">
                           <UsersIcon className="h-8 w-8 text-slate-400" />
@@ -228,6 +237,9 @@ export function ReferralList({ data }: Props) {
                       </TableCell>
                       <TableCell className="py-3 text-slate-400">
                         {format(new Date(user.createdAt), "MMM dd, yyyy")}
+                      </TableCell>
+                      <TableCell className="py-3 text-slate-200 font-semibold">
+                        {inr(user.totalCommission)}
                       </TableCell>
                     </TableRow>
                   ))

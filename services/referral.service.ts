@@ -74,6 +74,7 @@ export interface ReferralTreeNode {
   createdAt: string;
   depth: number;
   children: ReferralTreeNode[];
+  totalCommission?: string;
 }
 
 /** Flattened L1 user — derived from the tree on the client. */
