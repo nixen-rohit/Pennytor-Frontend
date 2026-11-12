@@ -49,31 +49,6 @@ export interface FinanceReportFilters {
   sortOrder?: FinanceSortOrder;
 }
 
-export interface FinanceSummary {
-  deposits: {
-    total: number;
-    pending: number;
-    underReview: number;
-    approved: number;
-    rejected: number;
-    approvedAmount: string;
-  };
-  withdrawals: {
-    total: number;
-    pending: number;
-    underReview: number;
-    approved: number;
-    rejected: number;
-    approvedAmount: string;
-  };
-  totals: {
-    totalTransactions: number;
-    totalPending: number;
-    totalApproved: number;
-    totalRejected: number;
-  };
-}
-
 /**
  * Finance report client: merges deposits + withdrawals on the backend,
  * ordered by date. The deposit page and withdrawal page use their own
@@ -95,9 +70,5 @@ export class FinanceAdminService {
     if (filters.sortBy) query.set("sortBy", filters.sortBy);
     if (filters.sortOrder) query.set("sortOrder", filters.sortOrder);
     return fetchApi(`/admin/finance/reports?${query.toString()}`);
-  }
-
-  static async getSummary(): Promise<FinanceSummary> {
-    return fetchApi("/admin/finance/summary");
   }
 }

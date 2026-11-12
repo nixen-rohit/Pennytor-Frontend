@@ -8,7 +8,6 @@ import { InvestmentFundAdminService } from "@/services/investment-fund-admin.ser
 import {
   FinanceAdminService,
   FinanceReportFilters,
-  FinanceSummary,
 } from "@/services/finance-admin.service";
 import { FINANCE_KEYS, useFinanceQueryStore } from "@/store/finance-query.store";
 
@@ -150,12 +149,6 @@ export function useInvestmentFundRequests(
   };
 }
 
-/** Dashboard summary cards. */
-export function useFinanceSummary() {
-  const loader = useCallback(() => FinanceAdminService.getSummary(), []);
-  return useQuery<FinanceSummary>(FINANCE_KEYS.summary, loader);
-}
-
 type DecisionType = "deposit" | "withdrawal";
 
 /** Approve a deposit or withdrawal, then invalidate every finance view. */
@@ -173,7 +166,6 @@ export function useApproveFinanceTransaction(type: DecisionType) {
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.deposits);
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.withdrawals);
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.reports);
-        useFinanceQueryStore.getState().bump(FINANCE_KEYS.summary);
         return true;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to approve");
@@ -202,7 +194,6 @@ export function useRejectFinanceTransaction(type: DecisionType) {
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.deposits);
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.withdrawals);
         useFinanceQueryStore.getState().bump(FINANCE_KEYS.reports);
-        useFinanceQueryStore.getState().bump(FINANCE_KEYS.summary);
         return true;
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to reject");

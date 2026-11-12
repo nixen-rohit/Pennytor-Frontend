@@ -1,19 +1,43 @@
 import { FormState } from "@/components/User/KYC/types";
-import { format } from "date-fns";
+import type { KycFileType } from "@/services/kyc.service";
 
 interface Props {
   data: FormState;
+  /** Document types the server already holds for this application. */
+  existingFiles?: ReadonlySet<KycFileType>;
 }
 
 function formatDate(d: Date | null) {
-  return d ? format(d, "dd MMM yyyy") : "Not provided";
+  if (!d) return "Not provided";
+  // Date-only values are pinned to 00:00 UTC — format the UTC calendar day so
+  // the display matches what was typed in every timezone.
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = MONTHS_SHORT[d.getUTCMonth()];
+  return `${day} ${month} ${d.getUTCFullYear()}`;
 }
 
-function formatFile(f: File | null) {
-  return f ? f.name : "Not uploaded";
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function formatFile(f: File | null, existing: boolean) {
+  if (f) return f.name;
+  return existing ? "On file (unchanged)" : "Not uploaded";
 }
 
-export function ReviewStep({ data }: Props) {
+export function ReviewStep({ data, existingFiles }: Props) {
+  const onFile = (type: KycFileType) => existingFiles?.has(type) ?? false;
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Review Your Details" />
@@ -27,16 +51,16 @@ export function ReviewStep({ data }: Props) {
         <Row label="Date of Birth" value={formatDate(data.dob)} />
         <Row label="Gender" value={data.gender || "Not provided"} />
         <Row label="Marital Status" value={data.maritalStatus || "Not provided"} />
-        <Row label="Selfie" value={formatFile(data.selfieFile)} />
+        <Row label="Selfie" value={formatFile(data.selfieFile, onFile("SELFIE"))} />
       </Section>
 
       <Section title="Documents">
         <Row label="Aadhaar Number" value={data.aadhaarNumber} />
-        <Row label="Aadhaar Front" value={formatFile(data.aadhaarFrontFile)} />
-        <Row label="Aadhaar Back" value={formatFile(data.aadhaarBackFile)} />
+        <Row label="Aadhaar Front" value={formatFile(data.aadhaarFrontFile, onFile("AADHAAR_FRONT"))} />
+        <Row label="Aadhaar Back" value={formatFile(data.aadhaarBackFile, onFile("AADHAAR_BACK"))} />
         <Row label="PAN Number" value={data.panNumber} />
-        <Row label="PAN Card" value={formatFile(data.panFile)} />
-        <Row label="Signature" value={formatFile(data.signatureFile)} />
+        <Row label="PAN Card" value={formatFile(data.panFile, onFile("PAN"))} />
+        <Row label="Signature" value={formatFile(data.signatureFile, onFile("SIGNATURE"))} />
       </Section>
 
       <Section title="Bank Details">
@@ -53,7 +77,7 @@ export function ReviewStep({ data }: Props) {
       <Section title="Nominee Details">
         <Row label="Nominee Name" value={data.nomineeName} />
         <Row label="Date of Birth" value={formatDate(data.nomineeDob)} />
-        <Row label="Aadhaar Number" value={data.nomineeAadhaar} />
+        <Row label="Aadhaar Number" value={data.nomineeAadhaar || "Not provided"} />
       </Section>
     </div>
   );

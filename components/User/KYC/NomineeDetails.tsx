@@ -1,17 +1,8 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { FormState } from "@/components/User/KYC/types";
 import type { FieldErrors } from "./validation";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 import { sanitizeAadhaar } from "@/utils/validation";
 
 interface Props {
@@ -39,47 +30,31 @@ export function NomineeDetails({ data, errors, onChange }: Props) {
             Date of Birth <span className="text-red-500">*</span>
           </Label>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal "
-              >
-                <CalendarIcon className="mr-2 h-4 w-4 text-slate-400 shrink-0" />
-
-                {data.nomineeDob
-                  ? format(data.nomineeDob, "dd MMM yyyy")
-                  : "Select Date of Birth"}
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                className="bg-black"
-                selected={data.nomineeDob ?? undefined}
-                onSelect={(date) => date && onChange("nomineeDob", date)}
-                captionLayout="dropdown"
-                startMonth={new Date(1900, 0)}
-                endMonth={new Date()}
-              />
-            </PopoverContent>
-          </Popover>
+          <DateInput
+            value={data.nomineeDob}
+            onChange={(date) => onChange("nomineeDob", date)}
+            minDate={new Date(1900, 0, 1)}
+            maxDate={new Date()}
+          />
           {errors?.nomineeDob && (
             <p className="text-xs text-red-500">{errors.nomineeDob}</p>
           )}
         </div>
 
-       
-        <Field label="Aadhaar Number" required error={errors?.nomineeAadhaar}>
-          <Input
-            placeholder="12-digit Aadhaar number"
-            inputMode="numeric"
-            value={data.nomineeAadhaar}
-            onChange={(e) => onChange("nomineeAadhaar", sanitizeAadhaar(e.target.value))}
-            maxLength={12}
-          />
-        </Field>
+        <div className="sm:col-span-2 space-y-1.5">
+          <Field label="Aadhaar Number" error={errors?.nomineeAadhaar}>
+            <Input
+              placeholder="12-digit Aadhaar number"
+              inputMode="numeric"
+              value={data.nomineeAadhaar}
+              onChange={(e) =>
+                onChange("nomineeAadhaar", sanitizeAadhaar(e.target.value))
+              }
+              maxLength={12}
+            />
+          </Field>
+          <p className="text-xs text-slate-400">Optional</p>
+        </div>
       </div>
     </div>
   );

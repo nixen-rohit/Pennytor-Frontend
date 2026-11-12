@@ -1,10 +1,4 @@
-import {
-  User,
-  Settings,
-  LogOut,
-  UserCog,
-  type LucideIcon,
-} from "lucide-react";
+import { LogOut, type LucideIcon } from "lucide-react";
 
 interface TopbarMenuItem {
   id: string;
@@ -21,19 +15,5 @@ interface TopbarConfig {
 
 export const adminTopbar: TopbarConfig = {
   homeHref: "/admin",
-  menuItems: [
-    {
-      id: "profile",
-      label: "Profile",
-      href: "/admin/profile",
-      icon: UserCog,
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      href: "/admin/settings",
-      icon: Settings,
-    },
-    { id: "logout", label: "Log out", icon: LogOut, type: "logout" },
-  ],
+  menuItems: [{ id: "logout", label: "Log out", icon: LogOut, type: "logout" }],
 };

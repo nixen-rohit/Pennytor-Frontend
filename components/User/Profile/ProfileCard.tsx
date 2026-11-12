@@ -11,6 +11,8 @@ interface ProfileCardProps {
 
 export function ProfileCard({ profile }: ProfileCardProps) {
   const [copied, setCopied] = useState(false);
+  const initial =
+    profile.name?.trim().charAt(0).toUpperCase() || "U";
 
   const copyClientId = async () => {
     try {
@@ -36,13 +38,13 @@ export function ProfileCard({ profile }: ProfileCardProps) {
 
       <div className="relative px-6 pb-8">
         <div className="-mt-16 flex justify-center">
-          <Image
-            src="/img/profile.png"
-            alt="Profile"
-            width={128}
-            height={128}
-            className="rounded-full border-4 border-[#111] object-cover"
-          />
+          <div
+            role="img"
+            aria-label={`${profile.name} profile`}
+            className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-[#111] bg-zinc-800 text-5xl lg:text-7xl font-semibold text-white select-none"
+          >
+            {initial}
+          </div>
         </div>
 
         <h2 className="mt-4 text-center text-xl font-semibold text-white flex justify-center items-center ">

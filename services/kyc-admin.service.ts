@@ -1,5 +1,5 @@
-import { API_URL } from "@/services/api";
-import { fetchApi } from "@/services/api";
+import { API_URL, ApiError, fetchApi } from "@/services/api";
+import { useAuthStore } from "@/store/auth.store";
 
 export type KycStatus =
   | "DRAFT"
@@ -67,7 +67,7 @@ export interface KycApplicationDetail {
     nomineeName: string;
     nomineeDob: string;
     nomineePhone: string | null;
-    nomineeAadhaar: string;
+    nomineeAadhaar: string | null;
   };
   files: KycFileMeta[];
 }
@@ -139,5 +139,77 @@ export class KycAdminService {
       `/admin/kyc/applications/${applicationId}/files/${fileId}`,
       { method: "DELETE" },
     );
+  }
+
+  /**
+   * Replace an existing document in place. Uses multipart/form-data, so it
+   * bypasses `fetchApi` (which always sets a JSON Content-Type) while still
+   * sending the session cookie and CSRF token. The backend keeps the same
+   * metadata row/id, writes a REPLACE audit entry, then deletes the old file.
+   */
+  static async replaceFile(params: {
+    applicationId: string;
+    fileId: string;
+    file: File;
+    reason: string;
+  }): Promise<{
+    id: string;
+    type: KycFileType;
+    mimeType: string;
+    fileSize: number;
+    originalName: string;
+    message: string;
+  }> {
+    const form = new FormData();
+    form.append("file", params.file);
+    form.append("reason", params.reason.trim());
+
+    const send = () => {
+      const csrfToken = useAuthStore.getState().csrfToken;
+      return fetch(
+        KycAdminService.fileUrl(params.applicationId, params.fileId),
+        {
+          method: "PUT",
+          headers: csrfToken ? { "X-CSRF-Token": csrfToken } : {},
+          credentials: "include",
+          body: form,
+          cache: "no-store",
+        },
+      );
+    };
+
+    let response = await send();
+
+    // Same stale-CSRF recovery as fetchApi: re-arm once from /auth/me.
+    if (response.status === 403) {
+      try {
+        const meResponse = await fetch(`${API_URL}/auth/me`, {
+          credentials: "include",
+          cache: "no-store",
+        });
+        const meData = await meResponse.json().catch(() => null);
+        const freshToken = meData?.data?.csrfToken;
+        if (meResponse.ok && freshToken) {
+          useAuthStore.getState().setCsrfToken(freshToken);
+          response = await send();
+        }
+      } catch {
+        // Fall through with the original 403.
+      }
+    }
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        useAuthStore.getState().clearAuth();
+      }
+      throw new ApiError(
+        response.status,
+        data?.message || "Failed to replace document",
+      );
+    }
+
+    return data;
   }
 }

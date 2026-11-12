@@ -1,121 +1,106 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
-import { useFinanceSummary } from "@/hooks/use-finance";
+import {
+  BadgeCheck,
+  Banknote,
+  Loader2,
+  PiggyBank,
+  TrendingUp,
+  Users,
+  Wallet,
+} from "lucide-react";
+import {
+  AdminDashboardService,
+  AdminPendingCounts,
+} from "@/services/admin-dashboard.service";
 
-const fmt = (n: string | number) =>
-  Number(n).toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
-interface Stat {
+interface PendingCard {
+  key: keyof AdminPendingCounts;
   label: string;
-  value: string | number;
   href: string;
-  accent?: string;
+  icon: typeof Wallet;
 }
 
-function StatCard({ stat }: { stat: Stat }) {
-  return (
-    <Link
-      href={stat.href}
-      className="block p-5 rounded-lg border border-[#1F1F23] bg-zinc-900/50 hover:bg-[#1F1F23] transition-colors"
-    >
-      <p className="text-sm text-gray-400">{stat.label}</p>
-      <p className={`text-2xl font-bold mt-2 ${stat.accent ?? "text-white"}`}>
-        {stat.value}
-      </p>
-    </Link>
-  );
-}
-
-function SectionHeading({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div className="mt-8 mb-4">
-      <h3 className="text-white font-semibold">{title}</h3>
-      <p className="text-sm text-gray-400">{subtitle}</p>
-    </div>
-  );
-}
+const CARDS: PendingCard[] = [
+  {
+    key: "kycPending",
+    label: "KYC Pending",
+    href: "/admin/kyc/applications",
+    icon: BadgeCheck,
+  },
+  {
+    key: "depositsPending",
+    label: "Deposit Pending",
+    href: "/admin/finance/deposite-request",
+    icon: Wallet,
+  },
+  {
+    key: "withdrawalsPending",
+    label: "Withdrawal Pending",
+    href: "/admin/finance/widthdrawal-request",
+    icon: Banknote,
+  },
+  {
+    key: "fixedDepositsPending",
+    label: "Fixed Deposit Scheme Pending",
+    href: "/admin/investments/fixed-deposite",
+    icon: PiggyBank,
+  },
+  {
+    key: "sipPending",
+    label: "SIP for Child Pending",
+    href: "/admin/investments/sip",
+    icon: Users,
+  },
+  {
+    key: "investmentFundPending",
+    label: "Investment Fund Pending",
+    href: "/admin/investments/investment-fund",
+    icon: TrendingUp,
+  },
+];
 
 export default function AdminDashboardPage() {
-  const { data: sum, loading, error } = useFinanceSummary();
+  const [counts, setCounts] = useState<AdminPendingCounts | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const depStats: Stat[] = sum
-    ? [
-        {
-          label: "Deposits Total",
-          value: sum.deposits.total,
-          href: "/admin/finance/reports",
-        },
-        {
-          label: "Deposits Pending",
-          value: sum.deposits.pending,
-          href: "/admin/finance/deposite-request",
-          accent: "text-amber-400",
-        },
-        {
-          label: "Deposits Approved",
-          value: sum.deposits.approved,
-          href: "/admin/finance/reports",
-          accent: "text-green-400",
-        },
-        {
-          label: "Amount Credited",
-          value: `₹${fmt(sum.deposits.approvedAmount)}`,
-          href: "/admin/finance/reports",
-          accent: "text-emerald-400",
-        },
-        {
-          label: "Deposits Rejected",
-          value: sum.deposits.rejected,
-          href: "/admin/finance/reports",
-          accent: "text-red-400",
-        },
-      ]
-    : [];
-
-  const wdrStats: Stat[] = sum
-    ? [
-        {
-          label: "Withdrawals Total",
-          value: sum.withdrawals.total,
-          href: "/admin/finance/reports",
-        },
-        {
-          label: "Withdrawals Pending",
-          value: sum.withdrawals.pending,
-          href: "/admin/finance/widthdrawal-request",
-          accent: "text-amber-400",
-        },
-        {
-          label: "Withdrawals Approved",
-          value: sum.withdrawals.approved,
-          href: "/admin/finance/reports",
-          accent: "text-green-400",
-        },
-        {
-          label: "Amount Debited",
-          value: `₹${fmt(sum.withdrawals.approvedAmount)}`,
-          href: "/admin/finance/reports",
-          accent: "text-red-400",
-        },
-        {
-          label: "Withdrawals Rejected",
-          value: sum.withdrawals.rejected,
-          href: "/admin/finance/reports",
-          accent: "text-red-400",
-        },
-      ]
-    : [];
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await AdminDashboardService.getPendingCounts();
+        if (!cancelled) {
+          setCounts(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Failed to load pending requests",
+          );
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-white mb-6">
+      <h2 className="text-xl font-semibold text-white mb-1">
         Welcome back, Admin
       </h2>
+      <p className="text-sm text-gray-400 mb-6">
+        Requests waiting for review. Open a queue to review and approve.
+      </p>
 
       {error ? (
         <div className="p-4 rounded-lg border border-red-600/40 bg-red-600/10 text-sm text-red-400">
@@ -124,44 +109,37 @@ export default function AdminDashboardPage() {
       ) : loading ? (
         <div className="flex items-center gap-2 text-sm text-gray-400 py-8">
           <Loader2 className="h-4 w-4 animate-spin text-indigo-500" />
-          Loading finance stats…
+          Loading pending requests…
         </div>
       ) : (
-        <>
-          <SectionHeading
-            title="Deposits"
-            subtitle="All fund deposit requests and their review outcomes"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {depStats.map((stat) => (
-              <StatCard key={stat.label} stat={stat} />
-            ))}
-          </div>
-
-          <SectionHeading
-            title="Withdrawals"
-            subtitle="All withdrawal requests and their review outcomes"
-          />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {wdrStats.map((stat) => (
-              <StatCard key={stat.label} stat={stat} />
-            ))}
-          </div>
-        </>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {CARDS.map((card) => {
+            const Icon = card.icon;
+            const value = counts?.[card.key] ?? 0;
+            return (
+              <Link
+                key={card.key}
+                href={card.href}
+                className="group flex items-start justify-between gap-4 rounded-lg border border-[#1F1F23] bg-zinc-900/50 p-5 transition-colors hover:bg-[#1F1F23]"
+              >
+                <div>
+                  <p className="text-sm text-gray-400">{card.label}</p>
+                  <p
+                    className={`mt-2 text-3xl font-bold ${
+                      value > 0 ? "text-amber-400" : "text-white"
+                    }`}
+                  >
+                    {value}
+                  </p>
+                </div>
+                <span className="rounded-md bg-[#1F1F23] p-2 text-gray-400 transition-colors group-hover:text-indigo-400">
+                  <Icon className="h-5 w-5" />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       )}
-
-      <div className="p-6 rounded-lg border border-[#1F1F23] bg-zinc-900/50 mt-8">
-        <h3 className="text-white font-semibold mb-2">
-          Admin verification pending
-        </h3>
-        <p className="text-sm text-gray-400">
-          {loading
-            ? "Loading pending request counts…"
-            : `${sum?.totals.totalPending ?? 0} request${
-                sum?.totals.totalPending === 1 ? "" : "s"
-              } awaiting review across deposits and withdrawals. Review them in the Finance section.`}
-        </p>
-      </div>
     </div>
   );
 }

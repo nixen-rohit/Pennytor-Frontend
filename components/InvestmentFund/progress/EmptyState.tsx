@@ -7,10 +7,10 @@ import { TrendingUp } from "lucide-react";
 
 export function EmptyState() {
   return (
-    <Card className="border-dashed border-white/15 bg-white/[0.02] shadow-none">
+    <Card className="border-dashed border-white/10 bg-[#111217] shadow-none">
       <CardContent className="flex flex-col items-center py-16 text-center space-y-4">
-        <div className="rounded-full bg-indigo-500/10 p-4 ring-1 ring-indigo-400/30">
-          <TrendingUp className="h-8 w-8 text-indigo-400" />
+       <div className="rounded-full bg-amber-400/10 p-4   ">
+          <TrendingUp className="h-8 w-8 text-amber-400" />
         </div>
         <div>
           <h2 className="text-lg font-semibold">No active schemes yet</h2>
@@ -21,7 +21,7 @@ export function EmptyState() {
         </div>
         <Button
           asChild
-          className="bg-indigo-600 hover:bg-indigo-700 text-white"
+           className="bg-amber-400 text-black hover:bg-amber-300"
         >
           <Link href="/investment/all-schemes/investment-fund">
             Browse Schemes

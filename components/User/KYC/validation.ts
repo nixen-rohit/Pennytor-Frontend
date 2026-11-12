@@ -1,4 +1,5 @@
 import { FormState } from "@/components/User/KYC/types";
+import type { KycFileType } from "@/services/kyc.service";
 import {
   containsUnsafe,
   ACCOUNT_NUMBER_PATTERN,
@@ -10,7 +11,11 @@ import {
 
 export type FieldErrors = Partial<Record<keyof FormState, string>>;
 
-export function validateStep(step: number, data: FormState): FieldErrors {
+export function validateStep(
+  step: number,
+  data: FormState,
+  existingFiles: ReadonlySet<KycFileType> = new Set(),
+): FieldErrors {
   switch (step) {
     case 1: {
       const errs: FieldErrors = {};
@@ -20,7 +25,7 @@ export function validateStep(step: number, data: FormState): FieldErrors {
       if (!data.dob) errs.dob = "Date of birth is required.";
       if (!PHONE_PATTERN.test(data.phone.replace(/\s/g, "")))
         errs.phone = "Enter a valid phone number.";
-      if (data.selfieFile === null)
+      if (data.selfieFile === null && !existingFiles.has("SELFIE"))
         errs.selfieFile = "Please upload your selfie photo.";
       return errs;
     }
@@ -29,16 +34,17 @@ export function validateStep(step: number, data: FormState): FieldErrors {
       const aadhaar = data.aadhaarNumber.replace(/\s/g, "");
       if (!AADHAAR_PATTERN.test(aadhaar))
         errs.aadhaarNumber = "Enter a valid 12-digit Aadhaar number.";
-      if (!data.aadhaarFrontFile)
+      if (!data.aadhaarFrontFile && !existingFiles.has("AADHAAR_FRONT"))
         errs.aadhaarFrontFile = "Upload your Aadhaar front image.";
-      if (!data.aadhaarBackFile)
+      if (!data.aadhaarBackFile && !existingFiles.has("AADHAAR_BACK"))
         errs.aadhaarBackFile = "Upload your Aadhaar back image.";
       if (containsUnsafe(data.panNumber))
         errs.panNumber = "PAN number contains invalid characters.";
       else if (!PAN_PATTERN.test(data.panNumber.toUpperCase()))
         errs.panNumber = "Enter a valid PAN number.";
-      if (!data.panFile) errs.panFile = "Upload your PAN card image.";
-      if (!data.signatureFile)
+      if (!data.panFile && !existingFiles.has("PAN"))
+        errs.panFile = "Upload your PAN card image.";
+      if (!data.signatureFile && !existingFiles.has("SIGNATURE"))
         errs.signatureFile = "Upload your signature image.";
       return errs;
     }
@@ -69,7 +75,8 @@ export function validateStep(step: number, data: FormState): FieldErrors {
       if (!data.nomineeDob)
         errs.nomineeDob = "Nominee date of birth is required.";
       const aadhaar = data.nomineeAadhaar.replace(/\s/g, "");
-      if (!AADHAAR_PATTERN.test(aadhaar))
+      // Nominee Aadhaar is optional — only validate when the user typed one.
+      if (aadhaar && !AADHAAR_PATTERN.test(aadhaar))
         errs.nomineeAadhaar =
           "Enter a valid 12-digit nominee Aadhaar number.";
       return errs;

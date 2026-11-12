@@ -54,7 +54,7 @@ export interface KycApplicationState extends KycApplicationRef {
     nomineeName: string;
     nomineeDob: string;
     nomineePhone: string | null;
-    nomineeAadhaar: string;
+    nomineeAadhaar: string | null;
   };
 }
 

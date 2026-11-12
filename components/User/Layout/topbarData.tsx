@@ -17,12 +17,6 @@ export const userTopbar: TopbarConfig = {
   homeHref: "/dashboard",
   menuItems: [
     { id: "profile", label: "Profile", href: "/profile", icon: User },
-    {
-      id: "settings",
-      label: "Settings",
-      href: "/profile/settings",
-      icon: Settings,
-    },
     { id: "logout", label: "Log out", icon: LogOut, type: "logout" },
   ],
 };

@@ -39,6 +39,13 @@ export default function KYCVerification() {
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
   const [statusError, setStatusError] = useState(false);
+  // Document types already stored server-side for this application. They count
+  // as present in validation so editing never forces a re-upload.
+  const [existingFiles, setExistingFiles] = useState<Set<KycFileType>>(
+    new Set(),
+  );
+  const [draftSaving, setDraftSaving] = useState(false);
+  const [draftNotice, setDraftNotice] = useState<string | null>(null);
 
   const loadStatus = async () => {
     setStatusLoading(true);
@@ -51,6 +58,7 @@ export default function KYCVerification() {
       setClientId(me?.data?.user?.clientId ?? null);
       if (!app) {
         setRejectionReason(null);
+        setExistingFiles(new Set());
         return;
       }
       if (
@@ -65,6 +73,7 @@ export default function KYCVerification() {
         // Pre-fill form with existing data so user only fixes what's needed.
         setRejectionReason(app.rejectionReason);
         setForm(mapAppToFormState(app));
+        setExistingFiles(new Set(app.files.map((f) => f.type)));
       }
     } catch {
       // A failed fetch must never look like a fresh, unsubmitted account.
@@ -131,6 +140,7 @@ export default function KYCVerification() {
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     const safeValue = typeof value === "string" ? sanitizeText(value) : value;
     setForm((prev) => ({ ...prev, [key]: safeValue }));
+    setDraftNotice(null);
     setErrors((prev) => {
       if (!(key in prev)) return prev;
       const next = { ...prev };
@@ -143,15 +153,57 @@ export default function KYCVerification() {
   const isLast = currentStep === PHASES.length;
 
   function handleNext() {
-    const errs = validateStep(currentStep, form);
+    const errs = validateStep(currentStep, form, existingFiles);
     setErrors(errs);
     if (Object.keys(errs).length === 0) {
       setCurrentStep((s) => s + 1);
     }
   }
 
-  function handleSaveDraft() {
-    console.log("Save draft:", form);
+  /**
+   * Persists a resumable DRAFT. The API expects the full application object,
+   * so every step is validated first; on the first invalid step the wizard
+   * jumps there instead of failing silently.
+   */
+  async function handleSaveDraft() {
+    const allErrors: FieldErrors = {};
+    let firstBadStep = 0;
+
+    for (const phase of PHASES) {
+      const stepErrors = validateStep(phase.step, form, existingFiles);
+      if (Object.keys(stepErrors).length > 0) {
+        if (firstBadStep === 0) firstBadStep = phase.step;
+        Object.assign(allErrors, stepErrors);
+      }
+    }
+
+    if (firstBadStep !== 0) {
+      setErrors(allErrors);
+      setCurrentStep(firstBadStep);
+      setDraftNotice(null);
+      setSubmitError(
+        "Complete the highlighted fields before saving a draft.",
+      );
+      return;
+    }
+
+    setDraftSaving(true);
+    setSubmitError(null);
+    setDraftNotice(null);
+    try {
+      await KycService.createApplication(buildPayload());
+      setDraftNotice(
+        "Draft saved. Your documents will be uploaded when you submit for verification.",
+      );
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Could not save the draft. Please try again.",
+      );
+    } finally {
+      setDraftSaving(false);
+    }
   }
 
   function buildPayload() {
@@ -308,10 +360,20 @@ export default function KYCVerification() {
           <CardContent className="p-6">
             <form onSubmit={(e) => e.preventDefault()} className="space-y-6" noValidate>
               {currentStep === 1 && (
-                <PersonalInfo data={form} errors={errors} onChange={updateField} />
+                <PersonalInfo
+                  data={form}
+                  errors={errors}
+                  onChange={updateField}
+                  existingFiles={existingFiles}
+                />
               )}
               {currentStep === 2 && (
-                <UploadDocument data={form} errors={errors} onChange={updateField} />
+                <UploadDocument
+                  data={form}
+                  errors={errors}
+                  onChange={updateField}
+                  existingFiles={existingFiles}
+                />
               )}
               {currentStep === 3 && (
                 <BankDetails data={form} errors={errors} onChange={updateField} />
@@ -319,7 +381,9 @@ export default function KYCVerification() {
               {currentStep === 4 && (
                 <NomineeDetails data={form} errors={errors} onChange={updateField} />
               )}
-              {currentStep === 5 && <ReviewStep data={form} />}
+              {currentStep === 5 && (
+                <ReviewStep data={form} existingFiles={existingFiles} />
+              )}
 
               <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-5 border-t border-neutral-800">
                 <Button
@@ -338,10 +402,15 @@ export default function KYCVerification() {
                     type="button"
                     variant="outline"
                     onClick={handleSaveDraft}
+                    disabled={draftSaving || submitting}
                     className="flex w-full items-center justify-center gap-1.5 border-white/20 sm:w-auto"
                   >
-                    <Save className="h-4 w-4" />
-                    Save as Draft
+                    {draftSaving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4" />
+                    )}
+                    {draftSaving ? "Saving..." : "Save as Draft"}
                   </Button>
 
                   {isLast ? (
@@ -373,6 +442,10 @@ export default function KYCVerification() {
 
               {submitError && (
                 <p className="text-sm text-red-500 pt-3">{submitError}</p>
+              )}
+
+              {draftNotice && (
+                <p className="text-sm text-green-400 pt-3">{draftNotice}</p>
               )}
             </form>
           </CardContent>

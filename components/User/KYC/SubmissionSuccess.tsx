@@ -74,7 +74,7 @@ export function SubmissionSuccess({ app }: { app: KycApplicationState }) {
             label="Phone"
             value={app.nominee.nomineePhone || "Not provided"}
           />
-          <Row label="Aadhaar" value={app.nominee.nomineeAadhaar} />
+          <Row label="Aadhaar" value={app.nominee.nomineeAadhaar || "Not provided"} />
         </Section>
       </div>
 
@@ -93,8 +93,13 @@ export function SubmissionSuccess({ app }: { app: KycApplicationState }) {
   );
 }
 
-function formatDate(d: string) {
-  return d ? format(new Date(d), "dd MMM yyyy") : "Not provided";
+function formatDate(d: string | null | undefined) {
+  if (!d) return "Not provided";
+  // DOB is a date-only value; read the calendar day from the ISO string so the
+  // browser's timezone can never shift it.
+  const [year, month, day] = d.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return "Not provided";
+  return format(new Date(year, month - 1, day), "dd MMM yyyy");
 }
 
 function Section({

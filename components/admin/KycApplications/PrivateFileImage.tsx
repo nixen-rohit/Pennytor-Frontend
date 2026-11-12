@@ -7,7 +7,7 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ZoomIn, Loader2, Download, AlertTriangle } from "lucide-react";
+import { Eye, Loader2, Download, AlertTriangle } from "lucide-react";
 import { KycAdminService } from "@/services/kyc-admin.service";
 
 /**
@@ -21,12 +21,15 @@ export function PrivateFileImage({
   alt,
   className,
   previewClassName,
+  buttonLabel,
 }: {
   applicationId: string;
   fileId: string;
   alt: string;
   className?: string;
   previewClassName?: string;
+  /** When set, render a text button (e.g. "View") instead of an inline thumbnail. */
+  buttonLabel?: string;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
@@ -67,16 +70,27 @@ export function PrivateFileImage({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          type="button"
-          className="group relative inline-flex cursor-zoom-in"
-          aria-label={`View ${alt}`}
-        >
-          <img src={url} alt={alt} className={className} />
-          <span className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-            <ZoomIn className="h-6 w-6 text-white" />
-          </span>
-        </button>
+        {buttonLabel ? (
+          <button
+            type="button"
+            className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"
+            title={`View ${alt}`}
+          >
+            <Eye className="h-3.5 w-3.5" />
+            {buttonLabel}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="group relative inline-flex cursor-zoom-in"
+            aria-label={`View ${alt}`}
+          >
+            <img src={url} alt={alt} className={className} />
+            <span className="absolute inset-0 flex items-center justify-center rounded-md bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+              <Eye className="h-6 w-6 text-white" />
+            </span>
+          </button>
+        )}
       </DialogTrigger>
       <DialogContent
         className="max-w-[90vw] sm:max-w-3xl border-neutral-800"

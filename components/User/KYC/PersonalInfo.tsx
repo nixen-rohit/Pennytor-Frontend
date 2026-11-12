@@ -1,18 +1,11 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/date-input";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
 import type { FieldErrors } from "./validation";
+import type { KycFileType } from "@/services/kyc.service";
 import { FaCamera } from "react-icons/fa6";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 import { sanitizePhone } from "@/utils/validation";
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -21,6 +14,8 @@ interface Props {
   data: FormState;
   errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+  /** Document types the server already holds for this application. */
+  existingFiles?: ReadonlySet<KycFileType>;
 }
 
 function SelectNative({
@@ -55,7 +50,7 @@ function SelectNative({
 const GENDERS = ["Male", "Female", "Other"];
 const MARITAL_STATUSES = ["Single", "Married", "Divorced", "Widowed"];
 
-export function PersonalInfo({ data, errors, onChange }: Props) {
+export function PersonalInfo({ data, errors, onChange, existingFiles }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Personal Information" />
@@ -83,38 +78,18 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
             Date of Birth <span className="text-red-500">*</span>
           </Label>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-full justify-start text-left font-normal border-white/20"
-              >
-                <CalendarIcon className="mr-2 h-4 w-4 text-slate-400 shrink-0" />
-
-                {data.dob
-                  ? format(data.dob, "dd MMM yyyy")
-                  : "Select Date of Birth"}
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                className="bg-black"
-                selected={data.dob ?? undefined}
-                onSelect={(date) => date && onChange("dob", date)}
-                captionLayout="dropdown"
-                startMonth={new Date(1900, 0)}
-                endMonth={new Date()}
-              />
-            </PopoverContent>
-          </Popover>
+          <DateInput
+            value={data.dob}
+            onChange={(date) => onChange("dob", date)}
+            minDate={new Date(1900, 0, 1)}
+            maxDate={new Date()}
+          />
           {errors?.dob && (
             <p className="text-xs text-red-500">{errors.dob}</p>
           )}
         </div>
 
-        <Field label="Gender">
+        <Field required label="Gender">
           <SelectNative
             value={data.gender}
             onChange={(v) => onChange("gender", v)}
@@ -123,7 +98,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
           />
         </Field>
 
-        <Field label="Marital Status">
+        <Field required label="Marital Status">
           <SelectNative
             value={data.maritalStatus}
             onChange={(v) => onChange("maritalStatus", v)}
@@ -139,6 +114,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
       </p>
       <div className="max-w-md">
         <UploadField
+        
           label="Selfie"
           hint="JPG, PNG, WebP · Max 2 MB"
           accept="image/jpeg,image/png,image/webp"
@@ -148,6 +124,7 @@ export function PersonalInfo({ data, errors, onChange }: Props) {
           onSelect={(f) => onChange("selfieFile", f)}
           onRemove={() => onChange("selfieFile", null)}
           allowedTypes={IMAGE_TYPES}
+          existing={existingFiles?.has("SELFIE")}
         />
       </div>
     </div>

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import {
   DropdownMenu,
@@ -62,6 +62,11 @@ export default function TopNav({
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  // Avatar shows the first letter of the signed-in user's name.
+  const userInitial = (user?.firstName || user?.lastName || user?.email || "")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
   const pathSegments = pathname
     .split("/")
     .filter(Boolean)
@@ -152,9 +157,8 @@ export default function TopNav({
               className="flex items-center space-x-2 p-2 "
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/img/profile.png" alt="User" />
-                <AvatarFallback>
-                  <User className="h-4 w-4" />
+                <AvatarFallback className="bg-zinc-800 text-sm font-semibold text-white">
+                  {userInitial || <User className="h-4 w-4" />}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden lg:flex flex-col items-start">

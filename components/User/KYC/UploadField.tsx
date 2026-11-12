@@ -15,6 +15,8 @@ interface UploadFieldProps {
   onRemove: () => void;
   allowedTypes?: string[];
   maxSizeMB?: number;
+  /** True when the server already holds this document for the application. */
+  existing?: boolean;
 }
 
 const DEFAULT_MAX_SIZE_MB = 2;
@@ -55,6 +57,7 @@ export function UploadField({
   onRemove,
   allowedTypes = ["image/jpeg", "image/png", "image/webp"],
   maxSizeMB = DEFAULT_MAX_SIZE_MB,
+  existing = false,
 }: UploadFieldProps) {
   const [dragOver, setDragOver] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -137,7 +140,11 @@ export function UploadField({
               <Icon className="mb-3 h-8 w-8 text-slate-400" />
             )}
             <p className="text-sm font-medium text-slate-300">
-              {displayError ? "Invalid file — see error below" : "Click to upload or drag & drop"}
+              {displayError
+                ? "Invalid file — see error below"
+                : existing
+                  ? "Document already on file — click to replace"
+                  : "Click to upload or drag & drop"}
             </p>
             <p className="mt-1 text-xs text-slate-400">{hint}</p>
           </>

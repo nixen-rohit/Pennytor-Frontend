@@ -252,8 +252,8 @@ export default function FDApply({ planId, planDetails }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[#09090b] px-4 py-8 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-2xl">
+    <div className="min-h-screen bg-[#09090b] px-4 lg:px-6 py-8 text-white ">
+      <div className="mx-auto max-w-4xl">
         {/* Back link */}
         <Link
           href="/investment/all-schemes/fixed-deposite"

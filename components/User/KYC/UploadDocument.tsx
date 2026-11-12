@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
 import type { FieldErrors } from "./validation";
+import type { KycFileType } from "@/services/kyc.service";
 import { FaIdCard, FaIdCardClip, FaSignature } from "react-icons/fa6";
 import { BsCardHeading } from "react-icons/bs";
 import { sanitizeAadhaar, sanitizePAN } from "@/utils/validation";
@@ -11,11 +12,13 @@ interface Props {
   data: FormState;
   errors?: FieldErrors;
   onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void;
+  /** Document types the server already holds for this application. */
+  existingFiles?: ReadonlySet<KycFileType>;
 }
 
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export function UploadDocument({ data, errors, onChange }: Props) {
+export function UploadDocument({ data, errors, onChange, existingFiles }: Props) {
   return (
     <div className="space-y-6 animate-in fade-in-0 slide-in-from-right-4 duration-300">
       <SectionHeading title="Aadhaar Card" />
@@ -45,6 +48,7 @@ export function UploadDocument({ data, errors, onChange }: Props) {
           onSelect={(f) => onChange("aadhaarFrontFile", f)}
           onRemove={() => onChange("aadhaarFrontFile", null)}
           allowedTypes={IMAGE_TYPES}
+          existing={existingFiles?.has("AADHAAR_FRONT")}
         />
         <UploadField
           label="Aadhaar Back Image"
@@ -56,6 +60,7 @@ export function UploadDocument({ data, errors, onChange }: Props) {
           onSelect={(f) => onChange("aadhaarBackFile", f)}
           onRemove={() => onChange("aadhaarBackFile", null)}
           allowedTypes={IMAGE_TYPES}
+          existing={existingFiles?.has("AADHAAR_BACK")}
         />
       </div>
 
@@ -86,6 +91,7 @@ export function UploadDocument({ data, errors, onChange }: Props) {
           onSelect={(f) => onChange("panFile", f)}
           onRemove={() => onChange("panFile", null)}
           allowedTypes={IMAGE_TYPES}
+          existing={existingFiles?.has("PAN")}
         />
       </div>
 
@@ -104,6 +110,7 @@ export function UploadDocument({ data, errors, onChange }: Props) {
           onSelect={(f) => onChange("signatureFile", f)}
           onRemove={() => onChange("signatureFile", null)}
           allowedTypes={IMAGE_TYPES}
+          existing={existingFiles?.has("SIGNATURE")}
         />
       </div>
     </div>

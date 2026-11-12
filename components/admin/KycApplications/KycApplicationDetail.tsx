@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,8 @@ import {
   FileText,
   Landmark,
   Users,
-  Download,
-  Trash2,
   Loader2,
+  RefreshCcw,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -60,7 +59,7 @@ export default function KycApplicationDetail() {
   const [note, setNote] = useState("");
   const [rejecting, setRejecting] = useState(false);
   const [deciding, setDeciding] = useState<KycStatus | null>(null);
-  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [replacingFileId, setReplacingFileId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -99,15 +98,25 @@ export default function KycApplicationDetail() {
     }
   };
 
-  const deleteFile = async (file: KycFileMeta) => {
-    setDeletingFileId(file.id);
+  const replaceFile = async (
+    file: KycFileMeta,
+    newFile: File,
+    reason: string,
+  ) => {
+    setReplacingFileId(file.id);
+    setError(null);
     try {
-      await KycAdminService.deleteFile(applicationId, file.id);
+      await KycAdminService.replaceFile({
+        applicationId,
+        fileId: file.id,
+        file: newFile,
+        reason,
+      });
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete file");
+      setError(err instanceof Error ? err.message : "Failed to replace file");
     } finally {
-      setDeletingFileId(null);
+      setReplacingFileId(null);
     }
   };
 
@@ -231,17 +240,8 @@ export default function KycApplicationDetail() {
                   label="Selfie"
                   file={fileOf("SELFIE")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)}
-                  deleting={deletingFileId === fileOf("SELFIE")?.id}
-                  render={(f) => (
-                    <PrivateFileImage
-                      applicationId={app.id}
-                      fileId={f.id}
-                      alt="Selfie"
-                      className="h-20 w-20 rounded-full object-cover border-2 border-neutral-700"
-                      previewClassName="rounded-full"
-                    />
-                  )}
+                  onReplaceFile={replaceFile}
+                  replacing={replacingFileId === fileOf("SELFIE")?.id}
                 />
                 <Row
                   label="Aadhaar Number"
@@ -251,62 +251,30 @@ export default function KycApplicationDetail() {
                   label="Aadhaar Card Front"
                   file={fileOf("AADHAAR_FRONT")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)}
-                  deleting={deletingFileId === fileOf("AADHAAR_FRONT")?.id}
-                  render={(f) => (
-                    <PrivateFileImage
-                      applicationId={app.id}
-                      fileId={f.id}
-                      alt="Aadhaar Card Front"
-                      className="h-20 rounded-md border border-neutral-700 object-cover"
-                    />
-                  )}
+                  onReplaceFile={replaceFile}
+                  replacing={replacingFileId === fileOf("AADHAAR_FRONT")?.id}
                 />
                 <DocRow
                   label="Aadhaar Card Back"
                   file={fileOf("AADHAAR_BACK")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)}
-                  deleting={deletingFileId === fileOf("AADHAAR_BACK")?.id}
-                  render={(f) => (
-                    <PrivateFileImage
-                      applicationId={app.id}
-                      fileId={f.id}
-                      alt="Aadhaar Card Back"
-                      className="h-20 rounded-md border border-neutral-700 object-cover"
-                    />
-                  )}
+                  onReplaceFile={replaceFile}
+                  replacing={replacingFileId === fileOf("AADHAAR_BACK")?.id}
                 />
                 <Row label="PAN Number" value={app.documents.panNumber} />
                 <DocRow
                   label="PAN Card"
                   file={fileOf("PAN")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)}
-                  deleting={deletingFileId === fileOf("PAN")?.id}
-                  render={(f) => (
-                    <PrivateFileImage
-                      applicationId={app.id}
-                      fileId={f.id}
-                      alt="PAN Card"
-                      className="h-20 rounded-md border border-neutral-700 object-cover"
-                    />
-                  )}
+                  onReplaceFile={replaceFile}
+                  replacing={replacingFileId === fileOf("PAN")?.id}
                 />
                 <DocRow
                   label="Signature"
                   file={fileOf("SIGNATURE")}
                   applicationId={app.id}
-                  onDeleteFile={(f) => deleteFile(f)}
-                  deleting={deletingFileId === fileOf("SIGNATURE")?.id}
-                  render={(f) => (
-                    <PrivateFileImage
-                      applicationId={app.id}
-                      fileId={f.id}
-                      alt="Signature"
-                      className="h-20 rounded-md border border-neutral-700 object-cover"
-                    />
-                  )}
+                  onReplaceFile={replaceFile}
+                  replacing={replacingFileId === fileOf("SIGNATURE")?.id}
                 />
               </Section>
 
@@ -339,7 +307,7 @@ export default function KycApplicationDetail() {
                   label="Phone"
                   value={app.nominee.nomineePhone || "Not provided"}
                 />
-                <Row label="Aadhaar" value={app.nominee.nomineeAadhaar} />
+                <Row label="Aadhaar" value={app.nominee.nomineeAadhaar || "Not provided"} />
               </Section>
             </div>
 
@@ -494,7 +462,12 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
 }
 
 function formatDate(d: string | null | undefined) {
-  return d ? format(new Date(d), "dd MMM yyyy") : "Not provided";
+  if (!d) return "Not provided";
+  // DOB is stored as a date-only UTC value; format the calendar day directly
+  // so it never shifts with the viewer's timezone.
+  const [year, month, day] = d.slice(0, 10).split("-").map(Number);
+  if (!year || !month || !day) return "Not provided";
+  return format(new Date(year, month - 1, day), "dd MMM yyyy");
 }
 
 function Section({
@@ -530,21 +503,19 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-/** Document row: renders the private image + download/delete actions. */
+/** Document row: view / update (replace) actions. */
 function DocRow({
   label,
   file,
   applicationId,
-  onDeleteFile,
-  deleting,
-  render,
+  onReplaceFile,
+  replacing,
 }: {
   label: string;
   file?: KycFileMeta;
   applicationId: string;
-  onDeleteFile: (file: KycFileMeta) => void;
-  deleting?: boolean;
-  render: (file: KycFileMeta) => React.ReactNode;
+  onReplaceFile: (file: KycFileMeta, newFile: File, reason: string) => void;
+  replacing?: boolean;
 }) {
   if (!file) {
     return <Row label={label} value="Not uploaded" />;
@@ -553,57 +524,124 @@ function DocRow({
     <Row
       label={label}
       value={
-        <span className="flex items-center justify-end gap-3">
-          {render(file)}
-          <span className="flex flex-col gap-1">
-            <a
-              href={KycAdminService.downloadUrl(applicationId, file.id)}
-              className="inline-flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"
-              title={`Download ${FILE_LABELS[file.type]}`}
-            >
-              <Download className="h-3.5 w-3.5" />
-              Download
-            </a>
-            <DeleteFileButton
-              onDelete={() => onDeleteFile(file)}
-              deleting={deleting}
-            />
-          </span>
+        <span className="flex items-center justify-end gap-4">
+          <PrivateFileImage
+            applicationId={applicationId}
+            fileId={file.id}
+            alt={FILE_LABELS[file.type]}
+            buttonLabel="View"
+          />
+          <ReplaceFileButton
+            onReplace={(newFile, reason) =>
+              onReplaceFile(file, newFile, reason)
+            }
+            replacing={replacing}
+          />
         </span>
       }
     />
   );
 }
 
-function DeleteFileButton({
-  onDelete,
-  deleting = false,
+function ReplaceFileButton({
+  onReplace,
+  replacing = false,
 }: {
-  onDelete: () => void;
-  deleting?: boolean;
+  onReplace: (file: File, reason: string) => Promise<void> | void;
+  replacing?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [picked, setPicked] = useState<File | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_BYTES = 2 * 1024 * 1024;
+  const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+
+  const pickFile = (file: File | null) => {
+    setLocalError(null);
+    if (!file) {
+      setPicked(null);
+      return;
+    }
+    if (!ALLOWED.includes(file.type)) {
+      setLocalError("Supported formats: JPG, PNG, WebP, PDF.");
+      setPicked(null);
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setLocalError("File is larger than 2 MB.");
+      setPicked(null);
+      return;
+    }
+    setPicked(file);
+  };
+
+  const reset = () => {
+    setReason("");
+    setPicked(null);
+    setLocalError(null);
+    if (inputRef.current) inputRef.current.value = "";
+  };
+
+  const canSubmit = picked !== null && reason.trim().length >= 3;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) reset();
+      }}
+    >
       <DialogTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300"
-          title="Delete document"
+          className="inline-flex items-center gap-1 text-xs text-green-400 hover:text-green-300"
+          title="Update document"
         >
-          <Trash2 className="h-3.5 w-3.5" />
-          Delete
+          <RefreshCcw className="h-3.5 w-3.5" />
+          Update
         </button>
       </DialogTrigger>
       <DialogContent className="max-w-sm border-neutral-800">
         <DialogTitle className="text-slate-50">
-          Delete this document?
+          Update this document
         </DialogTitle>
         <p className="text-sm text-slate-400">
-          The private file will be removed from the server and its metadata
-          deleted. This is audited.
+          Upload a new image below. When the new image is uploaded, the old
+          image will be deleted from the server. The swap is recorded in the
+          audit trail and the application status does not change. A short
+          reason is required.
         </p>
-        <div className="flex justify-end gap-3 pt-2">
+
+        <div className="space-y-3 pt-2">
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,application/pdf"
+            onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+            className="block w-full cursor-pointer rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-xs text-slate-300 file:mr-3 file:rounded file:border-0 file:bg-neutral-800 file:px-2 file:py-1 file:text-xs file:text-slate-200"
+          />
+          <textarea
+            rows={2}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="e.g. Customer re-sent a clearer Aadhaar photo"
+            maxLength={500}
+            className="w-full rounded-md border border-neutral-700 bg-neutral-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+          />
+          <div className="flex items-center justify-between text-xs text-slate-500">
+            <span>{reason.trim().length}/500 · min 3</span>
+            {picked ? <span className="text-green-400">File selected</span> : null}
+          </div>
+          {localError ? (
+            <p className="text-xs text-red-400">{localError}</p>
+          ) : null}
+        </div>
+
+        <div className="flex justify-end gap-3 pt-3">
           <Button
             type="button"
             variant="outline"
@@ -614,20 +652,23 @@ function DeleteFileButton({
           </Button>
           <Button
             type="button"
-            className="bg-red-600 hover:bg-red-700 text-white"
-            disabled={deleting}
-            onClick={() => {
+            className="bg-green-600 hover:bg-green-700 text-white"
+            disabled={replacing || !canSubmit}
+            onClick={async () => {
+              if (!picked) return;
+              await onReplace(picked, reason.trim());
               setOpen(false);
-              onDelete();
             }}
           >
-            {deleting ? (
+            {replacing ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : null}
-            Delete
+            Update
+No Fixed Deposits Yet
           </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+

@@ -3,14 +3,13 @@ import { create } from "zustand";
 /**
  * Minimal query invalidation for the finance module (the app has no React
  * Query). Every list hook subscribes to a version key; after approve/reject
- * the mutation bumps the affected keys so the pending lists, the reports and
- * the summary refetch automatically.
+ * the mutation bumps the affected keys so the pending lists and the reports
+ * refetch automatically.
  */
 export const FINANCE_KEYS = {
   deposits: "finance-deposits",
   withdrawals: "finance-withdrawals",
   reports: "finance-reports",
-  summary: "finance-summary",
   investmentFund: "finance-investment-fund",
 } as const;
 
@@ -37,10 +36,6 @@ export const useFinanceQueryStore = create<FinanceQueryState>((set, get) => ({
 export function invalidateFinanceLists() {
   useFinanceQueryStore.getState().bump(FINANCE_KEYS.deposits);
   useFinanceQueryStore.getState().bump(FINANCE_KEYS.withdrawals);
-}
-
-export function invalidateFinanceSummary() {
-  useFinanceQueryStore.getState().bump(FINANCE_KEYS.summary);
 }
 
 export function invalidateFinanceReports() {
