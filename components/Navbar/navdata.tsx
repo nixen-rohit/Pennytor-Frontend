@@ -65,7 +65,6 @@ export interface ProductColumn {
   items: NavLink[];
 }
 
- 
 export interface CTAType {
   href: string;
   label: string;
@@ -431,37 +430,42 @@ export const support: NavMenu = {
     },
   ],
 };
- 
+
 export const CTA: CTAType = { label: "Sign Up", href: "/login" };
 
 export const NAV: NavItem[] = [
-    {
+  {
     label: "Home",
     href: "/",
   },
- 
+
   {
     label: "Schemes",
     mega: { columns: [{ heading: "Schemes", links: Schemes.items }] },
   },
 
   {
-    label: "Services",
-    mega: {
-      columns: insuranceProducts.map((col) => ({
-        heading: col.heading,
-        links: col.items.map((item) => ({
-          label: item.label,
-          href: item.href,
-          icon: item.icon,
-          color: item.color,
-          description: item.description,
-        })),
-      })),
-    },
+    label: "Smart Class",
+    href: "/smart-class",
   },
 
-   {
+  // {
+  //   label: "Services",
+  //   mega: {
+  //     columns: insuranceProducts.map((col) => ({
+  //       heading: col.heading,
+  //       links: col.items.map((item) => ({
+  //         label: item.label,
+  //         href: item.href,
+  //         icon: item.icon,
+  //         color: item.color,
+  //         description: item.description,
+  //       })),
+  //     })),
+  //   },
+  // },
+
+  {
     label: "About Us",
     href: "/about-us",
   },

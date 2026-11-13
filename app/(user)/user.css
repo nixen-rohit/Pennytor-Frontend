@@ -1,80 +1,91 @@
 @import "tailwindcss";
 
- 
-
-@theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-
-  /* Menu colors */
-  --color-menu-text: hsl(var(--menu-text));
-  --color-menu-text-hover: hsl(var(--menu-text-hover));
-  --color-menu-icon: hsl(var(--menu-icon));
-  --color-menu-icon-hover: hsl(var(--menu-icon-hover));
-  --color-menu-section-label: hsl(var(--menu-section-label));
-}
-
+/*
+ * The signed-in app (dashboard, KYC) is a dark surface by design.
+ *
+ * These tokens are literals on purpose. They used to be
+ * `hsl(var(--x))` with `--x` declared nowhere, so the declaration was
+ * invalid at computed-value time and the property silently fell back to
+ * `inherit` — which is why the same error message looked red on the light
+ * auth pages and white on the dark KYC page.
+ */
 @theme {
-  --color-foreground: #E85B66;
-  --color-mainground: #4E385E;
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  --color-mainground: #4e385e;
+
+  --color-card: #101012;
+  --color-card-foreground: #ededed;
+  --color-popover: #101012;
+  --color-popover-foreground: #ededed;
+
+  --color-primary: #e85b66;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1f1f23;
+  --color-secondary-foreground: #ededed;
+  --color-muted: #1f1f23;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #1f1f23;
+  --color-accent-foreground: #ededed;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #27272a;
+  --color-input: #27272a;
+  --color-ring: #71717a;
+
+  --color-chart-1: #e85b66;
+  --color-chart-2: #4e385e;
+  --color-chart-3: #71717a;
+  --color-chart-4: #a1a1aa;
+  --color-chart-5: #27272a;
+
+  /* Menu colours */
+  --color-menu-text: #d4d4d8;
+  --color-menu-text-hover: #ffffff;
+  --color-menu-icon: #a1a1aa;
+  --color-menu-icon-hover: #ffffff;
+  --color-menu-section-label: #71717b;
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   html {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    color-scheme: dark;
+    background-color: var(--color-background);
+    color: var(--color-card-foreground);
   }
+
   body {
-    @apply bg-background text-foreground;
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-background text-card-foreground;
+    background-color: var(--color-background);
+    color: var(--color-card-foreground);
   }
 }
 
 /* Sidebar menu styling with CSS variables for theme customizer sync */
 .sidebar-menu-text {
-  color: hsl(var(--menu-text)) !important;
+  color: var(--color-menu-text) !important;
 }
 
 .sidebar-menu-icon {
-  color: hsl(var(--menu-icon)) !important;
+  color: var(--color-menu-icon) !important;
 }
 
 .sidebar-menu-item:hover .sidebar-menu-text {
-  color: hsl(var(--menu-text-hover)) !important;
+  color: var(--color-menu-text-hover) !important;
 }
 
 .sidebar-menu-item:hover .sidebar-menu-icon {
-  color: hsl(var(--menu-icon-hover)) !important;
+  color: var(--color-menu-icon-hover) !important;
 }
 
 .sidebar-section-label {
-  color: hsl(var(--menu-section-label)) !important;
+  color: var(--color-menu-section-label) !important;
 }
 
 /* Force correct colors for common classes */

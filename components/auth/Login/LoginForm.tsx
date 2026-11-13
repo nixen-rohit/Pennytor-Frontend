@@ -4,6 +4,7 @@ import React from "react";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ErrorMessage } from "@/components/ui/error-message";
 import {
   Form,
   FormControl,
@@ -121,9 +122,9 @@ export default function LoginForm({
 
           {/* Error Message */}
           {errorMsg && (
-            <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
+            <ErrorMessage variant="box" className="justify-center text-center">
               {errorMsg}
-            </p>
+            </ErrorMessage>
           )}
           {/* Submit Button */}
           <Button

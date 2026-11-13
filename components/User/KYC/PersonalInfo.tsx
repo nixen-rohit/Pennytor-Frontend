@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { DateInput } from "@/components/ui/date-input";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
 import type { FieldErrors } from "./validation";
@@ -85,7 +86,9 @@ export function PersonalInfo({ data, errors, onChange, existingFiles }: Props) {
             maxDate={new Date()}
           />
           {errors?.dob && (
-            <p className="text-xs text-red-500">{errors.dob}</p>
+            <ErrorMessage tone="dark" className="text-xs">
+              {errors.dob}
+            </ErrorMessage>
           )}
         </div>
 
@@ -149,7 +152,7 @@ function Field({
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <ErrorMessage tone="dark" className="text-xs">{error}</ErrorMessage>}
     </div>
   );
 }

@@ -34,7 +34,6 @@ export interface FooterBrandData {
 export const footerBrand: FooterBrandData = {
   name: "Pennytor",
   logo: "/logos/Graphic.jpeg",
-  
 };
 
 export const socialLinks: SocialLink[] = [
@@ -66,7 +65,7 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Our Products",
     links: [
-      { label: "Gullak Scheme", href: "/schemes/gullak-scheme" },
+      { label: "Smart Class", href: "/smart-class" },
       { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
       { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
       {
@@ -78,7 +77,7 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Quick Links",
     links: [
-      { label: "Gullak Scheme", href: "/schemes/gullak-scheme" },
+      { label: "Smart Class", href: "/smart-class" },
       { label: "SIP Child Scheme", href: "/schemes/sip-child-scheme" },
       { label: "Fixed Deposit With SWP ", href: "/schemes/fixed-swp-scheme" },
       {
@@ -90,16 +89,15 @@ export const footerColumns: FooterColumnData[] = [
   {
     heading: "Partner with us",
     links: [
-      { label: "Become a Partner", href: "/partner/become-a-partner" },
-      { label: "Partner Dashboard", href: "/partner/dashboard" },
-      { label: "Code of Conduct", href: "/partner/code-of-conduct" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms-services" },
     ],
   },
   {
     heading: "Company",
     links: [
       { label: "About Us", href: "/about-us" },
-      { label: "Pricing", href: "/pricing" },    
+      { label: "Smart Class", href: "/smart-class" },
       { label: "Contact Us", href: "/contact-us" },
     ],
   },

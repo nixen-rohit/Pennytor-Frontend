@@ -4,6 +4,7 @@ import type React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ErrorMessage } from "@/components/ui/error-message";
 import {
   Form,
   FormControl,
@@ -77,9 +78,9 @@ export default function ForgotPasswordForm({
               />
 
               {errorMsg && (
-                <p className="text-xs font-medium text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+                <ErrorMessage variant="box" className="text-xs">
                   {errorMsg}
-                </p>
+                </ErrorMessage>
               )}
 
               <Button

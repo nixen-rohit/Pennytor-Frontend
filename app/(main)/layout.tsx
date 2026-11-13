@@ -1,5 +1,3 @@
-import "./main.css"
-
 import Navbar from "@/components/Navbar/Navbar";
 import WhatsAppFloatingButton from "@/components/custom/WhatsAppFloatingButton";
 import Footer from "@/components/Footer/index";

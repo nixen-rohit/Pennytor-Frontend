@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { FormState } from "@/components/User/KYC/types";
 import { UploadField } from "./UploadField";
 import type { FieldErrors } from "./validation";
@@ -33,7 +34,9 @@ export function UploadDocument({ data, errors, onChange, existingFiles }: Props)
             maxLength={12}
           />
           {errors?.aadhaarNumber && (
-            <p className="text-xs text-red-500">{errors.aadhaarNumber}</p>
+            <ErrorMessage tone="dark" className="text-xs">
+              {errors.aadhaarNumber}
+            </ErrorMessage>
           )}
         </div>
       </div>
@@ -76,7 +79,9 @@ export function UploadDocument({ data, errors, onChange, existingFiles }: Props)
             maxLength={10}
           />
           {errors?.panNumber && (
-            <p className="text-xs text-red-500">{errors.panNumber}</p>
+            <ErrorMessage tone="dark" className="text-xs">
+              {errors.panNumber}
+            </ErrorMessage>
           )}
         </div>
       </div>

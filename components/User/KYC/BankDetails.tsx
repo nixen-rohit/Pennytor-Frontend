@@ -1,6 +1,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { FormState } from "@/components/User/KYC/types";
 import type { FieldErrors } from "./validation";
 
@@ -131,7 +132,7 @@ function Field({ label, required, error, children }: { label: string; required?:
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
       {children}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <ErrorMessage tone="dark" className="text-xs">{error}</ErrorMessage>}
     </div>
   );
 }

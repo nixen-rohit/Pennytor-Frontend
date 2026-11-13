@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
+import { ErrorMessage } from "@/components/ui/error-message";
 import { Upload, X, AlertCircle } from "lucide-react";
 
 interface UploadFieldProps {
@@ -139,7 +140,11 @@ export function UploadField({
             ) : (
               <Icon className="mb-3 h-8 w-8 text-slate-400" />
             )}
-            <p className="text-sm font-medium text-slate-300">
+            <p
+              className={`text-sm font-medium ${
+                displayError ? "text-red-300" : "text-slate-300"
+              }`}
+            >
               {displayError
                 ? "Invalid file — see error below"
                 : existing
@@ -159,10 +164,9 @@ export function UploadField({
         onChange={handleInputChange}
       />
       {displayError && (
-        <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-          <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+        <ErrorMessage tone="dark" className="mt-1.5 flex items-center gap-1 text-xs">
           {displayError}
-        </p>
+        </ErrorMessage>
       )}
     </div>
   );

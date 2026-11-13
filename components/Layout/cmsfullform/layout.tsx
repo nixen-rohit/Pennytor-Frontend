@@ -76,7 +76,9 @@ export default function Layout({ children, menuData, topbar }: LayoutProps) {
   };
 
   return (
-    <div className={`flex h-screen `}>
+    <div
+      className="flex h-screen bg-[#0a0a0a] text-slate-100 [color-scheme:dark]"
+    >
       <Sidebar menuData={menuData} />
       <div
         className="w-full flex flex-1 flex-col transition-all duration-300 ease-in-out min-w-0"

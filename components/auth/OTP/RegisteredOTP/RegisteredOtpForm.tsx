@@ -2,6 +2,7 @@
 
 import { Mail, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ErrorMessage } from "@/components/ui/error-message";
 import {
   InputOTP,
   InputOTPGroup,
@@ -124,9 +125,9 @@ export default function RegisteredOtpForm({
 
             {/* Error Message */}
             {errorMsg && (
-              <p className="text-sm font-bold text-center text-red-500 border border-red-500 px-3 py-2 rounded-lg animate-in fade-in-50">
+              <ErrorMessage variant="box" className="justify-center text-center">
                 {errorMsg}
-              </p>
+              </ErrorMessage>
             )}
 
             {/* Submit Button */}

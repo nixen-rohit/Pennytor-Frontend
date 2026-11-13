@@ -399,7 +399,7 @@ export default function Sidebar({ menuData }: SidebarProps) {
                   alt="CMSFullForm"
                   width={32}
                   height={32}
-                  className="shrink-0 hidden dark:block"
+                  className="shrink-0"
                 />
 
                 <span className="text-lg font-semibold hover:cursor-pointer text-white transition-opacity duration-200">
@@ -413,7 +413,7 @@ export default function Sidebar({ menuData }: SidebarProps) {
                   alt="CMSFullForm"
                   width={32}
                   height={32}
-                  className="shrink-0 hidden dark:block"
+                  className="shrink-0"
                 />
               </div>
             )}
