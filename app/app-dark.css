@@ -25,6 +25,16 @@
  */
 
 :is(.app-dark, body:has(.app-dark)) {
+  /*
+   * globals.css declares these two inside `@theme inline`, so Tailwind emits
+   * `bg-background` as `var(--background)` rather than
+   * `var(--color-background)`. Overriding only the `--color-*` form left
+   * every `bg-background` element (SelectTrigger, so every entries/status
+   * dropdown) white inside the shell. Both forms are set here.
+   */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+
   --color-background: #0a0a0a;
   --color-foreground: #ededed;
 
