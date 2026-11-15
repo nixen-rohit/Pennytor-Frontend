@@ -102,8 +102,9 @@ export default function ReferralDashboard() {
 
         <Button
           type="button"
-          variant="outline"
-          className="border-white/20 text-slate-300 shrink-0"
+
+          className={"text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"}
+
           onClick={fetchData}
           disabled={loading}
         >

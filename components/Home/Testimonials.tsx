@@ -82,7 +82,7 @@ export default function Testimonials() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col items-center gap-6 mt-8">
+        <div className="flex flex-col items-center gap-6 mt-8 ">
           <div className="flex gap-4">
             <SliderButton
               direction="left"
@@ -123,12 +123,12 @@ function SliderButton({ direction, onClick, disabled }: SliderButtonProps) {
       {direction === "left" ? (
         <ArrowLeft
           size={22}
-          className="group-hover:-translate-x-0.5 transition-transform"
+          className="group-hover:-translate-x-0.5 transition-transform text-white"
         />
       ) : (
         <ArrowRight
           size={22}
-          className="group-hover:translate-x-0.5 transition-transform"
+          className="group-hover:translate-x-0.5 transition-transform text-white"
         />
       )}
     </button>

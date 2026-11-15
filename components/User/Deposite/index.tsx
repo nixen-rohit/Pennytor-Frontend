@@ -348,10 +348,11 @@ export default function AddPaymentPage() {
               <div className="flex items-center justify-between gap-3 pt-5 border-t border-neutral-800">
                 <Button
                   type="button"
-                  variant="outline"
                   onClick={goBack}
                   disabled={step === 1 || submitting}
-                  className="flex items-center gap-1.5 border-white/20"
+                  className={
+                    "  flex items-center gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"
+                  }
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous

@@ -19,7 +19,6 @@ import {
   Mail,
   Phone,
   Loader2,
-  AlertCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import {

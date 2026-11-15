@@ -39,13 +39,12 @@ export default function WalletSummary() {
           </div>
           <div className="flex items-center gap-2">
             <Button
-              type="button"
-              variant="outline"
+              type="button"              
               size="icon"
               disabled={loading}
               onClick={() => void fetch(true)}
               aria-label="Refresh"
-              className="border-white/20"
+              className="border-white/20 bg-zinc-700 hover:bg-zinc-700/80 "
             >
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             </Button>

@@ -392,9 +392,10 @@ export default function KYCVerification() {
               <div className="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-5 border-t border-neutral-800">
                 <Button
                   type="button"
-                  variant="outline"
+                  
                   onClick={() => setCurrentStep((s) => s - 1)}
                   disabled={isFirst}
+                  
                   className="flex w-full items-center justify-center gap-1.5 border-white/20 sm:w-auto"
                 >
                   <ChevronLeft className="h-4 w-4" />

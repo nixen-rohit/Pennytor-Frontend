@@ -9,7 +9,11 @@ interface Props {
   loading?: boolean;
 }
 
-export function WalletBalanceCard({ balance, className, loading = false }: Props) {
+export function WalletBalanceCard({
+  balance,
+  className,
+  loading = false,
+}: Props) {
   return (
     <Card
       className={`relative overflow-hidden border-neutral-800 bg-neutral-950 shadow-sm ${className ?? ""}`}
@@ -61,8 +65,9 @@ export function WalletBalanceCard({ balance, className, loading = false }: Props
           </Button>
           <Button
             asChild
-            variant="outline"
-            className="flex-1 border-white/20 text-slate-200 hover:bg-white/10"
+            className={
+              " flex-1  border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"
+            }
           >
             <Link href="/funds/withdrawal">
               <ArrowUpRight className="h-4 w-4" />

@@ -171,13 +171,13 @@ function ReferralCode({ code }: { code: string }) {
             {linkText}
           </div>
           <Button
-            variant="outline"
+       
             size="sm"
             onClick={() => handleCopy(linkText, setCopiedLink)}
             disabled={!code}
             className={cn(
-              "text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300",
-              copiedLink && "text-green-500 border-green-500/30",
+              "text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80",
+              copiedLink && "text-green-500 border-green-500/30 bg-green-500/10",
             )}
           >
             <span className="relative">

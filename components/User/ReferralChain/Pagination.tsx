@@ -16,12 +16,12 @@ export function Pagination({
   return (
     <div className="p-4 sm:p-6 border-t border-neutral-800">
       <div className="flex items-center justify-center gap-2">
-        <Button
-          variant="outline"
+        <Button         
           size="sm"
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="h-8 w-8 p-0"
+           className={"text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"}
+
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>

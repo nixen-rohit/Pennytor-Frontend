@@ -161,7 +161,7 @@ export default function ContactList() {
                 </Select>
                 <span>entries</span>
               </div>
-              <div className="text-sm text-slate-400">
+              <div className="text-sm  ">
                 {loading ? (
                   "Loading..."
                 ) : (
@@ -180,7 +180,7 @@ export default function ContactList() {
             ) : error ? (
               <p className="py-16 text-center text-sm text-red-500">{error}</p>
             ) : items.length === 0 ? (
-              <div className="py-16 text-center space-y-3">
+              <div className="py-16 text-center space-y-3 ">
                 <FileText className="mx-auto h-10 w-10 text-slate-600" />
                 <p className="text-sm text-slate-400">No contact messages found.</p>
               </div>

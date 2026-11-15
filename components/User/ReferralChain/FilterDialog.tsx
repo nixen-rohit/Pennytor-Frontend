@@ -86,7 +86,12 @@ export function FilterDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClear}>
+          <Button
+            className={
+              "text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"
+            }
+            onClick={onClear}
+          >
             Clear Filters
           </Button>
           <Button onClick={() => onOpenChange(false)}>Apply Filters</Button>

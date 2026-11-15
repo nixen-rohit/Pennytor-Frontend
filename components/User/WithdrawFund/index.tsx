@@ -22,7 +22,11 @@ import { WithdrawDetails } from "./WithdrawDetails";
 import { OtpVerification } from "./OtpVerification";
 import { ReviewWithdraw } from "./ReviewWithdraw";
 import { Submitted } from "./Submitted";
-import { WithdrawalService, type UserBankAccount, type MyWithdrawal } from "@/services/withdrawal.service";
+import {
+  WithdrawalService,
+  type UserBankAccount,
+  type MyWithdrawal,
+} from "@/services/withdrawal.service";
 
 const statusConfig: Record<
   string,
@@ -115,12 +119,15 @@ function WithdrawalStatusPage({
             <p className="text-xs font-semibold text-red-400 uppercase tracking-wide">
               Rejection Reason
             </p>
-            <p className="text-sm text-slate-200 mt-1">{withdrawal.reviewNote}</p>
+            <p className="text-sm text-slate-200 mt-1">
+              {withdrawal.reviewNote}
+            </p>
           </div>
         )}
       </div>
 
-      {(withdrawal.status === "REJECTED" || withdrawal.status === "VERIFIED") && (
+      {(withdrawal.status === "REJECTED" ||
+        withdrawal.status === "VERIFIED") && (
         <div className="mt-8 w-full">
           <button
             type="button"
@@ -148,12 +155,15 @@ export default function WithdrawFundPage() {
   const [sendingOtp, setSendingOtp] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  const [userBankAccount, setUserBankAccount] = useState<UserBankAccount | null>(null);
+  const [userBankAccount, setUserBankAccount] =
+    useState<UserBankAccount | null>(null);
   const [bankAccountLoading, setBankAccountLoading] = useState(false);
   const submittedRef = useRef<{ id: string; status: string } | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [activeWithdrawal, setActiveWithdrawal] = useState<MyWithdrawal | null>(null);
+  const [activeWithdrawal, setActiveWithdrawal] = useState<MyWithdrawal | null>(
+    null,
+  );
   const [hasActive, setHasActive] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
@@ -238,8 +248,7 @@ export default function WithdrawFundPage() {
 
   const validateStep3 = () => {
     const errs: FormErrors = {};
-    if (!form.password)
-      errs.password = "Enter your password.";
+    if (!form.password) errs.password = "Enter your password.";
     if (form.otp.trim().length !== 6)
       errs.otp = "Enter the 6-digit OTP sent to your email.";
     setErrors(errs);
@@ -304,7 +313,8 @@ export default function WithdrawFundPage() {
         id: res.id,
         amount: form.amount,
         method: form.method,
-        destination: form.method === "upi" ? form.upiId.trim() : "Registered bank account",
+        destination:
+          form.method === "upi" ? form.upiId.trim() : "Registered bank account",
         status: res.status as any,
         reviewNote: null,
         submittedAt: null,
@@ -313,8 +323,13 @@ export default function WithdrawFundPage() {
       setHasActive(true);
       setShowForm(false);
     } catch (err) {
-      setApiError(err instanceof Error ? err.message : "Failed to submit request");
-      setErrors((prev) => ({ ...prev, otp: "Please request a fresh OTP and try again." }));
+      setApiError(
+        err instanceof Error ? err.message : "Failed to submit request",
+      );
+      setErrors((prev) => ({
+        ...prev,
+        otp: "Please request a fresh OTP and try again.",
+      }));
     } finally {
       setSubmitting(false);
     }
@@ -352,7 +367,10 @@ export default function WithdrawFundPage() {
               Request a withdrawal to your bank or UPI
             </p>
           </div>
-          <WithdrawalStatusPage withdrawal={activeWithdrawal} onNewRequest={resetForm} />
+          <WithdrawalStatusPage
+            withdrawal={activeWithdrawal}
+            onNewRequest={resetForm}
+          />
         </div>
       </div>
     );
@@ -424,10 +442,12 @@ export default function WithdrawFundPage() {
               <div className="flex items-center justify-between gap-3 border-t border-neutral-800 pt-5">
                 <Button
                   type="button"
-                  variant="outline"
+                  
                   onClick={goBack}
                   disabled={step === 1 || sendingOtp || submitting}
-                  className="flex items-center gap-1.5 border-white/20"
+                  className={
+                    " flex items-center   border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"
+                  }
                 >
                   <ChevronLeft className="h-4 w-4" />
                   Previous
@@ -460,7 +480,11 @@ export default function WithdrawFundPage() {
                       </>
                     ) : (
                       <>
-                        {step === 1 ? "Continue" : step === 2 ? "Authenticate" : "Continue"}
+                        {step === 1
+                          ? "Continue"
+                          : step === 2
+                            ? "Authenticate"
+                            : "Continue"}
                         <ChevronRight className="h-4 w-4" />
                       </>
                     )}

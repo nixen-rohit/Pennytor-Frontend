@@ -23,10 +23,17 @@ import { Search, Filter, Users as UsersIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ReferralState } from "@/components/User/ReferralChain/types";
 import { maskEmail } from "@/components/User/ReferralChain/utils";
-import { FilterDialog, ReferralFilters } from "@/components/User/ReferralChain/FilterDialog";
+import {
+  FilterDialog,
+  ReferralFilters,
+} from "@/components/User/ReferralChain/FilterDialog";
 import { Pagination } from "@/components/User/ReferralChain/Pagination";
 
-const EMPTY_FILTERS: ReferralFilters = { active: "all", level: "all", kyc: "all" };
+const EMPTY_FILTERS: ReferralFilters = {
+  active: "all",
+  level: "all",
+  kyc: "all",
+};
 
 const inr = (value: string | number | undefined) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
@@ -109,7 +116,12 @@ export function ReferralList({ data }: Props) {
             className="pl-10 focus-visible:ring-indigo-500"
           />
         </div>
-        <Button variant="outline" onClick={() => setOpenFilterDialog(true)}>
+        <Button
+          className={
+            "text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80"
+          }
+          onClick={() => setOpenFilterDialog(true)}
+        >
           <Filter className="mr-2 h-4 w-4" />
           Filters
           {hasActiveFilters && (
@@ -136,7 +148,7 @@ export function ReferralList({ data }: Props) {
                 <SelectTrigger className="w-[70px] h-8 bg-black">
                   <SelectValue placeholder="10" />
                 </SelectTrigger>
-                <SelectContent >
+                <SelectContent>
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="25">25</SelectItem>
                   <SelectItem value="50">50</SelectItem>
@@ -218,7 +230,9 @@ export function ReferralList({ data }: Props) {
                       </TableCell>
                       <TableCell className="py-3">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/20 text-indigo-400">
-                          {user.userType === "super_user" ? "Super User" : "User"}
+                          {user.userType === "super_user"
+                            ? "Super User"
+                            : "User"}
                         </span>
                       </TableCell>
                       <TableCell className="py-3">

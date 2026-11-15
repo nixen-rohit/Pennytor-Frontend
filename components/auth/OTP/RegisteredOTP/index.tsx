@@ -74,7 +74,7 @@ export default function RegisteredOtpPage() {
   }, [email]);
 
   return (
-    <section className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-linear-to-b from-foreground to-mainground p-4 md:p-12">
+    <section className="h-screen relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-linear-to-b from-foreground to-mainground p-4 md:p-12">
       {/* Background circles */}
       <div className="pointer-events-none absolute inset-0 opacity-10">
         <div className="absolute -bottom-20 -left-20 h-[600px] w-[600px] rounded-full border border-white" />
