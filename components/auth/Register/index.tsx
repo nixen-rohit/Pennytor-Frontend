@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +28,17 @@ export default function RegisterPage() {
       subscribeNewsletter: false,
     },
   });
+
+  /*
+   * Referral links land on /register?ref=CODE. Prefill the field so the
+   * customer never has to type the 8-character code by hand.
+   * `window.location` is read inside an effect to keep the static page
+   * prerenderable (useSearchParams would require a Suspense boundary).
+   */
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref");
+    if (ref) form.setValue("referralCode", ref.trim().toUpperCase());
+  }, [form]);
 
   const handleRegister = async (data: RegisterFormValues) => {
     setFormLoading(true);

@@ -95,8 +95,23 @@ function LockedState({ reason }: { reason: string | null }) {
 function ReferralCode({ code }: { code: string }) {
   const [copiedCode, setCopiedCode] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [origin, setOrigin] = useState("");
 
-  const linkText = `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/register?ref=${code}`;
+  /*
+   * Build the share link from the browser's own origin. NEXT_PUBLIC_SITE_URL
+   * was never defined in .env.production, so the old fallback shipped
+   * `http://localhost:3000/register?ref=…` to real customers. Using the
+   * origin keeps local dev on localhost and production on pennytor.com
+   * without any build-time variable (and no rebuild to change domains).
+   */
+  useEffect(() => {
+    setOrigin(
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
+        window.location.origin,
+    );
+  }, []);
+
+  const linkText = `${origin}/register?ref=${encodeURIComponent(code)}`;
 
   const handleCopy = useCallback(
     async (text: string, setter: (v: boolean) => void) => {
@@ -174,7 +189,7 @@ function ReferralCode({ code }: { code: string }) {
        
             size="sm"
             onClick={() => handleCopy(linkText, setCopiedLink)}
-            disabled={!code}
+            disabled={!code || !origin}
             className={cn(
               "text-xs gap-1.5 border-white/20 shrink-0 transition-all duration-300 bg-zinc-700 hover:bg-zinc-700/80",
               copiedLink && "text-green-500 border-green-500/30 bg-green-500/10",
