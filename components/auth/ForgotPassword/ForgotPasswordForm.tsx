@@ -164,7 +164,7 @@ export default function ForgotPasswordForm({
               variant="outline"
               onClick={onResendEmail}
               disabled={formLoading}
-              className="w-full h-12 rounded-xl border-zinc-200 font-medium"
+              className="w-full h-12 rounded-xl border-zinc-200 bg-white text-zinc-900 font-medium hover:bg-zinc-50"
             >
               {formLoading ? "Resending..." : "Resend email"}
             </Button>
