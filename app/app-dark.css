@@ -1,22 +1,30 @@
 /*
- * Signed-in app theme (dashboard, KYC, profile).
+ * Signed-in shell theme: user dashboard and admin.
  *
- * EVERYTHING here is scoped under `.app-dark`, the wrapper rendered by
- * `app/(user)/layout.tsx`.
+ * Applied by `components/Layout/cmsfullform/layout.tsx`, which renders the
+ * `.app-dark` marker on its root element for BOTH the `(user)` and `admin`
+ * route groups.
  *
- * It used to be global: this file re-imported Tailwind, redeclared
- * `:root` tokens and restyled `html`/`body`/`.bg-white` with `!important`.
- * Next.js never unloads a stylesheet chunk once it has been requested, so
- * after logging out the public site kept the signed-in theme: white navbar
- * and headings on the near-white hero, a dark body, and no animations.
+ * Why two selectors:
+ *
+ *   `.app-dark`  – the shell itself (SSR-safe, works in every browser).
+ *   `body:has(.app-dark)` – the same tokens pushed up to `<body>` so that
+ *   Radix portals (dropdown menus, selects, dialogs) inherit them. Portals
+ *   render into `<body>`, i.e. OUTSIDE the wrapper; with only `.app-dark`
+ *   they fell back to the light defaults in globals.css and appeared white.
+ *   `:has()` is wrapped in a forgiving `:is()`, so browsers without :has
+ *   just use the `.app-dark` branch and still get a correct shell.
+ *
+ * It is still strictly scoped: unmounting the shell removes the marker, so
+ * the public site can never inherit these values again.
  *
  * Rules for editing this file:
  *   - never add an unscoped selector (`body`, `.bg-white`, `*`, …);
  *   - never `@import "tailwindcss"` (globals.css owns that);
- *   - never re-declare `--color-*` at `:root`, only under `.app-dark`.
+ *   - never re-declare `--color-*` at `:root`, only in the list below.
  */
 
-.app-dark {
+:is(.app-dark, body:has(.app-dark)) {
   --color-background: #0a0a0a;
   --color-foreground: #ededed;
 
@@ -53,56 +61,56 @@
 }
 
 /* Sidebar menu styling driven by the tokens above. */
-.app-dark .sidebar-menu-text {
+:is(.app-dark, body:has(.app-dark)) .sidebar-menu-text {
   color: var(--color-menu-text) !important;
 }
 
-.app-dark .sidebar-menu-icon {
+:is(.app-dark, body:has(.app-dark)) .sidebar-menu-icon {
   color: var(--color-menu-icon) !important;
 }
 
-.app-dark .sidebar-menu-item:hover .sidebar-menu-text {
+:is(.app-dark, body:has(.app-dark)) .sidebar-menu-item:hover .sidebar-menu-text {
   color: var(--color-menu-text-hover) !important;
 }
 
-.app-dark .sidebar-menu-item:hover .sidebar-menu-icon {
+:is(.app-dark, body:has(.app-dark)) .sidebar-menu-item:hover .sidebar-menu-icon {
   color: var(--color-menu-icon-hover) !important;
 }
 
-.app-dark .sidebar-section-label {
+:is(.app-dark, body:has(.app-dark)) .sidebar-section-label {
   color: var(--color-menu-section-label) !important;
 }
 
 /*
  * Light-palette utilities used inside the shell get dark equivalents.
  * These are the only place a Tailwind colour utility is overridden; keep the
- * `.app-dark` prefix so the public site is never affected.
+ * scope so the public site is never affected.
  */
-.app-dark .bg-gray-50 {
+:is(.app-dark, body:has(.app-dark)) .bg-gray-50 {
   background-color: hsl(240 3.7% 15.9%) !important;
 }
 
-.app-dark .bg-white {
+:is(.app-dark, body:has(.app-dark)) .bg-white {
   background-color: hsl(240 10% 3.9%) !important;
 }
 
-.app-dark .text-gray-900 {
+:is(.app-dark, body:has(.app-dark)) .text-gray-900 {
   color: hsl(0 0% 98%) !important;
 }
 
-.app-dark .text-gray-600 {
+:is(.app-dark, body:has(.app-dark)) .text-gray-600 {
   color: hsl(240 5% 64.9%) !important;
 }
 
-.app-dark .text-gray-500 {
+:is(.app-dark, body:has(.app-dark)) .text-gray-500 {
   color: hsl(240 5% 64.9%) !important;
 }
 
-.app-dark .border-gray-200 {
+:is(.app-dark, body:has(.app-dark)) .border-gray-200 {
   border-color: hsl(240 3.7% 15.9%) !important;
 }
 
-.app-dark .border-gray-300 {
+:is(.app-dark, body:has(.app-dark)) .border-gray-300 {
   border-color: hsl(240 3.7% 15.9%) !important;
 }
 

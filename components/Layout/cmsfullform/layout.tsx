@@ -6,6 +6,7 @@ import TopNav, {
   type TopbarConfig,
 } from "@/components/Layout/Topbar/top-nav";
 import type { MenuSection } from "@/components/Layout/Sidebar/sidebar";
+import "@/app/app-dark.css";
 
 import { useEffect, useState } from "react";
 
@@ -77,7 +78,7 @@ export default function Layout({ children, menuData, topbar }: LayoutProps) {
 
   return (
     <div
-      className="flex h-screen bg-[#0a0a0a] text-slate-100 [color-scheme:dark]"
+      className="app-dark flex h-screen bg-[#0a0a0a] text-slate-100 [color-scheme:dark]"
     >
       <Sidebar menuData={menuData} />
       <div
