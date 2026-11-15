@@ -58,4 +58,29 @@ body {
   --color-ring: #71717a;
   --color-destructive: #ef4444;
   --color-muted-foreground: #73737a;
+
+  /*
+   * Token names are declared here, once, so Tailwind generates the utilities
+   * (`bg-card`, `text-muted-foreground`, …) for the whole app. The signed-in
+   * shell overrides their VALUES inside `.app-dark` (see app/(user)/user.css),
+   * which is what keeps the dark theme from leaking onto public pages.
+   */
+  --color-card: #ffffff;
+  --color-card-foreground: #171717;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #171717;
+  --color-primary: #E85B66;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f4f4f5;
+  --color-secondary-foreground: #18181b;
+  --color-muted: #f4f4f5;
+  --color-accent: #f4f4f5;
+  --color-accent-foreground: #18181b;
+  --color-border: #e4e4e7;
+  --color-input: #e4e4e7;
+  --color-menu-text: #d4d4d8;
+  --color-menu-text-hover: #ffffff;
+  --color-menu-icon: #a1a1aa;
+  --color-menu-icon-hover: #ffffff;
+  --color-menu-section-label: #71717b;
 }

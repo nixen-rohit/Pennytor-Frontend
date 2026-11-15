@@ -13,9 +13,9 @@ export default function UserLayout({
 }>) {
   return (
     <AuthGuard>
-      <Layout menuData={menuData} topbar={userTopbar}>
-        {children}
-      </Layout>
+      <div className="app-dark">
+        <Layout menuData={menuData} topbar={userTopbar}>{children}</Layout>
+      </div>
     </AuthGuard>
   );
 }

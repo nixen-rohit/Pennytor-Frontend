@@ -1,18 +1,24 @@
-@import "tailwindcss";
-
 /*
- * The signed-in app (dashboard, KYC) is a dark surface by design.
+ * Signed-in app theme (dashboard, KYC, profile).
  *
- * These tokens are literals on purpose. They used to be
- * `hsl(var(--x))` with `--x` declared nowhere, so the declaration was
- * invalid at computed-value time and the property silently fell back to
- * `inherit` — which is why the same error message looked red on the light
- * auth pages and white on the dark KYC page.
+ * EVERYTHING here is scoped under `.app-dark`, the wrapper rendered by
+ * `app/(user)/layout.tsx`.
+ *
+ * It used to be global: this file re-imported Tailwind, redeclared
+ * `:root` tokens and restyled `html`/`body`/`.bg-white` with `!important`.
+ * Next.js never unloads a stylesheet chunk once it has been requested, so
+ * after logging out the public site kept the signed-in theme: white navbar
+ * and headings on the near-white hero, a dark body, and no animations.
+ *
+ * Rules for editing this file:
+ *   - never add an unscoped selector (`body`, `.bg-white`, `*`, …);
+ *   - never `@import "tailwindcss"` (globals.css owns that);
+ *   - never re-declare `--color-*` at `:root`, only under `.app-dark`.
  */
-@theme {
+
+.app-dark {
   --color-background: #0a0a0a;
   --color-foreground: #ededed;
-  --color-mainground: #4e385e;
 
   --color-card: #101012;
   --color-card-foreground: #ededed;
@@ -35,118 +41,72 @@
   --color-input: #27272a;
   --color-ring: #71717a;
 
-  --color-chart-1: #e85b66;
-  --color-chart-2: #4e385e;
-  --color-chart-3: #71717a;
-  --color-chart-4: #a1a1aa;
-  --color-chart-5: #27272a;
-
-  /* Menu colours */
   --color-menu-text: #d4d4d8;
   --color-menu-text-hover: #ffffff;
   --color-menu-icon: #a1a1aa;
   --color-menu-icon-hover: #ffffff;
   --color-menu-section-label: #71717b;
+
+  color-scheme: dark;
+  background-color: var(--color-background);
+  color: var(--color-card-foreground);
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  html {
-    color-scheme: dark;
-    background-color: var(--color-background);
-    color: var(--color-card-foreground);
-  }
-
-  body {
-    @apply bg-background text-card-foreground;
-    background-color: var(--color-background);
-    color: var(--color-card-foreground);
-  }
-}
-
-/* Sidebar menu styling with CSS variables for theme customizer sync */
-.sidebar-menu-text {
+/* Sidebar menu styling driven by the tokens above. */
+.app-dark .sidebar-menu-text {
   color: var(--color-menu-text) !important;
 }
 
-.sidebar-menu-icon {
+.app-dark .sidebar-menu-icon {
   color: var(--color-menu-icon) !important;
 }
 
-.sidebar-menu-item:hover .sidebar-menu-text {
+.app-dark .sidebar-menu-item:hover .sidebar-menu-text {
   color: var(--color-menu-text-hover) !important;
 }
 
-.sidebar-menu-item:hover .sidebar-menu-icon {
+.app-dark .sidebar-menu-item:hover .sidebar-menu-icon {
   color: var(--color-menu-icon-hover) !important;
 }
 
-.sidebar-section-label {
+.app-dark .sidebar-section-label {
   color: var(--color-menu-section-label) !important;
 }
 
-/* Force correct colors for common classes */
-.bg-gray-50 {
-  background-color: hsl(210 40% 96%) !important;
-}
-
-.bg-white {
-  background-color: hsl(0 0% 100%) !important;
-}
-
-.text-gray-900 {
-  color: hsl(222.2 84% 4.9%) !important;
-}
-
-.text-gray-600 {
-  color: hsl(215.4 16.3% 46.9%) !important;
-}
-
-.text-gray-500 {
-  color: hsl(215.4 16.3% 46.9%) !important;
-}
-
-.border-gray-200 {
-  border-color: hsl(214.3 31.8% 91.4%) !important;
-}
-
-.border-gray-300 {
-  border-color: hsl(214.3 31.8% 91.4%) !important;
-}
-
-/* Dark mode overrides */
-.dark .bg-gray-50 {
+/*
+ * Light-palette utilities used inside the shell get dark equivalents.
+ * These are the only place a Tailwind colour utility is overridden; keep the
+ * `.app-dark` prefix so the public site is never affected.
+ */
+.app-dark .bg-gray-50 {
   background-color: hsl(240 3.7% 15.9%) !important;
 }
 
-.dark .bg-white {
+.app-dark .bg-white {
   background-color: hsl(240 10% 3.9%) !important;
 }
 
-.dark .text-gray-900 {
+.app-dark .text-gray-900 {
   color: hsl(0 0% 98%) !important;
 }
 
-.dark .text-gray-600 {
+.app-dark .text-gray-600 {
   color: hsl(240 5% 64.9%) !important;
 }
 
-.dark .text-gray-500 {
+.app-dark .text-gray-500 {
   color: hsl(240 5% 64.9%) !important;
 }
 
-.dark .border-gray-200 {
+.app-dark .border-gray-200 {
   border-color: hsl(240 3.7% 15.9%) !important;
 }
 
-.dark .border-gray-300 {
+.app-dark .border-gray-300 {
   border-color: hsl(240 3.7% 15.9%) !important;
 }
 
-/* RTL Support */
+/* RTL support */
 [dir="rtl"] {
   direction: rtl;
 }
@@ -159,47 +119,4 @@
 [dir="rtl"] .mr-auto {
   margin-right: 0;
   margin-left: auto;
-}
-
-/* Disable transitions for theme switching */
-*,
-*::before,
-*::after {
-  transition-duration: 0s !important;
-  animation-duration: 0s !important;
-  animation-delay: 0s !important;
-}
-
-/* Re-enable specific transitions we want to keep */
-.transition-all,
-.transition-colors,
-.transition-opacity,
-.transition-transform,
-.hover\:scale-105:hover,
-.hover\:shadow-xl:hover {
-  transition-duration: 0.2s !important;
-}
-
-/* Fast theme switching */
-.theme-transition {
-  transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease !important;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground));
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--foreground));
 }
