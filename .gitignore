@@ -34,6 +34,8 @@ yarn-error.log*
 .env*
 .env.local
 .env
+# committed template with no secrets in it
+!.env.production.example
 
 
 # vercel
